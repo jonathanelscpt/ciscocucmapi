@@ -1,19 +1,53 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import (
+    absolute_import,
+    division,
+    print_function,
+    unicode_literals,
+)
+
+from builtins import *
+
+from .exceptions import (
+    ServiceProxyCreationError,
+    UCToolkitConnectionException
+)
+from .model import axl_factory
+
+from .api.device import Phone as _PhoneAPI
+from .api.sql import ThinAXL as _ThinAXLAPI
+# from .api.lines import LinesAPI as _LinesAPI
+# from .api.users import UsersAPI as _UsersAPI
 
 from zeep import Client
 from zeep.cache import SqliteCache
 from zeep.transports import Transport
 from requests import Session
 from requests.auth import HTTPBasicAuth
-from requests.packages import urllib3
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+import os
+import urllib3
+from urllib3.exceptions import InsecureRequestWarning
 import logging.config
 import logging
-import os
+
 
 urllib3.disable_warnings(InsecureRequestWarning)
 
+WSDL_URLS = {
+    "RisPort70": "https://{fqdn}:8443/realtimeservice2/services/RISService70?wsdl",
+    "CDRonDemand": "https://{fqdn}:8443/realtimeservice2/services/CDRonDemandService?wsdl",
+    "PerfMon": "https://{fqdn}:8443/perfmonservice2/services/PerfmonService?wsdl",
+    "ControlCenterServices": "https://{fqdn}:8443/controlcenterservice2/services/ControlCenterServices?wsdl",
+    "ControlCenterServicesExtended": "https://{fqdn}:8443/controlcenterservice2/services/ControlCenterServicesEx?wsdl",
+    "LogCollection": "https://{fqdn}:8443/logcollectionservice2/services/LogCollectionPortTypeService?wsdl",
+    "DimeGetFileService": "https://{fqdn}:8443/logcollectionservice/services/DimeGetFileService?wsdl"
+}
+
+
 def enable_logging():
+    # default suggested zeep loggers
     logging.config.dictConfig({
         'version': 1,
         'formatters': {
@@ -38,48 +72,110 @@ def enable_logging():
     })
 
 
-class AxlToolkit:
-    dir = os.path.dirname(__file__)
+def get_connection_kwargs(env_dict, kwargs):
+    """Update connection kwargs with environment variable values.
+    Env parameters take precedence if they exist.
 
-    wsdl = os.path.join(dir, 'schema/AXLAPI.wsdl')
-
-    last_exception = None
-
-    '''
-
-    Constructor - Create new instance 
-
-    '''
-
-    def __init__(self, username, password, server_ip, tls_verify=True, timeout=10):
-        self.session = Session()
-        self.session.auth = HTTPBasicAuth(username, password)
-        self.session.verify = tls_verify
-
-        self.cache = SqliteCache(path='/tmp/sqlite_{0}.db'.format(server_ip), timeout=60)
-
-        self.client = Client(wsdl=self.wsdl, transport=Transport(timeout=timeout,
-                                                                 operation_timeout=timeout,
-                                                                 cache=self.cache,
-                                                                 session=self.session))
-
-        self.service = self.client.create_service("{http://www.cisco.com/AXLAPIService/}AXLAPIBinding",
-                                                  "https://{0}:8443/axl/".format(server_ip))
-
-        # enable_logging()
+    :param env_dict: dict mapping connection argument names to environment variable names
+    :param kwargs: __init__ input args
+    :return: kwargs with updated connection parameter values
+    :raises UCToolkitConnectionException: if no connection parameters not provided
+    """
+    connection_kwargs = {k: os.environ.get(v) for k, v in env_dict.items()}
+    try:
+        # we need to consolidate the env vars with what was provided during __init__
+        # we let env vars take precedence if they exist
+        init_kwargs = {k: kwargs[v] for k, v in env_dict.items() if connection_kwargs[k] is None}
+        connection_kwargs.update(init_kwargs)
+        return connection_kwargs
+    except KeyError:
+        raise UCToolkitConnectionException(
+            "All connection parameters must be provided, either via environment variables"
+            " or as explicit keyword arguments: {connection_params}".format(
+                connection_params=list(env_dict.keys()))
+        )
 
 
-    def get_service(self):
-        return self.service
+class UCSOAPConnector:
+    """
+    Parent class for all Cisco UC SOAP Connectors
+    """
+    def __init__(self, username=None,
+                 password=None,
+                 wsdl=None,
+                 binding_name=None,
+                 address=None,
+                 tls_verify=False,
+                 timeout=30):
+        """
+        Instantiate UC SOAP Client Connector
+
+        :param username: SOAP client connector username
+        :param password: SOAP client connector password
+        :param wsdl: SOAP WSDL location
+        :param binding_name: QName of the binding
+        :param address: address of the endpoint
+        :param tls_verify: /path/to/certificate.pem or False.  Certificate must be a CA_BUNDLE. Supports .pem and .crt
+        :param timeout: timeout in seconds.  Overrides zeep 300 default to timeout after 30sec
+        """
+        self._username = username
+        self._wsdl = wsdl
+        self._timeout = timeout
+
+        self._session = Session()
+        self._session.auth = HTTPBasicAuth(username, password)
+        self._session.verify = tls_verify
+        transport = Transport(cache=SqliteCache(), session=self._session, timeout=self._timeout)
+        self._client = Client(wsdl=wsdl, transport=transport)
+
+        if binding_name and address:
+            # create ServiceProxy from custom binding and address
+            self._client = self._client.create_service(binding_name, address)
+        elif binding_name or address:
+            raise ServiceProxyCreationError(
+                message="Incomplete parameters for ServiceProxy Object creation.  "
+                        "Requires 'binding_name' and 'address'"
+            )
+        else:
+            # use first service and first port within that service - zeep default behaviour
+            self.service = self._client.service
+
+    @property
+    def timeout(self):
+        return self._timeout
+
+    @property
+    def wsdl(self):
+        return self._wsdl
 
 
-    '''
-    
-    Thin AXL (SQL Queries / Updates)
-    
-    '''
+class UCMAXLConnector (UCSOAPConnector):
 
-    def run_sql_query(self, query):
+    ENV = {
+        "username": "AXL_USERNAME",
+        "password": "AXL_PASSWORD",
+        "fqdn": "AXL_WSDL_URL",
+        "wsdl": "AXL_FQDN",
+        # "timeout": "AXL_TIMEOUT"
+    }
+
+    def __init__(self, **kwargs):
+
+        connection_kwargs = get_connection_kwargs(self.ENV, kwargs)
+        connection_kwargs["binding_name"] = "{http://www.cisco.com/AXLAPIService/}AXLAPIBinding"
+        connection_kwargs["address"] = "https://{0}:8443/axl/".format(connection_kwargs["fqdn"])
+        del connection_kwargs["fqdn"]  # not used in super() call
+        UCSOAPConnector.__init__(self, **connection_kwargs)
+
+        # AXL API Wrappers
+        self.sql = _ThinAXLAPI(self._client, axl_factory)
+        self.phones = _PhoneAPI(self._client, axl_factory)
+        # self.users = _UsersAPI(self._client, axl_factory)
+        # self.lines = _LinesAPI(self._client, axl_factory)
+
+    """Thin AXL (SQL Queries / Updates)"""
+
+    def execute_sql_query(self, query):
         result = {'num_rows': 0,
                   'query': query}
 
@@ -106,8 +202,7 @@ class AxlToolkit:
 
         return result
 
-
-    def run_sql_update(self, query):
+    def execute_sql_update(self, query):
         result = {'rows_updated': 0,
                   'query': query}
 
@@ -123,12 +218,7 @@ class AxlToolkit:
 
         return result
 
-
-    '''
-    
-    UCM Group
-    
-    '''
+    """UCM Group"""
 
     def get_ucm_group(self, name):
         try:
@@ -183,12 +273,7 @@ class AxlToolkit:
 
         return result
 
-
-    '''
-    
-    Users
-    
-    '''
+    """Users"""
 
     def get_user(self, userid):
         try:
@@ -305,11 +390,7 @@ class AxlToolkit:
         pass
         # TODO: Need to add this code
 
-    '''
-    
-    Lines
-    
-    '''
+    """Lines"""
 
     def get_line(self, dn, partition):
         try:
@@ -338,11 +419,7 @@ class AxlToolkit:
 
         return result
 
-    '''
-
-    LDAP Filter 
-
-    '''
+    """LDAP Filter"""
 
     def get_ldap_filter(self, name):
         try:
@@ -377,12 +454,7 @@ class AxlToolkit:
 
         return result
 
-
-    '''
-    
-    LDAP Directory
-    
-    '''
+    """LDAP Directory"""
 
     def get_ldap_directory(self, name):
         try:
@@ -426,11 +498,7 @@ class AxlToolkit:
 
         return result
 
-    ''' 
-    
-    LDAP System
-    
-    '''
+    """ LDAP System"""
 
     def get_ldap_system(self):
         try:
@@ -453,14 +521,7 @@ class AxlToolkit:
 
         return result
 
-
-
-
-    ''' 
-    
-    LDAP Authentication
-    
-    '''
+    """LDAP Authentication"""
 
     def get_ldap_authentication(self):
         try:
@@ -493,11 +554,7 @@ class AxlToolkit:
 
         return result
 
-    '''
-    
-    Phone
-    
-    '''
+    """Phone"""
 
     def get_phone(self, name):
         try:
@@ -543,12 +600,7 @@ class AxlToolkit:
 
         return result
 
-
-    '''
-    
-    Partitions
-    
-    '''
+    """Partitions"""
 
     def add_partition(self, name, description):
 
@@ -603,11 +655,7 @@ class AxlToolkit:
 
         return result
 
-    '''
-    
-    Calling Search Space
-    
-    '''
+    """Calling Search Space"""
 
     def add_css(self, name, description, partition_list):
 
@@ -672,11 +720,7 @@ class AxlToolkit:
 
         return result
 
-    '''
-
-    Route Group
-
-    '''
+    """Route Group"""
 
     def add_route_group(self, name, distribution_algorithm, device_list):
 
@@ -729,11 +773,7 @@ class AxlToolkit:
         # TODO: Need to implement
         pass
 
-    '''
-
-    Route List
-
-    '''
+    """Route List"""
 
     def add_route_list(self, name, description, cm_group, enabled, roan, members, ddi=None):
 
@@ -789,12 +829,7 @@ class AxlToolkit:
         # TODO: Need to implement
         pass
 
-
-    '''
-
-    Route Pattern
-
-    '''
+    """Route Pattern"""
 
     def add_route_pattern(self, pattern, partition, route_list, network_location, outside_dialtone):
 
@@ -841,11 +876,7 @@ class AxlToolkit:
         # TODO: Need to implement
         pass
 
-    '''
-
-    SIP Route Pattern
-
-    '''
+    """SIP Route Pattern"""
 
     def add_sip_route_pattern(self, pattern, partition, route_list):
 
@@ -888,12 +919,7 @@ class AxlToolkit:
         # TODO: Need to implement
         pass
 
-
-    '''
-
-    Conference Bridge
-
-    '''
+    """Conference Bridge"""
 
     def add_cfb(self, cfb_data):
 
@@ -970,11 +996,7 @@ class AxlToolkit:
         #
         # return result
 
-    '''
-
-    Media Resource Group
-
-    '''
+    """Media Resource Group"""
 
     def get_mrg(self, name):
 
@@ -986,11 +1008,7 @@ class AxlToolkit:
 
         return result
 
-    '''
-
-    Media Resource Group List
-
-    '''
+    """Media Resource Group List"""
 
     def get_mrgl(self, name):
 
@@ -1002,11 +1020,7 @@ class AxlToolkit:
 
         return result
 
-    '''
-
-    Device Pool
-
-    '''
+    """Device Pool"""
 
     def get_device_pool(self, name):
 
@@ -1018,11 +1032,7 @@ class AxlToolkit:
 
         return result
 
-    '''
-    
-    Device Security Profile
-    
-    '''
+    """Device Security Profile"""
 
     def get_phone_security_profile(self, name):
 
@@ -1062,11 +1072,7 @@ class AxlToolkit:
 
         return result
 
-    '''
-
-    SIP Trunk Security Profile
-
-    '''
+    """SIP Trunk Security Profile"""
 
     def get_sip_trunk_security_profile(self, name):
 
@@ -1122,14 +1128,7 @@ class AxlToolkit:
 
         return result
 
-
-
-    ''' 
-    
-    SIP Profile
-    
-    '''
-
+    """SIP Profile"""
 
     def get_sip_profile(self, name):
 
@@ -1161,11 +1160,7 @@ class AxlToolkit:
 
         return result
 
-    ''' 
-
-    SIP Trunk
-
-    '''
+    """SIP Trunk """
 
     def get_sip_trunk(self, name):
 
@@ -1207,11 +1202,7 @@ class AxlToolkit:
 
         return result
 
-    '''
-    
-    Reset / Restart Devices
-    
-    '''
+    """Reset / Restart Devices"""
 
     def do_reset_restart_device(self, device, is_hard_reset, is_mgcp):
         reset_data = {
@@ -1248,12 +1239,7 @@ class AxlToolkit:
 
         return result
 
-
-    '''
-    
-    Service Parameters
-    
-    '''
+    """Service Parameters"""
 
     def sql_update_service_parameter(self, name, value):
 
@@ -1281,12 +1267,7 @@ class AxlToolkit:
 
         return result
 
-
-    '''
-    
-    Device Association
-    
-    '''
+    """Device Association"""
 
     def sql_associate_device_to_user(self, device, userid, association_type='1'):
 
@@ -1311,102 +1292,131 @@ class AxlToolkit:
         pass
 
 
-class UcmServiceabilityToolkit:
-    last_exception = None
+class UCMControlCenterConnector(UCSOAPConnector):
 
-    '''
+    def __init__(self, username, password, fqdn, tls_verify=True):
+        _wsdl = WSDL_URLS["ControlCenterServicesExtended"].format(fqdn)
+        UCSOAPConnector.__init__(self,
+                                 username=username,
+                                 password=password,
+                                 wsdl=_wsdl,
+                                 tls_verify=tls_verify)
 
-    Constructor - Create new instance 
+    def get_service_status(self, services=None):
+        # check this comment on factory creation:
+        # https://github.com/mvantellingen/python-zeep/issues/145#issuecomment-261509531
 
-    '''
+        # if not services:
+        #     return self.service.soapGetServiceStatus()
+        # else:
+        #     return self.service.soapGetServiceStatus(services)
+        raise NotImplementedError()
 
-    def __init__(self, username, password, server_ip, tls_verify=True):
-        wsdl = 'https://{0}:8443/controlcenterservice2/services/ControlCenterServices?wsdl'.format(server_ip)
+    def do_service_deployment(self):
+        # todo
+        # return self.service.soapDoServiceDeployment()
+        raise NotImplementedError()
 
-        self.session = Session()
-        self.session.auth = HTTPBasicAuth(username, password)
-        self.session.verify = tls_verify
-
-        self.cache = SqliteCache(path='/tmp/sqlite_serviceability.db', timeout=60)
-
-        self.client = Client(wsdl=wsdl, transport=Transport(cache=self.cache, session=self.session))
-
-        self.service = self.client.service
-
-        # enable_logging()
-
-    def get_service(self):
-        return self.service
-
-
-class UcmRisPortToolkit:
-    last_exception = None
-
-    '''
-
-    Constructor - Create new instance 
-
-    '''
-
-    def __init__(self, username, password, server_ip, tls_verify=True):
-        wsdl = 'https://{0}:8443/realtimeservice2/services/RISService70?wsdl'.format(server_ip)
-
-        self.session = Session()
-        self.session.auth = HTTPBasicAuth(username, password)
-        self.session.verify = tls_verify
-
-        self.cache = SqliteCache(path='/tmp/sqlite_risport.db', timeout=60)
-
-        self.client = Client(wsdl=wsdl, transport=Transport(cache=self.cache, session=self.session))
-
-        self.service = self.client.create_service("{http://schemas.cisco.com/ast/soap}RisBinding",
-                                                  "https://{0}:8443/realtimeservice2/services/RISService70".format(server_ip))
-
-        # enable_logging()
-
-    def get_service(self):
-        return self.service
+    def get_product_information_list(self):
+        # todo
+        # return self.service.getProductInformationList()
+        raise NotImplementedError()
 
 
-class UcmPerfMonToolkit:
-    last_exception = None
+class UCMRisPortConnector(UCSOAPConnector):
 
-    '''
+    def __init__(self, username, password, fqdn, tls_verify=False):
+        _wsdl = WSDL_URLS["RisPort70"].format(fqdn)
+        _binding_name = "{http://schemas.cisco.com/ast/soap}RisBinding"
+        _address = "https://{fqdn}:8443/realtimeservice2/services/RISService70".format(fqdn=fqdn)
+        UCSOAPConnector.__init__(self,
+                                 username=username,
+                                 password=password,
+                                 wsdl=_wsdl,
+                                 binding_name=_binding_name,
+                                 address=_address,
+                                 tls_verify=tls_verify)
 
-    Constructor - Create new instance 
+    def select_cm_device(self, state_info=None, **cm_selection_criteria):
+        # device_class = "Any",
+        # status = "Any",
+        # max_devices = 1000,
+        # model = 255,
+        # selection_type = None,
+        # node_name = None
+        #
+        _selection_types = [
+            "Name",
+            "IPV4Address",
+            "DirNumber",
+            "Description",
+            "SIPStatus"
+        ]
+        _device_classes = [
+            'Any',
+            'Phone',
+            'Gateway',
+            'H323',
+            'Cti',
+            'VoiceMail',
+            'MediaResources',
+            'HuntList',
+            'SIPTrunk',
+            'unknown'
+        ]
+        _device_statuses = [
+            'Any',
+            'Registered',
+            'UnRegistered',
+            'Rejected',
+            'Unknown'
+        ]
 
-    '''
+        _max_devices = 1000  # assume CUCM 9.1 and above only
+        _all_models = 255  # returns all models
 
-    def __init__(self, username, password, server_ip, tls_verify=True):
-        wsdl = 'https://{0}:8443/perfmonservice2/services/PerfmonService?wsdl'.format(server_ip)
+        # return self.service.selectCmDevice(state_info, {"CmSelectionCriteria": cm_selection_criteria})
+        raise NotImplementedError()
 
-        self.session = Session()
-        self.session.auth = HTTPBasicAuth(username, password)
-        self.session.verify = tls_verify
+    def select_cm_device_ext(self):
+        # return self.service.SelectCmDeviceExt
+        raise NotImplementedError()
 
-        self.cache = SqliteCache(path='/tmp/sqlite_risport.db', timeout=60)
+    def select_cti_item(self):
+        # return self.service.selectCtiItem
+        raise NotImplementedError()
 
-        self.client = Client(wsdl=wsdl, transport=Transport(cache=self.cache, session=self.session))
+    def select_cm_device_sip(self):
+        # return self.service.SelectCmDeviceSIP
+        raise NotImplementedError()
 
-        self.service = self.client.create_service("{http://schemas.cisco.com/ast/soap}PerfmonBinding",
-                                                  "https://{0}:8443/perfmonservice2/services/PerfmonService".format(server_ip))
 
-        # enable_logging()
+class UCMPerMonConnector(UCSOAPConnector):
 
-    def get_service(self):
-        return self.service
+    def __init__(self, username, password, fqdn, tls_verify=False):
+        _wsdl = WSDL_URLS["PerfMon"].format(fqdn)
+        _binding_name = "{http://schemas.cisco.com/ast/soap}PerfmonBinding"
+        _address = "https://{fqdn}:8443/perfmonservice2/services/PerfmonService".format(fqdn=fqdn)
+        UCSOAPConnector.__init__(self,
+                                 username=username,
+                                 password=password,
+                                 wsdl=_wsdl,
+                                 binding_name=_binding_name,
+                                 address=_address,
+                                 tls_verify=tls_verify)
 
-    def perfmonOpenSession(self):
-        session_handle = self.service.perfmonOpenSession()
-        return session_handle
+    def open_session(self):
+        # todo
+        # return self.service.perfmonOpenSession()
+        raise NotImplementedError()
 
-    def perfmonAddCounter(self, session_handle, counters):
-        '''
+    def add_counter(self, session_handle, counters):
+        """
         :param session_handle: A session Handle returned from perfmonOpenSession()
         :param counters: An array of counters or a single string for a single counter
         :return: True for Success and False for Failure
-        '''
-
+        """
+        # todo - fix unreferenced counter_data var
         if isinstance(counters, list):
             counter_data = [
                 {
@@ -1434,86 +1444,119 @@ class UcmPerfMonToolkit:
         try:
             self.service.perfmonAddCounter(SessionHandle=session_handle, ArrayOfCounter=counter_data)
             result = True
+        # todo - fix except - bubble to the top with custom exception?
         except:
             result = False
 
-        return result
+        # return result
+        raise NotImplementedError()
 
-    def perfmonCollectSessionData(self, session_handle):
+    def remove_counter(self):
+        # todo
+        # return self.service.perfmonRemoveCounter()
+        raise NotImplementedError()
 
-        return self.service.perfmonCollectSessionData(SessionHandle=session_handle)
+    def collect_session_data(self, session_handle):
+        # todo
+        # return self.service.perfmonCollectSessionData(SessionHandle=session_handle)
+        raise NotImplementedError()
 
+    def close_session(self):
+        # todo
+        # return self.service.perfmonCloseSession()
+        raise NotImplementedError()
 
-class UcmLogCollectionToolkit:
+    def list_instance(self):
+        # todo
+        # return self.service.perfmonListInstance()
+        raise NotImplementedError()
 
-    last_exception = None
+    def query_counter_description(self):
+        # todo
+        # return self.service.perfmonQueryCounterDescription()
+        raise NotImplementedError()
 
-    '''
+    def list_counter(self):
+        # todo
+        # return self.service.perfmonListCounter()
+        raise NotImplementedError()
 
-    Constructor - Create new instance 
-
-    '''
-
-    def __init__(self, username, password, server_ip, tls_verify=True):
-        wsdl = 'https://{0}:8443/logcollectionservice2/services/LogCollectionPortTypeService?wsdl'.format(server_ip)
-
-        self.session = Session()
-        self.session.auth = HTTPBasicAuth(username, password)
-        self.session.verify = tls_verify
-
-        self.cache = SqliteCache(path='/tmp/sqlite_logcollection.db', timeout=60)
-
-        self.client = Client(wsdl=wsdl, transport=Transport(cache=self.cache, session=self.session))
-
-        self.service = self.client.service
-
-        enable_logging()
-
-    def get_service(self):
-        return self.service
-
-
-class PawsToolkit:
-
-    last_exception = None
-
-    '''
-
-    Constructor - Create new instance 
-
-    '''
-
-    def __init__(self, username, password, server_ip, service, tls_verify=True):
-
-        dir = os.path.dirname(__file__)
-
-        if (service == 'HardwareInformation'):
-            wsdl = os.path.join(dir, 'paws/hardware_information_service.wsdl')
-            binding = "{http://services.api.platform.vos.cisco.com}HardwareInformationServiceSoap11Binding"
-            endpoint = "https://{0}:8443/platform-services/services/HardwareInformationService.HardwareInformationServiceHttpsSoap11Endpoint/".format(server_ip)
-        elif (service == 'ClusterNodesService'):
-            wsdl = 'https://{0}:8443/platform-services/services/ClusterNodesService?wsdl'.format(server_ip)
-            binding = "{http://services.api.platform.vos.cisco.com}ClusterNodesServiceHttpBinding"
-            endpoint = "https://{0}:8443/platform-services/services/ClusterNodesService.ClusterNodesServiceHttpsEndpoint/".format(server_ip)
-
-        self.session = Session()
-        self.session.auth = HTTPBasicAuth(username, password)
-        self.session.verify = tls_verify
-
-        self.cache = SqliteCache(path='/tmp/sqlite_logcollection.db', timeout=60)
-
-        self.client = Client(wsdl=wsdl, transport=Transport(cache=self.cache, session=self.session))
-
-        self.service = self.client.create_service(binding, endpoint)
-
-        enable_logging()
-
-    def get_service(self):
-        return self.service
-
-    def get_hardware_information(self):
-        hw_info = self.service.getHardwareInformation()
-
-        return hw_info
+    def collect_counter_data(self):
+        # todo
+        # return self.service.perfmonCollectCounterData()
+        raise NotImplementedError()
 
 
+class UCMLogCollectionConnector(UCSOAPConnector):
+
+    def __init__(self, username, password, fqdn, tls_verify=False):
+        _wsdl = WSDL_URLS["LogCollection"].format(fqdn)
+        UCSOAPConnector.__init__(self,
+                                 username=username,
+                                 password=password,
+                                 wsdl=_wsdl,
+                                 tls_verify=tls_verify)
+
+# class PAWSHardwareInformationConnector(UCSOAPConnector):
+#
+#     def __init__(self, username, password, fqdn, wsdl, tls_verify=False):
+#         _binding_name = "{http://services.api.platform.vos.cisco.com}HardwareInformationServiceSoap11Binding"
+#         _address = "https://{ip_address}:8443/platform-services/services/HardwareInformationService.HardwareInformationServiceHttpsSoap11Endpoint/".format(ip_address=fqdn)  # noqa
+#         UCSOAPConnector.__init__(self,
+#                                  username=username,
+#                                  password=password,
+#                                  wsdl=wsdl,
+#                                  binding_name=_binding_name,
+#                                  address=_address,
+#                                  tls_verify=tls_verify)
+#
+#     def get_hardware_information(self):
+#         return self.service.getHardwareInformation()
+#
+#
+# class PAWSPlatformConnector(UCSOAPConnector):
+#
+#     def __init__(self, username, password, fqdn, wsdl, tls_verify=False):
+#         _binding_name = "{http://services.api.platform.vos.cisco.com}ClusterNodesServiceHttpBinding"
+#         _address = "https://{ip_address}:8443/platform-services/services/ClusterNodesService.ClusterNodesServiceHttpsEndpoint/".format(ip_address=fqdn)# noqa
+#         UCSOAPConnector.__init__(self,
+#                                  username=username,
+#                                  password=password,
+#                                  wsdl=wsdl,
+#                                  binding_name=_binding_name,
+#                                  address=_address,
+#                                  tls_verify=tls_verify)
+#
+#
+# class PAWSConnector:
+#
+#     # last_exception = None
+#
+#     def __init__(self, username, password, ip_address, service='ClusterNodesService', tls_verify=True):
+#
+#         self.last_exception = None
+#         _dir = os.path.dirname(__file__)
+#
+#         if service == 'HardwareInformation':
+#             wsdl = os.path.join(_dir, 'paws/hardware_information_service.wsdl')
+#             binding = "{http://services.api.platform.vos.cisco.com}HardwareInformationServiceSoap11Binding"
+#             endpoint = "https://{ip_address}:8443/platform-services/services/HardwareInformationService.HardwareInformationServiceHttpsSoap11Endpoint/".format(ip_address=ip_address)
+#         else:
+#             wsdl = 'https://{ip_address}:8443/platform-services/services/ClusterNodesService?wsdl'.format(ip_address=ip_address)
+#             binding = "{http://services.api.platform.vos.cisco.com}ClusterNodesServiceHttpBinding"
+#             endpoint = "https://{ip_address}:8443/platform-services/services/ClusterNodesService.ClusterNodesServiceHttpsEndpoint/".format(ip_address=ip_address)
+#
+#         self.session = Session()
+#         self.session.auth = HTTPBasicAuth(username, password)
+#         self.session.verify = tls_verify
+#
+#         self.cache = SqliteCache(path='/tmp/sqlite_logcollection.db', timeout=60)
+#
+#         self.client = Client(wsdl=wsdl, transport=Transport(cache=self.cache, session=self.session))
+#
+#         self.service = self.client.create_service(binding, endpoint)
+#
+#     def get_hardware_information(self):
+#         hw_info = self.service.getHardwareInformation()
+#
+#         return hw_info
