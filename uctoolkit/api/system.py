@@ -11,5 +11,5 @@ from __future__ import (
 
 from builtins import *
 
-from . import AbstractAXLAPI
+from .abstract import AbstractAXLAPI
 

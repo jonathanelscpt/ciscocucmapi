@@ -11,7 +11,7 @@ from __future__ import (
 
 from builtins import *
 
-from . import AbstractThinAXLAPI
+from .abstract import AbstractThinAXLAPI
 
 
 class ThinAXL(AbstractThinAXLAPI):
@@ -19,7 +19,7 @@ class ThinAXL(AbstractThinAXLAPI):
     Wraps the CUCM AXL API and exposes the API as native Python
     methods that return native Python objects.
     """
-    _OBJECT_TYPE = 'thin_axl'
+    _OBJECT_TYPE = 'sql'
     _RETURN_OBJECT_NAME = 'row'
 
     def __init__(self, client, object_factory):

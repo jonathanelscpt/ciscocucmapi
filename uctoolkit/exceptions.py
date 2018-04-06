@@ -34,6 +34,10 @@ class AXLAttributeError(UCToolkitException):
     """Invalid attribute for AXL API endpoint"""
 
 
+class AXLMethodDoesNotExist(UCToolkitException):
+    """Method override for scenarios where certain methods do not exist of an api endpoint"""
+
+
 class IllegalSQLStatement(AXLError):
     """Illegal SQL Statement response from CUCM"""
 

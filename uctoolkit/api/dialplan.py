@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """CUCM Dial Plan Configuration APIs."""
 
-
 from __future__ import (
     absolute_import,
     division,
@@ -11,41 +10,37 @@ from __future__ import (
 
 from builtins import *
 
-from . import AbstractAXLDeviceAPI
+from .abstract import AbstractAXLDeviceAPI
+from ..exceptions import AXLMethodDoesNotExist
 
 
-class Line(AbstractAXLDeviceAPI):
-    """Cisco CUCM Line API.
+class RoutePartition(AbstractAXLDeviceAPI):
+    """Cisco CUCM RoutePartition API.
 
     Wraps the CUCM AXL API and exposes the API as native Python
     methods that return native Python objects.
     """
-    _OBJECT_TYPE = 'line'
-    _RETURN_OBJECT_NAME = 'line'
+    _OBJECT_TYPE = 'route_partition'
+    _RETURN_OBJECT_NAME = 'routePartition'
     _IDENTIFIERS = (
         "uuid",
-        "pattern"  # todo - check if RoutePartition is needed as well
+        "name",
     )
     _LIST_API_SEARCH_CRITERIA = (
-        "pattern"
-        "description"
-        "usage"
-        "routePartitionName"
+        "name",
     )
     _ADD_API_MANDATORY_ATTRIBUTES = (
-        "pattern",
-        "routePartitionName",
-        "usage"
+        "name",
     )
 
     def __init__(self, client, object_factory):
-        """Initialize a new Line object with the provided AXL client.
+        """Initialize a new RoutePartition object with the provided AXL client.
 
         :param client: zeep SOAP AXL client for API calls to CUCM's SOAP interface
         :param object_factory: factory function for instantiating data models objects
         :raises TypeError: If parameter types are invalid.
         """
-        super(Line, self).__init__(client, object_factory)
+        super(RoutePartition, self).__init__(client, object_factory)
 
     @classmethod
     def object_type(cls):
@@ -66,3 +61,9 @@ class Line(AbstractAXLDeviceAPI):
     @classmethod
     def identifiers(cls):
         return cls._IDENTIFIERS
+
+    def reset(self, **kwargs):
+        raise AXLMethodDoesNotExist(
+            message="Reset method not available for RoutePartition api endpoint.  "
+                    "'restartRoutePartition' and 'applyRoutePartition' methods do exist."
+        )

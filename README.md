@@ -35,7 +35,7 @@ Installing and upgrading uctoolkit is done with pip:
 from uctoolkit import UCMAXLConnector
 
 
-axl = UCMAXLConnector()  # using env var for connection params
+axl = UCMAXLConnector()  # env vars for connection params
 
 # list phones by name
 bot_names = {
