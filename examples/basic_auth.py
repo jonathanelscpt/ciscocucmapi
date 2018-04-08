@@ -2,11 +2,11 @@
 
 from uctoolkit import UCMAXLConnector
 
-# explicit auth creden
+# explicit auth credentials
 USERNAME = 'administrator'
 PASSWORD = 'ciscopsdt'
 FQDN = "10.10.20.1"
-WSDL = 'file://C://Users//jonathan.els//develop//pvt-repos//UCToolkit//schema//current//AXLAPI.wsdl'
+WSDL = 'file://C://path//to//AXLAPI.wsdl'
 
 
 def main():
