@@ -103,3 +103,4 @@ ENV/
 
 # ignore AXL schemas
 schema/
+.idea/

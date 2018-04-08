@@ -21,22 +21,24 @@ from zeep.exceptions import Fault
 from ..exceptions import (
     AXLError,
     IllegalSearchCriteria,
-    IllegalSQLStatement
+    IllegalSQLStatement,
+    AXLAttributeError
 
 )
 from .._internal_utils import (
     has_valid_kwargs_keys,
     has_mandatory_keys,
-    has_single_identifier,
+    all_attributes_exist_with_null_intersection,
     element_list_to_ordered_dict
 )
+from ..model import AXLDataModel
 
 
 class AbstractAXLAPI(ABC):
     """Abstract API Class enforcing common methods for AXL objects"""
 
-    def __init__(self, client, object_factory):
-        self._client = client
+    def __init__(self, connector, object_factory):
+        self._connector = connector
         self._object_factory = object_factory
         super(AbstractAXLAPI, self).__init__()
 
@@ -65,22 +67,22 @@ class AbstractAXLAPI(ABC):
     def list_api_search_criteria(cls):
         raise NotImplementedError
 
-    def _axl_methodcaller(self, instance, action, **kwargs):
+    def _axl_methodcaller(self, action, **kwargs):
         try:
-            axl_method = methodcaller("".join([action, instance.__class__.__name__]), **kwargs)
-            return axl_method(self._client)
+            axl_method = methodcaller("".join([action, self.__class__.__name__]), **kwargs)
+            return axl_method(self._connector.service)
         except Fault as fault:
             raise AXLError(fault.message)
 
-    def _serialize_axl_object(self, cls, action, **kwargs):
-        axl_resp = self._axl_methodcaller(cls, action, **kwargs)
+    def _serialize_axl_object(self, action, **kwargs):
+        axl_resp = self._axl_methodcaller(action, **kwargs)
         return self._object_factory(
-            cls.object_type(),
-            serialize_object(axl_resp)["return"][cls.return_object_name()]
+            self.object_type(),
+            serialize_object(axl_resp)["return"][self.return_object_name()]
         )
 
     def _check_identifiers(self, **kwargs):
-        if not has_single_identifier(self.identifiers(), kwargs):
+        if not all_attributes_exist_with_null_intersection(self.identifiers(), kwargs):
             raise TypeError("Single identifier must be supplied from list: {identifiers}".format(
                 identifiers=self.identifiers())
             )
@@ -91,26 +93,33 @@ class AbstractAXLAPI(ABC):
                 mandatory=self.add_api_mandatory_attributes())
             )
 
-    def add(self, **kwargs):
-        self._check_mandatory_attributes(**kwargs)
+    def create(self, **kwargs):
+        try:
+            # all AXL API endpoints include an "X" naming prefix, so we can safely using the
+            # __class__.__name__ concat paradigm as is already used for method-calling
+            create_method = methodcaller("".join(["X", self.__class__.__name__]), **kwargs)
+            x_obj = create_method(self._connector.model_factory)
+            return self._object_factory(self.object_type(), serialize_object(x_obj))
+        except TypeError as type_error:
+            raise AXLAttributeError(type_error)
+
+    def add(self, *args, **kwargs):
         # AXL's 'add' APIs expects kwargs options wrapped in tags with the api endpoint's return object name
-        # We wrap this ourselves to simplify the Python add interface.
+        # We wrap this ourselves to simplify the Python 'add' interface.
         wrapped_kwargs = {
-            self.return_object_name(): kwargs
+            self.return_object_name(): serialize_object(args[0]) if len(args) == 1 and isinstance(args[0], AXLDataModel)
+            else kwargs
         }
-        self._axl_methodcaller(self, "add", **wrapped_kwargs)
+        self._check_mandatory_attributes(**wrapped_kwargs[self.return_object_name()])
+        self._axl_methodcaller("add", **wrapped_kwargs)
 
     def get(self, **kwargs):
         self._check_identifiers(**kwargs)
-        return self._serialize_axl_object(self, "get", **kwargs)
+        return self._serialize_axl_object("get", **kwargs)
 
     def update(self, **kwargs):
         self._check_identifiers(**kwargs)  # todo - is this required in AXL or not?
-        self._axl_methodcaller(self, "update", **kwargs)
-
-    def remove(self, **kwargs):
-        self._check_identifiers(**kwargs)
-        self._axl_methodcaller(self, "remove", **kwargs)
+        self._axl_methodcaller("update", **kwargs)
 
     def list(self, search_criteria, returned_tags, skip=None, first=None):
         # todo - simply leave skip and first - ignored if not in use?
@@ -125,16 +134,20 @@ class AbstractAXLAPI(ABC):
             "skip": skip,
             "first": first
         }
-        axl_resp = self._axl_methodcaller(self, "list", **list_api_kwargs)
+        axl_resp = self._axl_methodcaller("list", **list_api_kwargs)
         axl_list = serialize_object(axl_resp)["return"][self.return_object_name()]
         return [self._object_factory(self.object_type(), _) for _ in axl_list]
+
+    def remove(self, **kwargs):
+        self._check_identifiers(**kwargs)
+        self._axl_methodcaller("remove", **kwargs)
 
 
 class AbstractAXLDeviceAPI(AbstractAXLAPI):
     """Abstract Device API class with additional device methods"""
 
-    def __init__(self, client, object_factory):
-        super(AbstractAXLDeviceAPI, self).__init__(client, object_factory)
+    def __init__(self, connector, object_factory):
+        super(AbstractAXLDeviceAPI, self).__init__(connector, object_factory)
 
     @classmethod
     @abstractmethod
@@ -163,22 +176,22 @@ class AbstractAXLDeviceAPI(AbstractAXLAPI):
 
     def apply(self, **kwargs):
         self._check_identifiers(**kwargs)
-        self._axl_methodcaller(self, "apply", **kwargs)
+        self._axl_methodcaller("apply", **kwargs)
 
     def restart(self, **kwargs):
         self._check_identifiers(**kwargs)
-        self._axl_methodcaller(self, "restart", **kwargs)
+        self._axl_methodcaller("restart", **kwargs)
 
     def reset(self, **kwargs):
         self._check_identifiers(**kwargs)
-        self._axl_methodcaller(self, "reset", **kwargs)
+        self._axl_methodcaller("reset", **kwargs)
 
 
 class AbstractThinAXLAPI(ABC):
     """Abstract API Class enforcing common methods for Thin AXL objects"""
 
-    def __init__(self, client, object_factory):
-        self._client = client
+    def __init__(self, connector, object_factory):
+        self._connector = connector
         self._object_factory = object_factory
         super(AbstractThinAXLAPI, self).__init__()
 
@@ -192,9 +205,9 @@ class AbstractThinAXLAPI(ABC):
     def return_object_name(cls):
         raise NotImplementedError
 
-    def _extract_thin_axl_resp(self, axl_resp):
+    def _extract_thin_axl_query_resp(self, axl_resp):
         thin_axl_resp = element_list_to_ordered_dict(
-            serialize_object(axl_resp)["return"][self.return_object_name()]
+            serialize_object(axl_resp)["return"]["rows"]
         )
         return self._object_factory(self.object_type(), thin_axl_resp)
 
@@ -205,8 +218,8 @@ class AbstractThinAXLAPI(ABC):
         :return: SQL Thin AXL object
         """
         try:
-            axl_resp = self._client.executeSQLQuery(sql=sql_statement)
-            return self._extract_thin_axl_resp(axl_resp)
+            axl_resp = self._connector.service.executeSQLQuery(sql=sql_statement)
+            return self._extract_thin_axl_query_resp(axl_resp)
         except Fault as fault:
             raise IllegalSQLStatement(message=fault.message)
 
@@ -214,10 +227,11 @@ class AbstractThinAXLAPI(ABC):
         """Execute SQL update via Thin AXL
 
         :param sql_statement: Informix-compliant SQL statement
-        :return: SQL Thin AXL object
+        :return: (int) rows updated
         """
         try:
-            axl_resp = self._client.executeSQLQuery(sql=sql_statement)
-            return self._extract_thin_axl_resp(axl_resp)
+            axl_resp = self._connector.service.executeSQLUpdate(sql=sql_statement)
+            # todo - confirm that update returns an int!
+            return serialize_object(axl_resp)["return"]["rowsUpdated"]
         except Fault as fault:
             raise IllegalSQLStatement(message=fault.message)

@@ -22,6 +22,10 @@ class UCToolkitException(Exception):
         return '%s(%r)' % (self.__class__.__name__, self.message)
 
 
+class ServiceProxyError(UCToolkitException):
+    """Unable to create ServiceProxy object with given parameters"""
+
+
 class UCToolkitConnectionException(UCToolkitException):
     """Exceptions for invalid connection params"""
 
@@ -30,11 +34,11 @@ class AXLError(UCToolkitException):
     """Bubble error received from AXL API"""
 
 
-class AXLAttributeError(UCToolkitException):
+class AXLAttributeError(AXLError):
     """Invalid attribute for AXL API endpoint"""
 
 
-class AXLMethodDoesNotExist(UCToolkitException):
+class AXLMethodDoesNotExist(AXLError):
     """Method override for scenarios where certain methods do not exist of an api endpoint"""
 
 
@@ -42,9 +46,5 @@ class IllegalSQLStatement(AXLError):
     """Illegal SQL Statement response from CUCM"""
 
 
-class ServiceProxyCreationError(UCToolkitException):
-    """Unable to create ServiceProxy object with given parameters"""
-
-
-class IllegalSearchCriteria(UCToolkitException):
+class IllegalSearchCriteria(AXLError):
     """Supplied Search Criteria are invalid for AXL API Call"""

@@ -1,8 +1,9 @@
 # Cisco UC Toolkit
 
 The uctoolkit package is inspired by the most excellent [ciscosparkapi](https://github.com/CiscoDevNet/ciscosparkapi)
-Python API wrapper for Cisco Spark.  The library uses a custom 
-[python-zeep](https://github.com/mvantellingen/python-zeep) connector for AXL connections.
+Python API wrapper for Cisco Spark.  The library wraps a 
+[python-zeep](https://github.com/mvantellingen/python-zeep) client to create and manage 
+AXL connections and provide CRUD operations for common API endpoints.
 
 
 ## Features
@@ -18,7 +19,7 @@ Python API wrapper for Cisco Spark.  The library uses a custom
   
 ## Installation
 
-Installing and upgrading uctoolkit is done with pip:
+Installing and upgrading `uctoolkit` is done with `pip`:
 
 **Installing via PIP**
 
@@ -90,16 +91,22 @@ dns = [_['dnorpattern'] for _ in numplan]
 ## Supported Languages and AXL Versions
 
  - Currently only Python 3.6 tested.
- - Python 2.7 planned, but not a current priority
- - All AXL versions should be supported, however only 11.5 has been currently tested.
+ - There is currently no plan to support Python 2.7, as `asyncio` is not supported in 2.7
+   and the suggested 2.7 alternative, `Trollius`, is not longer maintained.
+ - All AXL versions *should* be supported, however only 11.5 has been currently tested.  All
+   AXL data models include metadata on mandatory params for `add`, `get` and `list` calls.  It 
+   is expected that these should not change across AXL schema versions.  Please raise a defect 
+   if you encounter any issues.
  
  
  ## Donate
  
-If this library has helped you, or if you would like to support future development, please feel free to donate:
+If this library has helped you, or if you would like to support future development, 
+donations are most welcome:
 
  - BTC: xxxxxxxxxxxxxxx
  - ETH: xxxxxxxxxxxxxxx
+ 
  
  # Support
  

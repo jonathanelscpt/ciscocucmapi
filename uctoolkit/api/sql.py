@@ -15,12 +15,14 @@ from .abstract import AbstractThinAXLAPI
 
 
 class ThinAXL(AbstractThinAXLAPI):
-    """Cisco CUCM Phones API.
+    """Cisco CUCM ThinAXL API.
     Wraps the CUCM AXL API and exposes the API as native Python
     methods that return native Python objects.
     """
     _OBJECT_TYPE = 'sql'
-    _RETURN_OBJECT_NAME = 'row'
+    _RETURN_OBJECT_NAME = NotImplementedError(
+        "Do not use: Thin AXL return key differs for query and execute methods"
+    )
 
     def __init__(self, client, object_factory):
         """
@@ -36,4 +38,5 @@ class ThinAXL(AbstractThinAXLAPI):
         return self._OBJECT_TYPE
 
     def return_object_name(self):
-        return self._RETURN_OBJECT_NAME
+        raise self._RETURN_OBJECT_NAME
+

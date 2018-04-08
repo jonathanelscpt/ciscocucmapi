@@ -45,13 +45,18 @@ class RoutePartitionDataModel(AXLDataModel):
     """Cisco CUCM AXL RoutePartition data model."""
 
 
+class CallPickupGroupDataModel(AXLDataModel):
+    """Cisco CUCM AXL CallPickupGroup data model."""
+
+
 axl_data_models = defaultdict(
     lambda: AXLDataModel,
     sql=ThinAXLDataModel,
     phone=PhoneDataModel,
     user=UserDataModel,
     line=LineDataModel,
-    route_partition=RoutePartitionDataModel
+    route_partition=RoutePartitionDataModel,
+    call_pickup_group=CallPickupGroupDataModel
 )
 
 

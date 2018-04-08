@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Package helper functions and classes."""
 
-
 from __future__ import (
     absolute_import,
     division,
@@ -12,7 +11,7 @@ from __future__ import (
 from builtins import *
 from past.builtins import basestring, unicode
 
-from collections import OrderedDict
+from collections import OrderedDict, Iterable
 import os
 import sys
 import json
@@ -88,26 +87,6 @@ def to_bytes(string):
             return string
 
 
-def to_json_dict(json_data):
-    """Given a dictionary/OrderedDict or JSON string; return a dictionary.
-
-    :param json_data: json_data(dict, OrderedDict, str): Input JSON object.
-    :return: A Python dictionary/OrderedDict with the contents of the JSON object.
-    :raises TypeError: If the input object is not a dictionary/OrderedDict or string.
-    """
-    if isinstance(json_data, OrderedDict):
-        return json_data
-    elif isinstance(json_data, dict):
-        return json_data
-    elif isinstance(json_data, basestring):
-        return json.loads(json_data, object_hook=OrderedDict)
-    else:
-        raise TypeError(
-            "'json_data' must be a dictionary, OrderedDict or valid JSON string; "
-            "received: {!r}".format(json_data)
-        )
-
-
 def element_list_to_ordered_dict(element_list):
     """Converts a list of lists of zeep Element objects to a list of OrderedDicts
 
@@ -152,6 +131,38 @@ def has_single_identifier(identifiers, kwargs):
     :return: True if only one identifier present in kwargs
     """
     return len(set(kwargs) & set(identifiers)) == 1
+
+
+def _flatten(l):
+    """Flattens nested Iterable of arbitrary depth
+
+    :param l: Iterable
+    :return: flattened generator
+    """
+    for el in l:
+        if isinstance(el, Iterable) and not isinstance(el, (str, bytes)):
+            yield from _flatten(el)
+        else:
+            yield el
+
+
+def all_attributes_exist_with_null_intersection(iterable, d):
+    """Test if any value (or all values, if nested) in an Iterable matches
+    the keys in a dict, and that the dict has no matching keys
+    for any other values (incl. if nested) in the Iterable.
+
+    Limitations:
+
+    Currently doesn't supportive arbitrary recursive calling on Iterable nesting.
+    Depth can only be 1.
+
+    :param iterable: Iterable
+    :param d: dict
+    :return: True if all attributes exist in dict, with null intersection for remaining
+    """
+    return sum((i in d if not isinstance(i, tuple) else (all(sub_i in d for sub_i in i)))
+               and frozenset(d.keys()).isdisjoint(_flatten([x for x in i if x != i]))
+               for i in iterable) == 1
 
 
 def has_mandatory_keys(kwargs, mandatory_keys):

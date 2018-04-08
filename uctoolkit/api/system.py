@@ -11,5 +11,6 @@ from __future__ import (
 
 from builtins import *
 
-from .abstract import AbstractAXLAPI
+from uctoolkit.api.abstract import AbstractAXLAPI
+
 

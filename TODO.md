@@ -1,43 +1,46 @@
-# TODOs
+# TODO
 
 ## UCM AXL Changes
- - **[DONE]** rename references to MixIn classes
+
+### Outstanding
+
  - add `__copy__` and `__deep__` to base model class
- - **[DONE]** implement manageable inheritance for `uuid`
  - determine how to cater for singleton classes
- - **[DONE]** add environment variable support for AXL Connectors
- - **[DONE]** Look at how best to make use of `__getattr__`, `__setattr__`, `__delattr__` and `__getattribute__`.  Check this
-   between 3.6 and 2.7
  - Consider if `__hash__` is useful for working with object sets
- - Uniqueness based on `uuid` or `name`?  Is `name` globally significant for the whole api?
    Best to change to entire attr dict?
- - consider renaming zeep's `ServiceProxy` object for to allow for correct native inspection of zeep client
+ - Check if sql updates are returning the number of rows affected
+ - fix `__eq__` to compare `_axl_dict`
  
  
  ## Known Issues
  - `first` and `skip` for list not available for all apis - need child class extension to 
    include support for this for limited set of endpoints apis
- - **[DONE]** listPhone current hardcoded in`AbstractAXLAPI`
- - `__getitem__` and `__getattr__` interference
- 
-## Future Extensions
- - add notes for incorporating PAWS and CUCM AXL WSDLs.  Should not be included in library.
+ - revisit `__getitem__` and `__getattr__` interference
 
 
 ## Clean-up
- - move `ucdevops` samples to separate repo
- - convert `AbstractAXLDeviceAPI` to a mixin and move `_serialize_axl_object` and 
-   `_axl_methodcaller` to module methods to prevent abstract inheritance mess
+
  - split `reset` method to separate mixin so that it is possible to segregate devices that 
    are not able to be reset (e.g. RoutePartition).  Clean up RoutePartition once done.
  - rename `_RETURN_OBJECT_NAME` to `_API_ENDPOINT_NAME`
-  
-## Steps to adding New API
+ - clean up `ThinAXLAPI` and `reset` inheritance
+ 
+ 
+## Completed
 
- 1. define class-level attributes
- 1. add cl
- 1. create api Classes to .api `__all__`
- 1. add api to connectors import and `UCMAXLConnector` class `__init__` method
- 1. add new data model class to `.model.__init__.py`
- 1. add data model to `axl_data_models`, mapping to api class `object_type(cls)` return value
- 1. analyze AXL schema for any custom method extensions to api or data model classes
+ - **[DONE]** rename references to MixIn classes
+ - **[DONE]** implement manageable inheritance for `uuid`
+ - **[DONE]** add environment variable support for AXL Connectors
+ - **[DONE]** Look at how best to make use of `__getattr__`, `__setattr__`, `__delattr__` and `__getattribute__`.  Check this
+ - **[DONE]** consider renaming zeep's `ServiceProxy` object for to allow for correct native inspection of zeep client
+ - **[DONE]** Uniqueness based on `uuid` or `name`?  Is `name` globally significant for the whole api?
+ - **[DONE]** listPhone current hardcoded in`AbstractAXLAPI`
+ - **[DONE]** move `ucdevops` samples to separate repo
+ - **[DONE]** convert `AbstractAXLDeviceAPI` to a mixin and move `_serialize_axl_object` and 
+   `_axl_methodcaller` to module methods to prevent abstract inheritance mess
+  - **[DROPPED]** convert to absolute package imports
+
+
+## Future Extensions
+ - add notes for incorporating PAWS and CUCM AXL WSDLs.  Should not be included in library.
+ - Add support for async client

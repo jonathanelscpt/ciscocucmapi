@@ -24,7 +24,10 @@ class Line(AbstractAXLDeviceAPI):
     _RETURN_OBJECT_NAME = 'line'
     _IDENTIFIERS = (
         "uuid",
-        "pattern"  # todo - check if RoutePartition is needed as well
+        (
+            "pattern",
+            "routePartitionName"
+        )
     )
     _LIST_API_SEARCH_CRITERIA = (
         "pattern",
@@ -138,7 +141,7 @@ class Phone(AbstractAXLDeviceAPI):
         :raises TypeError: if name or uuid not supplied
         """
         self._check_identifiers(**kwargs)
-        self._serialize_axl_object(self, "wipe", **kwargs)
+        self._serialize_axl_object("wipe", **kwargs)
 
     def options(self, uuid, returned_choices=None):
         # self._client.getPhoneOptions(uuid, returnedChoices=returned_choices)

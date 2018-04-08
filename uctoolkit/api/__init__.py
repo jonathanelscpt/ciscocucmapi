@@ -15,8 +15,10 @@ from .device import (
     Line,
     Phone
 )
+from .user import User
 from .dialplan import (
-    RoutePartition
+    RoutePartition,
+    CallPickupGroup
 )
 
 _sql = [
@@ -26,14 +28,19 @@ _devices = [
     Line,
     Phone,
 ]
+_user = [
+    User
+]
 _dial_plan = [
-    RoutePartition
+    RoutePartition,
+    CallPickupGroup,
 ]
 
-_apis = [
+_all = [
     _sql,
+    _user,
     _devices,
     _dial_plan
 ]
 
-__all__ = list(itertools.chain.from_iterable(_apis))
+__all__ = list(itertools.chain.from_iterable(_all))
