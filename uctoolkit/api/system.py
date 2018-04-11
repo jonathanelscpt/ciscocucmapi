@@ -13,9 +13,6 @@ class CallManagerGroup(AbstractAXLDeviceAPI):
         "members"
     )
 
-    def __init__(self, client, object_factory):
-        super(CallManagerGroup, self).__init__(client, object_factory)
-
     @property
     def object_type(self):
         return self._OBJECT_TYPE
@@ -39,9 +36,6 @@ class DevicePool(AbstractAXLDeviceAPI):
         "callManagerGroupName",
         "regionName",
     )
-
-    def __init__(self, client, object_factory):
-        super(DevicePool, self).__init__(client, object_factory)
 
     @property
     def object_type(self):

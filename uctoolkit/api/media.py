@@ -16,9 +16,6 @@ class ConferenceBridge(AbstractAXLDeviceAPI):
         # "locationName",
     )
 
-    def __init__(self, client, object_factory):
-        super(ConferenceBridge, self).__init__(client, object_factory)
-
     @property
     def object_type(self):
         return self._OBJECT_TYPE

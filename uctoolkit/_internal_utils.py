@@ -3,44 +3,6 @@
 
 from collections import OrderedDict, Iterable
 
-from zeep.xsd.elements.indicators import Choice
-from zeep.xsd.elements.indicators import Sequence
-from zeep.xsd.elements.element import Element
-
-
-def check_type(o, acceptable_types, may_be_none=True):
-    """Object is an instance of one of the acceptable types or None.
-
-    :param o: The object to be inspected.
-    :param acceptable_types: A type or tuple of acceptable types.
-    :param may_be_none: Whether or not the object may be None.
-    :return: None
-    :raises TypeError: If the object is None and may_be_none=False, or if the
-            object is not an instance of one of the acceptable types.
-    """
-    if not isinstance(acceptable_types, tuple):
-        acceptable_types = (acceptable_types,)
-
-    if may_be_none and o is None:
-        # Object is None, and that is OK!
-        pass
-    elif isinstance(o, acceptable_types):
-        # Object is an instance of an acceptable type.
-        pass
-    else:
-        # Object is something else.
-        error_message = (
-            "We were expecting to receive an instance of one of the following "
-            "types: {types}{none}; but instead we received {o} which is a "
-            "{o_type}.".format(
-                types=", ".join([repr(t.__name__) for t in acceptable_types]),
-                none="or 'None'" if may_be_none else "",
-                o=o,
-                o_type=repr(type(o).__name__)
-            )
-        )
-        raise TypeError(error_message)
-
 
 def element_list_to_ordered_dict(element_list):
     """Converts a list of lists of zeep Element objects to a list of OrderedDicts
@@ -76,16 +38,6 @@ def has_valid_kwargs_keys(kwargs, supported_keys):
     :return: True if all keys in kwargs are supported for method
     """
     return set(kwargs) - set(supported_keys) == set()
-
-
-def has_single_identifier(identifiers, kwargs):
-    """Tests if one and only one identifier is included in kwargs
-
-    :param identifiers: list of identifiers for API call, of which only one is allows
-    :param kwargs: method kwargs
-    :return: True if only one identifier present in kwargs
-    """
-    return len(set(kwargs) & set(identifiers)) == 1
 
 
 def _flatten(l):
@@ -133,15 +85,3 @@ def has_mandatory_keys(kwargs, mandatory_keys):
     :return: True if all mandatory keys in kwargs dictionary
     """
     return all(k in kwargs for k in mandatory_keys)
-
-
-def extract_get_choices(obj):
-    if isinstance(obj, (Choice, Sequence)):
-        return tuple([extract_get_choices(_) for _ in obj])
-    elif isinstance(obj, Element):
-        return obj.name
-    else:
-        raise TypeError("Only Choice, Sequence and Element classes inspected, Type '{cls}' found.".format(
-            cls=obj.__class__.__name__
-            )
-        )

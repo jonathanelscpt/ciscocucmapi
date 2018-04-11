@@ -10,23 +10,7 @@ class ThinAXL(AbstractThinAXLAPI):
     methods that return native Python objects.
     """
     _OBJECT_TYPE = 'sql'
-    _RETURN_OBJECT_NAME = NotImplementedError(
-        "Do not use: Thin AXL return key differs for query and execute methods"
-    )
 
-    def __init__(self, client, object_factory):
-        """
-        Initialize a new ThinAXLAPI object with the provided AXL client.
-
-        :param client: zeep SOAP AXL client for API calls to CUCM's SOAP interface
-        :param object_factory: factory function for instantiating SQL data models objects
-        :raises TypeError: If parameter types are invalid.
-        """
-        super(ThinAXL, self).__init__(client, object_factory)
-
+    @property
     def object_type(self):
         return self._OBJECT_TYPE
-
-    def return_object_name(self):
-        raise self._RETURN_OBJECT_NAME
-

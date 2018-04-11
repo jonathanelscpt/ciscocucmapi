@@ -18,9 +18,6 @@ class User(AbstractAXLAPI):
         "presenceGroupName"
     )
 
-    def __init__(self, client, object_factory):
-        super(User, self).__init__(client, object_factory)
-
     @property
     def object_type(self):
         return self._OBJECT_TYPE

@@ -14,9 +14,6 @@ class Line(AbstractAXLDeviceAPI):
         "usage"
     )
 
-    def __init__(self, client, object_factory):
-        super(Line, self).__init__(client, object_factory)
-
     @property
     def object_type(self):
         return self._OBJECT_TYPE
@@ -43,9 +40,6 @@ class Phone(AbstractAXLDeviceAPI):
         "commonPhoneConfigName",
         "locationName"
     )
-
-    def __init__(self, connector, object_factory):
-        super(Phone, self).__init__(connector, object_factory)
 
     @property
     def object_type(self):
@@ -89,9 +83,6 @@ class CtiRoutePoint(AbstractAXLDeviceAPI):
         # "locationName"
     )
 
-    def __init__(self, connector, object_factory):
-        super(CtiRoutePoint, self).__init__(connector, object_factory)
-
     @property
     def object_type(self):
         return self._OBJECT_TYPE
@@ -115,7 +106,7 @@ class CtiRoutePoint(AbstractAXLDeviceAPI):
         :param kwargs:
         :return: API Data Model object
         """
-        # workaround for restricted name
+        # workaround for restricted 'class' attribute
         if "class" not in kwargs:
             kwargs["class"] = "CTI Route Point"
         default_kwargs = {

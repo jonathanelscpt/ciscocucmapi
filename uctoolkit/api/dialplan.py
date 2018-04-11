@@ -13,9 +13,6 @@ class AarGroup(AbstractAXLAPI):
         "name",
     )
 
-    def __init__(self, client, object_factory):
-        super(AarGroup, self).__init__(client, object_factory)
-
     @property
     def object_type(self):
         return self._OBJECT_TYPE
@@ -37,9 +34,6 @@ class CallPickupGroup(AbstractAXLAPI):
         "name",
         "pattern",
     )
-
-    def __init__(self, client, object_factory):
-        super(CallPickupGroup, self).__init__(client, object_factory)
 
     @property
     def object_type(self):
@@ -63,9 +57,6 @@ class CallPark(AbstractAXLAPI):
         "callManagerName",
     )
 
-    def __init__(self, client, object_factory):
-        super(CallPark, self).__init__(client, object_factory)
-
     @property
     def object_type(self):
         return self._OBJECT_TYPE
@@ -86,9 +77,6 @@ class CalledPartyTransformationPattern(AbstractAXLAPI):
     _ADD_API_MANDATORY_ATTRIBUTES = (
         "pattern",
     )
-
-    def __init__(self, client, object_factory):
-        super(CalledPartyTransformationPattern, self).__init__(client, object_factory)
 
     @property
     def object_type(self):
@@ -111,9 +99,6 @@ class CallingPartyTransformationPattern(AbstractAXLAPI):
         "pattern",
     )
 
-    def __init__(self, client, object_factory):
-        super(CallingPartyTransformationPattern, self).__init__(client, object_factory)
-
     @property
     def object_type(self):
         return self._OBJECT_TYPE
@@ -135,9 +120,6 @@ class CmcInfo(AbstractAXLAPI):
         "code",
     )
 
-    def __init__(self, client, object_factory):
-        super(CmcInfo, self).__init__(client, object_factory)
-
     @property
     def object_type(self):
         return self._OBJECT_TYPE
@@ -158,9 +140,6 @@ class Css(AbstractAXLDeviceAPI):
     _ADD_API_MANDATORY_ATTRIBUTES = (
         "name"
     )
-
-    def __init__(self, client, object_factory):
-        super(Css, self).__init__(client, object_factory)
 
     @property
     def object_type(self):
@@ -191,9 +170,6 @@ class DirectedCallPark(AbstractAXLDeviceAPI):
         "retrievalPrefix"
     )
 
-    def __init__(self, client, object_factory):
-        super(DirectedCallPark, self).__init__(client, object_factory)
-
     @property
     def object_type(self):
         return self._OBJECT_TYPE
@@ -214,9 +190,6 @@ class RoutePartition(AbstractAXLDeviceAPI):
     _ADD_API_MANDATORY_ATTRIBUTES = (
         "name",
     )
-
-    def __init__(self, client, object_factory):
-        super(RoutePartition, self).__init__(client, object_factory)
 
     @property
     def object_type(self):

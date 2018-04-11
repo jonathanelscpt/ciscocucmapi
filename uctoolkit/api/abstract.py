@@ -9,6 +9,9 @@ from operator import methodcaller
 
 from zeep.helpers import serialize_object
 from zeep.exceptions import Fault
+from zeep.xsd.elements.indicators import Choice
+from zeep.xsd.elements.indicators import Sequence
+from zeep.xsd.elements.element import Element
 
 from ..exceptions import (
     AXLError,
@@ -18,10 +21,27 @@ from ..exceptions import (
 from .._internal_utils import (
     has_mandatory_keys,
     check_valid_attribute_req_dict,
-    element_list_to_ordered_dict,
-    extract_get_choices
+    element_list_to_ordered_dict
 )
 from ..utils import get_model_dict
+
+
+def _extract_get_choices(obj):
+    """Recursively inspects a zeep object and extracts the available choices available when performing
+    the specific AXL call, as defined in AXL xsd.
+
+    :param obj: zeep Element data structure type
+    :return: nested tuple of the xsd-defined choices for the AXL method
+    """
+    if isinstance(obj, (Choice, Sequence)):
+        return tuple([_extract_get_choices(_) for _ in obj])
+    elif isinstance(obj, Element):
+        return obj.name
+    else:
+        raise TypeError("Only Choice, Sequence and Element classes inspected, Type '{cls}' found.".format(
+            cls=obj.__class__.__name__
+            )
+        )
 
 
 class AbstractAXLAPI(ABC):
@@ -32,21 +52,21 @@ class AbstractAXLAPI(ABC):
         self.connector = connector
         self.object_factory = object_factory
 
-        _add_model_name = "".join(["X", self.__class__.__name__])
-        _get_method_name = "".join(["Get", self.__class__.__name__, "Req"])
-        _get_model_name = "".join(["R", self.__class__.__name__])
-        _update_method_name = "".join(["Update", self.__class__.__name__, "Req"])
-        _list_method_name = "".join(["List", self.__class__.__name__, "Req"])
-        _list_model_name = "".join(["L", self.__class__.__name__])
+        add_model_name = "".join(["X", self.__class__.__name__])
+        get_method_name = "".join(["Get", self.__class__.__name__, "Req"])
+        get_model_name = "".join(["R", self.__class__.__name__])
+        update_method_name = "".join(["Update", self.__class__.__name__, "Req"])
+        list_method_name = "".join(["List", self.__class__.__name__, "Req"])
+        list_model_name = "".join(["L", self.__class__.__name__])
 
         self._wsdl_objects = {
             "add_method": NotImplementedError,  # not used in class
-            "add_model": self._get_wsdl_obj(_add_model_name),
-            "get_method": self._get_wsdl_obj(_get_method_name),
-            "get_model": self._get_wsdl_obj(_get_model_name),
-            "list_method":self._get_wsdl_obj(_list_method_name),
-            "list_model": self._get_wsdl_obj(_list_model_name),
-            "update_method": self._get_wsdl_obj(_update_method_name),
+            "add_model": self._get_wsdl_obj(add_model_name),
+            "get_method": self._get_wsdl_obj(get_method_name),
+            "get_model": self._get_wsdl_obj(get_model_name),
+            "list_method":self._get_wsdl_obj(list_method_name),
+            "list_model": self._get_wsdl_obj(list_model_name),
+            "update_method": self._get_wsdl_obj(update_method_name),
             "update_model": NotImplementedError,  # doesn't exist in schema
             "name_and_guid_model": self._get_wsdl_obj("NameAndGUIDRequest")  # used in many AXL requests
         }
@@ -67,12 +87,22 @@ class AbstractAXLAPI(ABC):
         raise NotImplementedError
 
     @staticmethod
-    def _check_identifiers(method_obj, **kwargs):
-        _identifiers = extract_get_choices(method_obj.elements_nested[0][1][0])
-        if not check_valid_attribute_req_dict(_identifiers, kwargs):
+    def _check_identifiers(obj, **kwargs):
+        identifiers = _extract_get_choices(obj.elements_nested[0][1][0])
+        if not check_valid_attribute_req_dict(identifiers, kwargs):
             raise TypeError("Supplied identifiers not supported for 'get' API call: {identifiers}".format(
                 identifiers=_identifiers)
             )
+
+    def _get_wsdl_obj(self, obj_name):
+        """Get an empty python-zeep complex type
+
+        :param obj_name: name of AXL type
+        :return: empty zeep complex type obj
+        """
+        return self.connector.client.get_type('ns0:{name}'.format(
+            name=obj_name
+        ))
 
     def _axl_methodcaller(self, action, **kwargs):
         try:
@@ -82,6 +112,13 @@ class AbstractAXLAPI(ABC):
             raise AXLError(fault.message)
 
     def _serialize_axl_object(self, action, **kwargs):
+        """Builds and AXL methodcaller using given action verb and the object type,
+        serializes the response and uses the resultant dict to instantiate a data model object
+
+        :param action: AXL action verb - 'add', 'get', 'update', 'remove', etc.
+        :param kwargs: AXL method attribute kwargs dictionary
+        :return: Data Model object containing the serialized response data dict
+        """
         axl_resp = self._axl_methodcaller(action, **kwargs)
         return self.object_factory(
             self.object_type,
@@ -89,19 +126,20 @@ class AbstractAXLAPI(ABC):
         )
 
     def _serialize_uuid_only_resp(self, action, **kwargs):
+        """Serialize commons responses that return a uuid string only
+
+        :param action: axl method verb
+        :param kwargs: dict of method attributes
+        :return: (str) uuid
+        """
         axl_resp = self._axl_methodcaller(action, **kwargs)
         return serialize_object(axl_resp)["return"]
 
-    def _get_wsdl_obj(self, obj_name):
-        return self.connector.client.get_type('ns0:{req_obj_name}'.format(
-            req_obj_name=obj_name
-        ))
-
     def create(self, **kwargs):
         """Create AXL object locally for pre-processing"""
-        _create = methodcaller(self._wsdl_objects["add_model"].__class__.__name__, **kwargs)
-        _add_obj = _create(self.connector.model_factory)
-        return self.object_factory(self.object_type, serialize_object(_add_obj))
+        axl_add_method = methodcaller(self._wsdl_objects["add_model"].__class__.__name__, **kwargs)
+        axl_add_obj = axl_add_method(self.connector.model_factory)
+        return self.object_factory(self.object_type, serialize_object(axl_add_obj))
 
     def add(self, **kwargs):
         if not has_mandatory_keys(kwargs, self.add_api_mandatory_attributes):
@@ -124,9 +162,9 @@ class AbstractAXLAPI(ABC):
         return self._serialize_uuid_only_resp("update", **kwargs)
 
     def list(self, search_criteria=None, returned_tags=None, skip=None, first=None):
-        _supported_criteria = [element[0] for element in self._wsdl_objects["list_method"].elements[0][1].type.elements]
+        supported_criteria = [element[0] for element in self._wsdl_objects["list_method"].elements[0][1].type.elements]
         list_api_kwargs = {
-            "searchCriteria": search_criteria if search_criteria else {_supported_criteria[0]: "%"},
+            "searchCriteria": search_criteria if search_criteria else {supported_criteria[0]: "%"},
             "returnedTags": returned_tags if returned_tags else get_model_dict(self._wsdl_objects["list_model"]),
             "skip": skip,
             "first": first
@@ -142,9 +180,6 @@ class AbstractAXLAPI(ABC):
 
 class AbstractAXLDeviceAPI(AbstractAXLAPI):
     """Abstract Device API class with additional device methods"""
-
-    def __init__(self, connector, object_factory):
-        super(AbstractAXLDeviceAPI, self).__init__(connector, object_factory)
 
     @property
     @abstractmethod
@@ -193,35 +228,27 @@ class AbstractThinAXLAPI(ABC):
     """Abstract API Class enforcing common methods for Thin AXL objects"""
 
     def __init__(self, connector, object_factory):
+        super(AbstractThinAXLAPI, self).__init__()
         self._connector = connector
         self._object_factory = object_factory
-        super(AbstractThinAXLAPI, self).__init__()
 
     @property
     @abstractmethod
     def object_type(self):
         raise NotImplementedError
 
-    @property
-    @abstractmethod
-    def return_object_name(self):
-        raise NotImplementedError
-
-    def _extract_thin_axl_query_resp(self, axl_resp):
-        thin_axl_resp = element_list_to_ordered_dict(
-            serialize_object(axl_resp)["return"]["rows"]
-        )
-        return self._object_factory(self.object_type(), thin_axl_resp)
-
     def query(self, sql_statement=None):
         """Execute SQL query via Thin AXL
 
         :param sql_statement: Informix-compliant SQL statement
-        :return: SQL Thin AXL object
+        :return: SQL Thin AXL data model object
         """
         try:
             axl_resp = self._connector.service.executeSQLQuery(sql=sql_statement)
-            return self._extract_thin_axl_query_resp(axl_resp)
+            serialized_thin_axl_resp = element_list_to_ordered_dict(
+                serialize_object(axl_resp)["return"]["rows"]
+            )
+            return self._object_factory(self.object_type, serialized_thin_axl_resp)
         except Fault as fault:
             raise IllegalSQLStatement(message=fault.message)
 
