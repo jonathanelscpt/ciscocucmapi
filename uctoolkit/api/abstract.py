@@ -17,14 +17,16 @@ from zeep.xsd.elements.element import Element
 from ..exceptions import (
     AXLError,
     IllegalSQLStatement
-
 )
 from .._internal_utils import (
     has_mandatory_keys,
     check_valid_attribute_req_dict,
     element_list_to_ordered_dict
 )
-from ..helpers import get_model_dict, sanitize_data_model_dict
+from ..helpers import (
+    get_model_dict,
+    sanitize_data_model_dict
+)
 
 
 def _extract_get_choices(obj):
@@ -92,7 +94,7 @@ class AbstractAXLAPI(ABC):
         identifiers = _extract_get_choices(obj.elements_nested[0][1][0])
         if not check_valid_attribute_req_dict(identifiers, kwargs):
             raise TypeError("Supplied identifiers not supported for 'get' API call: {identifiers}".format(
-                identifiers=_identifiers)
+                identifiers=identifiers)
             )
 
     def _get_wsdl_obj(self, obj_name):
