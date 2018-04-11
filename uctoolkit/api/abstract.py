@@ -165,14 +165,29 @@ class AbstractAXLDeviceAPI(AbstractAXLAPI):
         raise NotImplementedError
 
     def apply(self, **kwargs):
+        """Apply config to CUCM device
+
+        :param kwargs: uuid or name
+        :return: None
+        """
         self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         self._axl_methodcaller("apply", **kwargs)
 
     def restart(self, **kwargs):
+        """Restart to CUCM device
+
+        :param kwargs: uuid or name
+        :return: None
+        """
         self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         self._axl_methodcaller("restart", **kwargs)
 
     def reset(self, **kwargs):
+        """Reset to CUCM device
+
+        :param kwargs: uuid or name
+        :return: None
+        """
         self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         self._axl_methodcaller("reset", **kwargs)
 

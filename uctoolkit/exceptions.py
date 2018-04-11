@@ -34,6 +34,10 @@ class AXLError(UCToolkitException):
     """Bubble error received from AXL API"""
 
 
+class AXLAttributeError(AXLError):
+    """Invalid attribute for AXL API endpoint"""
+
+
 class AXLMethodDoesNotExist(AXLError):
     """Method override for scenarios where certain methods do not exist of an api endpoint"""
 

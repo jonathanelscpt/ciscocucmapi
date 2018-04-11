@@ -73,11 +73,10 @@ class Phone(AbstractAXLDeviceAPI):
         """Allows Cisco's newer Android-based devices, like the Cisco DX650,
         to be remotely reset to factory defaults, removing user specific settings and data.
 
-        :param kwargs: phone name or uuid, but not both
+        :param kwargs: phone name or uuid
         :return: None
-        :raises TypeError: if name or uuid not supplied
         """
-        self._check_identifiers(self._wsdl_objects["name_and_guid_model"],**kwargs)
+        self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         self._serialize_axl_object("wipe", **kwargs)
 
     def options(self, uuid, returned_choices=None):
