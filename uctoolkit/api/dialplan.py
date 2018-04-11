@@ -13,6 +13,30 @@ from .abstract import AbstractAXLDeviceAPI, AbstractAXLAPI
 from ..exceptions import AXLMethodDoesNotExist
 
 
+class AarGroup(AbstractAXLAPI):
+
+    _OBJECT_TYPE = 'aar_group'
+    _RETURN_OBJECT_NAME = 'aarGroup'
+    _ADD_API_MANDATORY_ATTRIBUTES = (
+        "name",
+    )
+
+    def __init__(self, client, object_factory):
+        super(AarGroup, self).__init__(client, object_factory)
+
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
+
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
+
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
+
+
 class RoutePartition(AbstractAXLDeviceAPI):
 
     _OBJECT_TYPE = 'route_partition'

@@ -29,8 +29,10 @@ from .api import (
     Line as _LineAPI,
     RoutePartition as _RoutePartitionAPI,
     CallPickupGroup as _CallPickupGroupAPI,
-    User as _UserAPI
+    User as _UserAPI,
+    AarGroup as _AarGroupAPI
 )
+
 
 WSDL_URLS = {
     "RisPort70": "https://{fqdn}:8443/realtimeservice2/services/RISService70?wsdl",
@@ -176,6 +178,7 @@ class UCMAXLConnector (UCSOAPConnector):
         # dial plan API wrappers
         self.route_partitions = _RoutePartitionAPI(self, axl_factory)
         self.call_pickup_groups = _CallPickupGroupAPI(self, axl_factory)
+        self.aar_group = _AarGroupAPI(self, axl_factory)
 
 
 class UCMControlCenterConnector(UCSOAPConnector):

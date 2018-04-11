@@ -18,7 +18,8 @@ from .device import (
 from .user import User
 from .dialplan import (
     RoutePartition,
-    CallPickupGroup
+    CallPickupGroup,
+    AarGroup
 )
 
 _sql = [
@@ -34,6 +35,7 @@ _user = [
 _dial_plan = [
     RoutePartition,
     CallPickupGroup,
+    AarGroup
 ]
 
 _all = [

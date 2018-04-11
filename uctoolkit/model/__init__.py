@@ -49,6 +49,10 @@ class CallPickupGroupDataModel(AXLDataModel):
     """Cisco CUCM AXL CallPickupGroup data model."""
 
 
+class AarGroupDataModel(AXLDataModel):
+    """Cisco CUCM AXL CallPickupGroup data model."""
+
+
 axl_data_models = defaultdict(
     lambda: AXLDataModel,
     sql=ThinAXLDataModel,
@@ -56,7 +60,8 @@ axl_data_models = defaultdict(
     user=UserDataModel,
     line=LineDataModel,
     route_partition=RoutePartitionDataModel,
-    call_pickup_group=CallPickupGroupDataModel
+    call_pickup_group=CallPickupGroupDataModel,
+    aar_group=AarGroupDataModel
 )
 
 

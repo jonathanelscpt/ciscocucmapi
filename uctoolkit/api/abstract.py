@@ -95,6 +95,10 @@ class AbstractAXLAPI(ABC):
             serialize_object(axl_resp)["return"][self.return_object_name]
         )
 
+    def _serialize_uuid_only_resp(self, action, **kwargs):
+        axl_resp = self._axl_methodcaller(action, **kwargs)
+        return serialize_object(axl_resp)["return"]
+
     def _get_wsdl_obj(self, obj_name):
         return self.connector.client.get_type('ns0:{req_obj_name}'.format(
             req_obj_name=obj_name
@@ -115,7 +119,7 @@ class AbstractAXLAPI(ABC):
         wrapped_kwargs = {
             self.return_object_name: kwargs
         }
-        self._axl_methodcaller("add", **wrapped_kwargs)
+        return self._serialize_uuid_only_resp("add", **wrapped_kwargs)
 
     def get(self, returned_tags=None, **kwargs):
         kwargs["returnedTags"] = returned_tags
@@ -124,7 +128,7 @@ class AbstractAXLAPI(ABC):
 
     def update(self, **kwargs):
         self._check_identifiers(self._wsdl_objects["update_method"], **kwargs)
-        self._axl_methodcaller("update", **kwargs)
+        return self._serialize_uuid_only_resp("update", **kwargs)
 
     def list(self, search_criteria=None, returned_tags=None, skip=None, first=None):
         _supported_criteria = [element[0] for element in self._wsdl_objects["list_method"].elements[0][1].type.elements]
@@ -140,7 +144,7 @@ class AbstractAXLAPI(ABC):
 
     def remove(self, **kwargs):
         self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
-        self._axl_methodcaller("remove", **kwargs)
+        return self._serialize_uuid_only_resp("remove", **kwargs)
 
 
 class AbstractAXLDeviceAPI(AbstractAXLAPI):
@@ -168,28 +172,28 @@ class AbstractAXLDeviceAPI(AbstractAXLAPI):
         """Apply config to CUCM device
 
         :param kwargs: uuid or name
-        :return: None
+        :return: (str) uuid
         """
         self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
-        self._axl_methodcaller("apply", **kwargs)
+        return self._serialize_uuid_only_resp("apply", **kwargs)
 
     def restart(self, **kwargs):
         """Restart to CUCM device
 
         :param kwargs: uuid or name
-        :return: None
+        :return: (str) uuid
         """
         self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
-        self._axl_methodcaller("restart", **kwargs)
+        return self._serialize_uuid_only_resp("restart", **kwargs)
 
     def reset(self, **kwargs):
         """Reset to CUCM device
 
         :param kwargs: uuid or name
-        :return: None
+        :return: (str) uuid
         """
         self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
-        self._axl_methodcaller("reset", **kwargs)
+        return self._serialize_uuid_only_resp("reset", **kwargs)
 
 
 class AbstractThinAXLAPI(ABC):
