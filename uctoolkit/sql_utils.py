@@ -2,7 +2,7 @@
 """Useful SQL query utils for UC System Administration  tasks where full AXL object
 instantiation and method calling is too verbose or slow"""
 
-from .utils import extract_pkid_from_uuid
+from .helpers import extract_pkid_from_uuid
 
 
 def get_device_pkid(axl_connector, device_name):

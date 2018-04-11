@@ -6,6 +6,7 @@ from abc import (
     abstractmethod
 )
 from operator import methodcaller
+from collections import OrderedDict
 
 from zeep.helpers import serialize_object
 from zeep.exceptions import Fault
@@ -23,7 +24,7 @@ from .._internal_utils import (
     check_valid_attribute_req_dict,
     element_list_to_ordered_dict
 )
-from ..utils import get_model_dict
+from ..helpers import get_model_dict, sanitize_data_model_dict
 
 
 def _extract_get_choices(obj):
@@ -134,6 +135,14 @@ class AbstractAXLAPI(ABC):
         """
         axl_resp = self._axl_methodcaller(action, **kwargs)
         return serialize_object(axl_resp)["return"]
+
+    def empty_add_model(self, sanitize=True):
+        if sanitize:
+            return sanitize_data_model_dict(
+                get_model_dict(self._wsdl_objects["add_model"], target_cls=OrderedDict)
+            )
+        else:
+            return get_model_dict(self._wsdl_objects["add_model"], target_cls=OrderedDict)
 
     def create(self, **kwargs):
         """Create AXL object locally for pre-processing"""

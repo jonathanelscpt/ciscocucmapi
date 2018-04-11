@@ -5,7 +5,7 @@
 from collections.abc import MutableMapping
 
 from ..exceptions import AXLAttributeError
-from ..utils import sanitize_data_model_dict
+from ..helpers import sanitize_data_model_dict
 
 
 class AXLDataModel(MutableMapping):

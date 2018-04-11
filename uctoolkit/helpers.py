@@ -80,7 +80,9 @@ def sanitize_data_model_dict(obj):
     :return: sanitized AXL data model
     """
     # flatten zeep's handling of AXL's XFkType into a k, v pair
-    if set(obj.keys()) == {"uuid", "_value_1"}:
+    # we need to support the two cases for an instantiated response and
+    # where an "X" api endpoint model was created using zeep's 'client.get_type' method
+    if set(obj.keys()) == {"uuid", "_value_1"} or set(obj.keys()) == {"_value_1"}:
         return obj["_value_1"]
     else:
         for k, v in obj.items():
@@ -117,13 +119,20 @@ def filter_mandatory_attributes(zeep_axl_factory_object):
             yield element[1]
 
 
-def get_model_dict(api_endpoint):
-    """Get an empty model dict for an api endpoint from a zeep
+def get_model_dict(api_endpoint, target_cls=dict):
+    """Get an empty model dict or OrderedDict for an api endpoint from a complex zeep type
 
-    :param api_endpoint:
-    :return:
+    :param api_endpoint: zeep data structure
+    :param target_cls: requested type for instantiation - dict or OrderedDict
+    :return: (dict or OrderedDict) of soap api endpoint
     """
-    return {e[0]: "" if not hasattr(e[1].type, 'elements')
-            else get_model_dict(e[1].type)
-            for e in api_endpoint.elements}
-
+    if target_cls is dict:
+        return {e[0]: "" if not hasattr(e[1].type, 'elements')
+                else get_model_dict(e[1].type)
+                for e in api_endpoint.elements}
+    elif target_cls is OrderedDict:
+        return OrderedDict((e[0], "") if not hasattr(e[1].type, 'elements')
+                           else (e[0], get_model_dict(e[1].type))
+                           for e in api_endpoint.elements)
+    else:
+        raise TypeError("Invalid target class - only dictionary types supported")
