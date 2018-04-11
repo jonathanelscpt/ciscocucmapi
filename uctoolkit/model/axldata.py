@@ -35,13 +35,11 @@ class AXLDataModel(MutableMapping):
 
     def __str__(self):
         """A human-readable string representation of this object."""
-        json_str = json.dumps(self._axl_data, indent=2)
-        return "{}:\n{}".format(self.__class__.__name__, json_str)
+        return "{}:\n{}".format(self.__class__.__name__, self._axl_data)
 
     def __repr__(self):
         """A string representing this object as valid Python expression."""
-        json_str = json.dumps(self._axl_data, ensure_ascii=False)
-        return "{}({})".format(self.__class__.__name__, json_str)
+        return "{}({})".format(self.__class__.__name__, self._axl_data)
 
     def __eq__(self, other):
         """AXL objects equality using on uuid"""
