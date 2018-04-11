@@ -1,21 +1,14 @@
 # -*- coding: utf-8 -*-
-
 """
 UCToolkit Library
 ~~~~~~~~~~~~~~~~~
 
-UCToolkit is a Python-based library providing basic connectors for common Cisco UC SOAP APIs.
+UCToolkit is a Python-based library providing basic connectors for common Cisco UC SOAP APIs
+to facilitate DevOps Cisco UC application provisioning.
 
 :copyright: (c) 2018 by Jonathan Els.
 :license: MIT, see LICENSE for more details.
 """
-
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
 
 from .__version__ import __title__, __description__, __url__, __version__
 from .__version__ import __build__, __author__, __author_email__, __license__

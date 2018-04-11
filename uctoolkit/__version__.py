@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
 """Package Version information"""
 
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
 
 __title__ = 'UCToolkit'
 __description__ = 'Python Toolkit for Cisco UC APIs'

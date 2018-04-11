@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
 """Package helper functions and classes."""
 
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals
-)
-from builtins import *
-
 from collections import OrderedDict, Iterable
 
 from zeep.xsd.elements.indicators import Choice

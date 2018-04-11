@@ -1,15 +1,6 @@
 # -*- coding: utf-8 -*-
 """UCToolkit Exceptions"""
 
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
-
-from builtins import *
-
 
 class UCToolkitException(Exception):
     """Generic package Exception Container"""

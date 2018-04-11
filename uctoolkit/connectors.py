@@ -1,13 +1,5 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
-
-from builtins import *
+"""python-zeep SOAP client wrappers"""
 
 import os
 import urllib3
@@ -30,7 +22,17 @@ from .api import (
     RoutePartition as _RoutePartitionAPI,
     CallPickupGroup as _CallPickupGroupAPI,
     User as _UserAPI,
-    AarGroup as _AarGroupAPI
+    AarGroup as _AarGroupAPI,
+    CallManagerGroup as _CallManagerGroupAPI,
+    DirectedCallPark as _DirectedCallParkAPI,
+    CallPark as _CallParkAPI,
+    CalledPartyTransformationPattern as _CalledPartyTransformationPatternAPI,
+    CallingPartyTransformationPattern as _CallingPartyTransformationPatternAPI,
+    CmcInfo as _CmcInfoAPI,
+    ConferenceBridge as _ConferenceBridgeAPI,
+    Css as _CssAPI,
+    CtiRoutePoint as _CtiRoutePointAPI,
+    DevicePool as _DevicePoolAPI
 )
 
 
@@ -167,10 +169,14 @@ class UCMAXLConnector (UCSOAPConnector):
 
         UCSOAPConnector.__init__(self, **connection_kwargs)
 
-        # device API wrappers
+        # sql API wrapper
         self.sql = _ThinAXLAPI(self, axl_factory)
+
+        # device API wrappers
         self.phones = _PhoneAPI(self, axl_factory)
         self.lines = _LineAPI(self, axl_factory)
+        self.cti_route_point = _CtiRoutePointAPI(self, axl_factory)
+        self.device_pool = _DevicePoolAPI(self, axl_factory)
 
         # user API wrappers
         self.users = _UserAPI(self, axl_factory)
@@ -179,6 +185,18 @@ class UCMAXLConnector (UCSOAPConnector):
         self.route_partitions = _RoutePartitionAPI(self, axl_factory)
         self.call_pickup_groups = _CallPickupGroupAPI(self, axl_factory)
         self.aar_group = _AarGroupAPI(self, axl_factory)
+        self.directed_call_park = _DirectedCallParkAPI(self, axl_factory)
+        self.call_park = _CallParkAPI(self, axl_factory)
+        self.called_party_xform_pattern = _CalledPartyTransformationPatternAPI(self, axl_factory)
+        self.calling_party_xform_pattern = _CallingPartyTransformationPatternAPI(self, axl_factory)
+        self.cmc = _CmcInfoAPI(self, axl_factory)
+        self.css = _CssAPI(self, axl_factory)
+
+        # system API wrappers
+        self.callmanager_group = _CallManagerGroupAPI(self, axl_factory)
+
+        # media API wrappers
+        self.conference_bridge = _ConferenceBridgeAPI(self, axl_factory)
 
 
 class UCMControlCenterConnector(UCSOAPConnector):

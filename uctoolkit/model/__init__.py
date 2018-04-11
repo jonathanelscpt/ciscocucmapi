@@ -1,13 +1,6 @@
 # -*- coding: utf-8 -*-
 """AXL Data Model Classes"""
 
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
-
 from collections import defaultdict
 
 from .axldata import AXLDataModel
@@ -30,27 +23,67 @@ class ThinAXLDataModel(AXLDataModel):
 
 
 class PhoneDataModel(AXLDataModel):
-    """Cisco CUCM AXL Phone data model."""
+    """Phone data model."""
 
 
 class LineDataModel(AXLDataModel):
-    """Cisco CUCM AXL Line data model."""
+    """Line data model."""
 
 
 class UserDataModel(AXLDataModel):
-    """Cisco CUCM AXL User data model."""
+    """CUCM User data model."""
 
 
 class RoutePartitionDataModel(AXLDataModel):
-    """Cisco CUCM AXL RoutePartition data model."""
+    """RoutePartition data model."""
 
 
 class CallPickupGroupDataModel(AXLDataModel):
-    """Cisco CUCM AXL CallPickupGroup data model."""
+    """CallPickupGroup data model."""
 
 
 class AarGroupDataModel(AXLDataModel):
-    """Cisco CUCM AXL CallPickupGroup data model."""
+    """AarGroup data model."""
+
+
+class CallManagerGroupDataModel(AXLDataModel):
+    """CUCM Group data model"""
+
+
+class DirectedCallParkDataModel(AXLDataModel):
+    """DirectedCallPark data model"""
+
+
+class CallParkDataModel(AXLDataModel):
+    """CallPark data model"""
+
+
+class CalledPartyTransformationPatternDataModel(AXLDataModel):
+    """CalledPartyTransformationPattern data model"""
+
+
+class CallingPartyTransformationPatternDataModel(AXLDataModel):
+    """CallingPartyTransformationPattern data model"""
+
+
+class CmcInfoDataModel(AXLDataModel):
+    """CmcInfo data model"""
+
+
+class ConferenceBridgeDataModel(AXLDataModel):
+    """ConferenceBridge data model"""
+
+
+class CssDataModel(AXLDataModel):
+    """Css data model"""
+
+
+class CtiRoutePointDataModel(AXLDataModel):
+    """Css data model"""
+
+
+class DevicePoolDataModel(AXLDataModel):
+    """Device Pool data model"""
 
 
 axl_data_models = defaultdict(
@@ -61,7 +94,17 @@ axl_data_models = defaultdict(
     line=LineDataModel,
     route_partition=RoutePartitionDataModel,
     call_pickup_group=CallPickupGroupDataModel,
-    aar_group=AarGroupDataModel
+    aar_group=AarGroupDataModel,
+    callmanager_group=CallManagerGroupDataModel,
+    directed_call_park=DirectedCallParkDataModel,
+    call_park=CallParkDataModel,
+    called_party_xform_pattern=CalledPartyTransformationPatternDataModel,
+    calling_party_xform_pattern=CallingPartyTransformationPatternDataModel,
+    cmc=CmcInfoDataModel,
+    conference_bridge=ConferenceBridgeDataModel,
+    css=CssDataModel,
+    cti_route_point=CtiRoutePointDataModel,
+    device_pool=DevicePoolDataModel
 )
 
 

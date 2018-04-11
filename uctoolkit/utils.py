@@ -1,16 +1,6 @@
 # -*- coding: utf-8 -*-
 """Package helper functions and classes."""
 
-
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals
-)
-from builtins import *
-from past.builtins import basestring, unicode
-
 import json
 import csv
 from collections import OrderedDict
@@ -28,7 +18,7 @@ def to_json_dict(json_data):
     """
     if isinstance(json_data, dict):
         return json_data
-    elif isinstance(json_data, basestring):
+    elif isinstance(json_data, str):
         return json.loads(json_data, object_hook=OrderedDict)
     else:
         raise TypeError(

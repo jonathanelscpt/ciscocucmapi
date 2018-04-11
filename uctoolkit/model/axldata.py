@@ -2,20 +2,7 @@
 """Cisco UC AXL Generic Data Model"""
 
 
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals
-)
-
-from builtins import *
-
-try:
-    from collections.abc import MutableMapping
-except ImportError:
-    from collections import MutableMapping
-import json
+from collections.abc import MutableMapping
 
 from ..exceptions import AXLAttributeError
 from ..utils import sanitize_data_model_dict

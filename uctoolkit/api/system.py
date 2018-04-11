@@ -1,16 +1,58 @@
 # -*- coding: utf-8 -*-
 """CUCM System Configuration APIs."""
 
+from uctoolkit.api.abstract import AbstractAXLAPI, AbstractAXLDeviceAPI
 
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
 
-from builtins import *
+class CallManagerGroup(AbstractAXLDeviceAPI):
 
-from uctoolkit.api.abstract import AbstractAXLAPI
+    _OBJECT_TYPE = 'callmanager_group'
+    _RETURN_OBJECT_NAME = 'callManagerGroup'
+    _ADD_API_MANDATORY_ATTRIBUTES = (
+        "name",
+        "members"
+    )
+
+    def __init__(self, client, object_factory):
+        super(CallManagerGroup, self).__init__(client, object_factory)
+
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
+
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
+
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
+
+
+class DevicePool(AbstractAXLDeviceAPI):
+
+    _OBJECT_TYPE = 'device_pool'
+    _RETURN_OBJECT_NAME = 'devicePool'
+    _ADD_API_MANDATORY_ATTRIBUTES = (
+        "name",
+        "dateTimeSettingName",
+        "callManagerGroupName",
+        "regionName",
+    )
+
+    def __init__(self, client, object_factory):
+        super(DevicePool, self).__init__(client, object_factory)
+
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
+
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
+
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
 
 

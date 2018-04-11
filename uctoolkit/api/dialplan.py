@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
 """CUCM Dial Plan Configuration APIs."""
 
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
-from builtins import *
-
 from .abstract import AbstractAXLDeviceAPI, AbstractAXLAPI
 from ..exceptions import AXLMethodDoesNotExist
 
@@ -23,6 +15,184 @@ class AarGroup(AbstractAXLAPI):
 
     def __init__(self, client, object_factory):
         super(AarGroup, self).__init__(client, object_factory)
+
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
+
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
+
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
+
+
+class CallPickupGroup(AbstractAXLAPI):
+
+    _OBJECT_TYPE = 'call_pickup_group'
+    _RETURN_OBJECT_NAME = 'callPickupGroup'
+    _ADD_API_MANDATORY_ATTRIBUTES = (
+        "name",
+        "pattern",
+    )
+
+    def __init__(self, client, object_factory):
+        super(CallPickupGroup, self).__init__(client, object_factory)
+
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
+
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
+
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
+
+
+class CallPark(AbstractAXLAPI):
+
+    _OBJECT_TYPE = 'call_park'
+    _RETURN_OBJECT_NAME = 'callPark'
+    _ADD_API_MANDATORY_ATTRIBUTES = (
+        "pattern",
+        "callManagerName",
+    )
+
+    def __init__(self, client, object_factory):
+        super(CallPark, self).__init__(client, object_factory)
+
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
+
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
+
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
+
+
+class CalledPartyTransformationPattern(AbstractAXLAPI):
+
+    _OBJECT_TYPE = 'called_party_xform_pattern'
+    _RETURN_OBJECT_NAME = 'calledPartyTransformationPattern'
+    _ADD_API_MANDATORY_ATTRIBUTES = (
+        "pattern",
+    )
+
+    def __init__(self, client, object_factory):
+        super(CalledPartyTransformationPattern, self).__init__(client, object_factory)
+
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
+
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
+
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
+
+
+class CallingPartyTransformationPattern(AbstractAXLAPI):
+
+    _OBJECT_TYPE = 'calling_party_xform_pattern'
+    _RETURN_OBJECT_NAME = 'callingPartyTransformationPattern'
+    _ADD_API_MANDATORY_ATTRIBUTES = (
+        "pattern",
+    )
+
+    def __init__(self, client, object_factory):
+        super(CallingPartyTransformationPattern, self).__init__(client, object_factory)
+
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
+
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
+
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
+
+
+class CmcInfo(AbstractAXLAPI):
+
+    _OBJECT_TYPE = 'cmc'
+    _RETURN_OBJECT_NAME = 'cmcInfo'
+    _ADD_API_MANDATORY_ATTRIBUTES = (
+        "code",
+    )
+
+    def __init__(self, client, object_factory):
+        super(CmcInfo, self).__init__(client, object_factory)
+
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
+
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
+
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
+
+
+class Css(AbstractAXLDeviceAPI):
+
+    _OBJECT_TYPE = 'css'
+    _RETURN_OBJECT_NAME = 'css'
+    _ADD_API_MANDATORY_ATTRIBUTES = (
+        "name"
+    )
+
+    def __init__(self, client, object_factory):
+        super(Css, self).__init__(client, object_factory)
+
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
+
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
+
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
+
+    def reset(self, **kwargs):
+        # todo - refactor and improve abstract class design
+        raise AXLMethodDoesNotExist(
+            message="Reset method not available for RoutePartition api endpoint.  "
+                    "'restartRoutePartition' and 'applyRoutePartition' methods do exist."
+        )
+
+
+class DirectedCallPark(AbstractAXLDeviceAPI):
+
+    _OBJECT_TYPE = 'directed_call_park'
+    _RETURN_OBJECT_NAME = 'directedCallPark'
+    _ADD_API_MANDATORY_ATTRIBUTES = (
+        "pattern",
+        "retrievalPrefix"
+    )
+
+    def __init__(self, client, object_factory):
+        super(DirectedCallPark, self).__init__(client, object_factory)
 
     @property
     def object_type(self):
@@ -67,28 +237,4 @@ class RoutePartition(AbstractAXLDeviceAPI):
                     "'restartRoutePartition' and 'applyRoutePartition' methods do exist."
         )
 
-
-class CallPickupGroup(AbstractAXLAPI):
-
-    _OBJECT_TYPE = 'call_pickup_group'
-    _RETURN_OBJECT_NAME = 'callPickupGroup'
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "pattern",
-    )
-
-    def __init__(self, client, object_factory):
-        super(CallPickupGroup, self).__init__(client, object_factory)
-
-    @property
-    def object_type(self):
-        return self._OBJECT_TYPE
-
-    @property
-    def return_object_name(self):
-        return self._RETURN_OBJECT_NAME
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
 

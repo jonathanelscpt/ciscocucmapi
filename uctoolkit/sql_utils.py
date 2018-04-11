@@ -2,14 +2,6 @@
 """Useful SQL query utils for UC System Administration  tasks where full AXL object
 instantiation and method calling is too verbose or slow"""
 
-
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals
-)
-
 from .utils import extract_pkid_from_uuid
 
 
