@@ -7,14 +7,13 @@ from __future__ import (
     print_function,
     unicode_literals
 )
-
 from builtins import *
-from past.builtins import basestring, unicode
 
 from collections import OrderedDict, Iterable
-import os
-import sys
-import json
+
+from zeep.xsd.elements.indicators import Choice
+from zeep.xsd.elements.indicators import Sequence
+from zeep.xsd.elements.element import Element
 
 
 def check_type(o, acceptable_types, may_be_none=True):
@@ -49,42 +48,6 @@ def check_type(o, acceptable_types, may_be_none=True):
             )
         )
         raise TypeError(error_message)
-
-
-def is_local_file(string):
-    """Check to see if string is a valid local file path."""
-    assert isinstance(string, basestring)
-    return os.path.isfile(string)
-
-
-def to_unicode(string):
-    """Convert a string (bytes, str or unicode) to unicode."""
-    assert isinstance(string, basestring)
-    if sys.version_info[0] >= 3:
-        if isinstance(string, bytes):
-            return string.decode('utf-8')
-        else:
-            return string
-    else:
-        if isinstance(string, str):
-            return string.decode('utf-8')
-        else:
-            return string
-
-
-def to_bytes(string):
-    """Convert a string (bytes, str or unicode) to bytes."""
-    assert isinstance(string, basestring)
-    if sys.version_info[0] >= 3:
-        if isinstance(string, str):
-            return string.encode('utf-8')
-        else:
-            return string
-    else:
-        if isinstance(string, unicode):
-            return string.encode('utf-8')
-        else:
-            return string
 
 
 def element_list_to_ordered_dict(element_list):
@@ -165,6 +128,11 @@ def all_attributes_exist_with_null_intersection(iterable, d):
                for i in iterable) == 1
 
 
+def check_valid_attribute_req_dict(iterable, d):
+    return any((i in d if not isinstance(i, tuple) else (all(sub_i in d for sub_i in i)))
+               for i in iterable)
+
+
 def has_mandatory_keys(kwargs, mandatory_keys):
     """Tests if a minimal list of keys exist in dictionary
 
@@ -174,3 +142,14 @@ def has_mandatory_keys(kwargs, mandatory_keys):
     """
     return all(k in kwargs for k in mandatory_keys)
 
+
+def extract_get_choices(obj):
+    if isinstance(obj, (Choice, Sequence)):
+        return tuple([extract_get_choices(_) for _ in obj])
+    elif isinstance(obj, Element):
+        return obj.name
+    else:
+        raise TypeError("Only Choice, Sequence and Element classes inspected, Type '{cls}' found.".format(
+            cls=obj.__class__.__name__
+            )
+        )

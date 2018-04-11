@@ -18,6 +18,7 @@ except ImportError:
 import json
 
 from ..exceptions import AXLAttributeError
+from ..utils import sanitize_data_model_dict
 
 
 class AXLDataModel(MutableMapping):
@@ -34,15 +35,13 @@ class AXLDataModel(MutableMapping):
 
     def __str__(self):
         """A human-readable string representation of this object."""
-        class_str = self.__class__.__name__
         json_str = json.dumps(self._axl_data, indent=2)
-        return "{}:\n{}".format(class_str, json_str)
+        return "{}:\n{}".format(self.__class__.__name__, json_str)
 
     def __repr__(self):
         """A string representing this object as valid Python expression."""
-        class_str = self.__class__.__name__
         json_str = json.dumps(self._axl_data, ensure_ascii=False)
-        return "{}({})".format(class_str, json_str)
+        return "{}({})".format(self.__class__.__name__, json_str)
 
     def __eq__(self, other):
         """AXL objects equality using on uuid"""
@@ -84,13 +83,5 @@ class AXLDataModel(MutableMapping):
     def __setattr__(self, key, value):
         self.__setitem__(key, value)
 
-    def to_dict(self):
-        """Convert the AXL data to a dictionary."""
-        return dict(self._axl_data)
-
-    def to_json(self, **kwargs):
-        """Convert the AXL data to JSON for export or transit purposes.
-        Any keyword arguments provided are passed through the native
-        Python JSON encoder.
-        """
-        return json.dumps(self._axl_data, **kwargs)
+    def sanitize(self):
+        return sanitize_data_model_dict(self._axl_data)

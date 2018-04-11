@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Useful SQL query utils for UC System Administration.
-Often useful for specific admin tasks where full object instantiation and AXl method calling
-is too verbose"""
+"""Useful SQL query utils for UC System Administration  tasks where full AXL object
+instantiation and method calling is too verbose or slow"""
 
 
 from __future__ import (

@@ -21,10 +21,7 @@ from zeep.asyncio import AsyncTransport
 from requests import Session
 from requests.auth import HTTPBasicAuth
 
-from .exceptions import (
-    ServiceProxyError,
-    UCToolkitConnectionException
-)
+from .exceptions import ServiceProxyError
 from .model import axl_factory
 from .api import (
     ThinAXL as _ThinAXLAPI,
@@ -47,8 +44,10 @@ WSDL_URLS = {
 
 
 def get_connection_kwargs(env_dict, kwargs):
-    """Update connection kwargs with environment variable values.
-    Env parameters take precedence if they exist.
+    """Get zeep client kwargs by consolidating environment variables and statically defined attributes.
+
+    Note:
+    Static parameters take precedence over env vars, if they exist.
 
     :param env_dict: dict mapping connection argument names to environment variable names
     :param kwargs: __init__ input args
@@ -56,18 +55,8 @@ def get_connection_kwargs(env_dict, kwargs):
     :raises UCToolkitConnectionException: if no connection parameters not provided
     """
     connection_kwargs = {k: os.environ.get(v) for k, v in env_dict.items()}
-    try:
-        # we need to consolidate the env vars with what was provided during __init__
-        # we let env vars take precedence if they exist
-        init_kwargs = {k: kwargs[v] for k, v in env_dict.items() if connection_kwargs[k] is None}
-        connection_kwargs.update(init_kwargs)
-        return connection_kwargs
-    except KeyError:
-        raise UCToolkitConnectionException(
-            "All connection parameters must be provided, either via environment variables"
-            " or as explicit keyword arguments: {connection_params}".format(
-                connection_params=list(env_dict.keys()))
-        )
+    connection_kwargs.update(kwargs)
+    return connection_kwargs
 
 
 class UCSOAPConnector:
@@ -120,8 +109,8 @@ class UCSOAPConnector:
                                   timeout=self._timeout
                                   )
 
+        # self._client = Client(wsdl=wsdl, transport=transport)
         self._client = Client(wsdl=wsdl, transport=transport)
-
         if binding_name and address:
             # self._client = self._client.create_service(binding_name, address)
             self._service = self._client.create_service(binding_name, address)
@@ -134,7 +123,7 @@ class UCSOAPConnector:
             # use first service and first port within that service - zeep default behaviour
             self._service = ServiceProxyError("ServiceProxy not used for this connector")
 
-        self._model_factory = self._client.type_factory('ns0')
+        self.model_factory = self._client.type_factory('ns0')
 
     @property
     def timeout(self):
@@ -154,11 +143,6 @@ class UCSOAPConnector:
     def service(self):
         """Direct access to zeep service for method-calling of proxied services"""
         return self._service
-
-    @property
-    def model_factory(self):
-        """zeep factory for global wsdl namespace"""
-        return self._model_factory
 
 
 class UCMAXLConnector (UCSOAPConnector):

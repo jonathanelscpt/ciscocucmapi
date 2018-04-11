@@ -10,7 +10,7 @@
    Best to change to entire attr dict?
  - Check if sql updates are returning the number of rows affected
  - fix `__eq__` to compare `_axl_dict`
- 
+ - extend use of zeep factory in connector to abstract classes
  
  ## Known Issues
  - `first` and `skip` for list not available for all apis - need child class extension to 

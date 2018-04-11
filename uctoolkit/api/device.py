@@ -15,26 +15,9 @@ from .abstract import AbstractAXLDeviceAPI
 
 
 class Line(AbstractAXLDeviceAPI):
-    """Cisco CUCM Line API.
 
-    Wraps the CUCM AXL API and exposes the API as native Python
-    methods that return native Python objects.
-    """
     _OBJECT_TYPE = 'line'
     _RETURN_OBJECT_NAME = 'line'
-    _IDENTIFIERS = (
-        "uuid",
-        (
-            "pattern",
-            "routePartitionName"
-        )
-    )
-    _LIST_API_SEARCH_CRITERIA = (
-        "pattern",
-        "description",
-        "usage",
-        "routePartitionName"
-    )
     _ADD_API_MANDATORY_ATTRIBUTES = (
         "pattern",
         "routePartitionName",
@@ -42,95 +25,49 @@ class Line(AbstractAXLDeviceAPI):
     )
 
     def __init__(self, client, object_factory):
-        """Initialize a new Line object with the provided AXL client.
-
-        :param client: zeep SOAP AXL client for API calls to CUCM's SOAP interface
-        :param object_factory: factory function for instantiating data models objects
-        :raises TypeError: If parameter types are invalid.
-        """
         super(Line, self).__init__(client, object_factory)
 
-    @classmethod
-    def object_type(cls):
-        return cls._OBJECT_TYPE
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
 
-    @classmethod
-    def return_object_name(cls):
-        return cls._RETURN_OBJECT_NAME
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
 
-    @classmethod
-    def add_api_mandatory_attributes(cls):
-        return cls._ADD_API_MANDATORY_ATTRIBUTES
-
-    @classmethod
-    def list_api_search_criteria(cls):
-        return cls._LIST_API_SEARCH_CRITERIA
-
-    @classmethod
-    def identifiers(cls):
-        return cls._IDENTIFIERS
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
 
 
 class Phone(AbstractAXLDeviceAPI):
-    """Cisco CUCM Phones API.
 
-    Wraps the CUCM AXL API and exposes the API as native Python
-    methods that return native Python objects.
-    """
     _OBJECT_TYPE = 'phone'
     _RETURN_OBJECT_NAME = 'phone'
-    _IDENTIFIERS = (
-        "name",
-        "uuid"
-    )
-    _LIST_API_SEARCH_CRITERIA = (
-        "name",
-        "description",
-        "protocol",
-        "callingSearchSpaceName",
-        "devicePoolName",
-        "securityProfileName"
-    )
     _ADD_API_MANDATORY_ATTRIBUTES = (
         "name",
         "product",
         "class",
         "protocol",
-        "protocolSide",
         "devicePoolName",
         "commonPhoneConfigName",
-        "useTrustedRelayPoint",
         "locationName"
     )
 
-    def __init__(self, client, object_factory):
-        """Initialize a new Phone object with the provided AXL client.
+    def __init__(self, connector, object_factory):
+        super(Phone, self).__init__(connector, object_factory)
 
-        :param client: zeep SOAP AXL client for API calls to CUCM's SOAP interface
-        :param object_factory: factory function for instantiating data models objects
-        :raises TypeError: If parameter types are invalid.
-        """
-        super(Phone, self).__init__(client, object_factory)
+    @property
+    def object_type(self):
+        return self._OBJECT_TYPE
 
-    @classmethod
-    def object_type(cls):
-        return cls._OBJECT_TYPE
+    @property
+    def return_object_name(self):
+        return self._RETURN_OBJECT_NAME
 
-    @classmethod
-    def return_object_name(cls):
-        return cls._RETURN_OBJECT_NAME
-
-    @classmethod
-    def add_api_mandatory_attributes(cls):
-        return cls._ADD_API_MANDATORY_ATTRIBUTES
-
-    @classmethod
-    def list_api_search_criteria(cls):
-        return cls._LIST_API_SEARCH_CRITERIA
-
-    @classmethod
-    def identifiers(cls):
-        return cls._IDENTIFIERS
+    @property
+    def add_api_mandatory_attributes(self):
+        return self._ADD_API_MANDATORY_ATTRIBUTES
 
     def wipe(self, **kwargs):
         """Allows Cisco's newer Android-based devices, like the Cisco DX650,
@@ -140,7 +77,7 @@ class Phone(AbstractAXLDeviceAPI):
         :return: None
         :raises TypeError: if name or uuid not supplied
         """
-        self._check_identifiers(**kwargs)
+        self._check_identifiers(self._wsdl_objects["name_and_guid_model"],**kwargs)
         self._serialize_axl_object("wipe", **kwargs)
 
     def options(self, uuid, returned_choices=None):

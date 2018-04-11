@@ -38,7 +38,27 @@ from uctoolkit import UCMAXLConnector
 
 axl = UCMAXLConnector()  # env vars for connection params
 
-# list phones by name
+# adding a phone
+# todo
+
+# api endpoints can be created prior to invoking axl method-calling for pre-processing
+bot_device_attributes = {
+    "name": "BOTJONATHANTEST",
+    "product": "",
+    "class": "",
+    "protocol": "SIP",
+    "protocolSide": "",
+    "devicePoolName": "Default",
+    "commonPhoneConfigName": "",
+    "useTrustedRelayPoint": "",
+    "locationName": "",
+}
+axl.phones.create()
+
+
+# geting phones
+
+# listing phones by name
 bot_names = {
     "name": "BOT%"
 }
@@ -62,16 +82,15 @@ kwargs = {
     "locationName": botuser15.locationName
 }
 axl.phones.update(name=botuser15.name, **kwargs)
+
 # updating a phone from data model object
 axl.phones.update(botuser15)
-
 
 # deleting a phone
 axl.phones.remove(botuser15)  # using existing phone object
 axl.phones.remove(name="BOTUSER015")  # native API call
 
-
-# execute sql query
+# execute sql queries
 numplan = axl.sql.query("SELECT * FROM numplan")
 dns = [_['dnorpattern'] for _ in numplan]
 
@@ -90,13 +109,13 @@ dns = [_['dnorpattern'] for _ in numplan]
  
 ## Supported Languages and AXL Versions
 
- - Currently only Python 3.6 tested.
- - There is currently no plan to support Python 2.7, as `asyncio` is not supported in 2.7
-   and the suggested 2.7 alternative, `Trollius`, is not longer maintained.
+ - Currently only Python 3.6 tested.   Python 2.7 not planned for support in the short-term.
  - All AXL versions *should* be supported, however only 11.5 has been currently tested.  All
-   AXL data models include metadata on mandatory params for `add`, `get` and `list` calls.  It 
-   is expected that these should not change across AXL schema versions.  Please raise a defect 
+   AXL data models include static metadata on mandatory params for `add` calls.  It  is 
+   not expected that these should change across AXL schema versions.  Please raise a defect 
    if you encounter any issues.
+ - Other API methods contain reliable information and can be queried from the 
+   schema dynamically.  
  
  
  ## Donate
