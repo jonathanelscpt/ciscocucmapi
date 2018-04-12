@@ -2,7 +2,7 @@
 
 import itertools
 
-from .sql import ThinAXL
+from .base import ThinAXL
 from .device import (
     Line,
     Phone,
@@ -37,7 +37,7 @@ from .media import (
     ConferenceBridge,
 )
 
-_sql = [
+_base = [
     ThinAXL
 ]
 _devices = [
@@ -76,12 +76,6 @@ _media = [
     ConferenceBridge
 ]
 
-_all = [
-    _sql,
-    _user,
-    _devices,
-    _dial_plan,
-    _system
-]
+_all = [_base, _user, _devices, _dial_plan, _system]
 
 __all__ = list(itertools.chain.from_iterable(_all))
