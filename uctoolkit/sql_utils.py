@@ -6,6 +6,7 @@ from .helpers import extract_pkid_from_uuid
 
 
 def get_device_pkid(axl_connector, device_name):
+    """Get a device pkid from the device name"""
     sql_statement = "select pkid " \
             "from device " \
             "where name={device_name}".format(
@@ -15,6 +16,7 @@ def get_device_pkid(axl_connector, device_name):
 
 
 def get_enduser_pkid(axl_connector, userid):
+    """Get an enduser pkid from the enduser userid"""
     sql_statement = "select pkid " \
             "from enduser " \
             "where userid={userid}".format(
@@ -24,6 +26,7 @@ def get_enduser_pkid(axl_connector, userid):
 
 
 def associate_device_to_enduser(axl_connector, enduser_pkid_or_uuid, device_pkid_or_uuid, tkuserassociation=1):
+    """Insert row into enduserdevicemap table to add user/device association"""
     enduser_pkid = extract_pkid_from_uuid(enduser_pkid_or_uuid)
     device_pkid = extract_pkid_from_uuid(device_pkid_or_uuid)
     sql_statement = "insert into enduserdevicemap (fkenduser, fkdevice, defaultprofile, tkuserassociation)" \
@@ -36,6 +39,7 @@ def associate_device_to_enduser(axl_connector, enduser_pkid_or_uuid, device_pkid
 
 
 def associate_enduser_to_user_group(axl_connector, enduser_pkid_or_uuid, dirgroup_pkid_or_uuid):
+    """Insert row into enduserdirgroupmap table to add enduser/user group association"""
     enduser_pkid = extract_pkid_from_uuid(enduser_pkid_or_uuid)
     dirgroup_pkid = extract_pkid_from_uuid(dirgroup_pkid_or_uuid)
     sql_statement = "insert into enduserdirgroupmap (fkenduser, fkdirgroup) " \
@@ -46,7 +50,11 @@ def associate_enduser_to_user_group(axl_connector, enduser_pkid_or_uuid, dirgrou
     return axl_connector.sql.update(sql_statement)
 
 
-def get_dnorpattern_pkid(axl_connector, dnorpattern, tkpatternusage=2):
+def get_dn_pkid(axl_connector, dnorpattern, tkpatternusage=2):
+    """Get dn pkid from the dnorpattern from numplan table.
+    'tkpatternusage' is specified to only return DNs.
+
+    Does not ensure uniqueness as does not include join on route partition table"""
     sql_statement = "select pkid from numplan " \
                     "where dnorpattern={dnorpattern} "\
                     "and tkpatternusage={tkpatternusage}".format(
@@ -57,6 +65,7 @@ def get_dnorpattern_pkid(axl_connector, dnorpattern, tkpatternusage=2):
 
 
 def get_service_parameter_details(axl_connector, parameter_name):
+    """Get individual service parameters tuple"""
     sql_statement = "select * from processconfig "  \
                     "where paramname = '{parameter_name}'".format(
                      parameter_name=parameter_name
@@ -65,6 +74,7 @@ def get_service_parameter_details(axl_connector, parameter_name):
 
 
 def update_service_parameter(axl_connector, parameter_name, parameter_value):
+    """Update service parameter with specified value"""
     sql_statement = "update processconfig " \
                     "set paramvalue = '{parameter_value}' " \
                     "where paramname = '{parameter_name}'".format(

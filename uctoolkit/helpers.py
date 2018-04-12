@@ -37,7 +37,7 @@ def to_csv(data_model_list, destination_path):
     if isinstance(destination_path, Path):
         destination_path = destination_path.resolve()
     try:
-        with open(destination_path, "w") as _:
+        with open(destination_path, "w", newline='') as _:
             dict_writer = csv.DictWriter(_, fieldnames=data_model_list[0].keys())
             dict_writer.writeheader()
             dict_writer.writerows(data_model_list)

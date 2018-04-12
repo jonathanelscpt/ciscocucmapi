@@ -7,6 +7,7 @@ from .device import (
     Line,
     Phone,
     CtiRoutePoint,
+    DeviceProfile,
 )
 from .user import User
 from .dialplan import (
@@ -18,11 +19,19 @@ from .dialplan import (
     CalledPartyTransformationPattern,
     CallingPartyTransformationPattern,
     CmcInfo,
-    Css
+    Css,
+    FacInfo,
+    HuntList,
+    HuntPilot,
+    LineGroup
 )
 from .system import (
     CallManagerGroup,
-    DevicePool
+    DevicePool,
+    DateTimeGroup,
+    LdapDirectory,
+    LdapFilter,
+    LdapSyncCustomField
 )
 from .media import (
     ConferenceBridge,
@@ -35,6 +44,7 @@ _devices = [
     Line,
     Phone,
     CtiRoutePoint,
+    DeviceProfile,
 ]
 _user = [
     User,
@@ -48,11 +58,19 @@ _dial_plan = [
     CalledPartyTransformationPattern,
     CallingPartyTransformationPattern,
     CmcInfo,
-    Css
+    Css,
+    FacInfo,
+    HuntList,
+    HuntPilot,
+    LineGroup
 ]
 _system = [
     CallManagerGroup,
     DevicePool,
+    DateTimeGroup,
+    LdapDirectory,
+    LdapFilter,
+    LdapSyncCustomField
 ]
 _media = [
     ConferenceBridge

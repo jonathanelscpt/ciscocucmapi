@@ -85,3 +85,7 @@ def has_mandatory_keys(kwargs, mandatory_keys):
     :return: True if all mandatory keys in kwargs dictionary
     """
     return all(k in kwargs for k in mandatory_keys)
+
+
+def downcase_string(s):
+    return s[:1].lower() + s[1:] if s else ''

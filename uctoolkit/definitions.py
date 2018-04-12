@@ -1,6 +1,66 @@
 # -*- coding: utf-8 -*-
-"""AXL Data definitions"""
+"""AXL definitions"""
 
+from .api import (
+    ThinAXL,
+    Phone,
+    Line,
+    RoutePartition,
+    CallPickupGroup,
+    User,
+    AarGroup,
+    CallManagerGroup,
+    DirectedCallPark,
+    CallPark,
+    CalledPartyTransformationPattern,
+    CallingPartyTransformationPattern,
+    CmcInfo,
+    ConferenceBridge,
+    Css,
+    CtiRoutePoint,
+    DevicePool,
+    DateTimeGroup,
+    DeviceProfile,
+    FacInfo,
+    HuntList,
+    HuntPilot,
+)
+
+
+WSDL_URLS = {
+    "RisPort70": "https://{fqdn}:8443/realtimeservice2/services/RISService70?wsdl",
+    "CDRonDemand": "https://{fqdn}:8443/realtimeservice2/services/CDRonDemandService?wsdl",
+    "PerfMon": "https://{fqdn}:8443/perfmonservice2/services/PerfmonService?wsdl",
+    "ControlCenterServices": "https://{fqdn}:8443/controlcenterservice2/services/ControlCenterServices?wsdl",
+    "ControlCenterServicesExtended": "https://{fqdn}:8443/controlcenterservice2/services/ControlCenterServicesEx?wsdl",
+    "LogCollection": "https://{fqdn}:8443/logcollectionservice2/services/LogCollectionPortTypeService?wsdl",
+    "DimeGetFileService": "https://{fqdn}:8443/logcollectionservice/services/DimeGetFileService?wsdl"
+}
+
+AXL_API_ENDPOINTS = [
+    ThinAXL,
+    Phone,
+    Line,
+    RoutePartition,
+    CallPickupGroup,
+    User,
+    AarGroup,
+    CallManagerGroup,
+    DirectedCallPark,
+    CallPark,
+    CalledPartyTransformationPattern,
+    CallingPartyTransformationPattern,
+    CmcInfo,
+    ConferenceBridge,
+    Css,
+    CtiRoutePoint,
+    DevicePool,
+    DateTimeGroup,
+    DeviceProfile,
+    FacInfo,
+    HuntList,
+    HuntPilot,
+]
 
 PHONE_MODEL_CODES = {
     1: "Cisco 30 SP+",
@@ -190,7 +250,6 @@ PHONE_MODEL_CODES = {
     36207: "Cisco TelePresence MX700",
     36208: "Cisco TelePresence MX800"
 }
-
 
 CONTROL_SERVICE_REASON_CODES = {
     -1000: "Component already initialized",

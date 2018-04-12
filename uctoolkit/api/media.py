@@ -1,28 +1,16 @@
 # -*- coding: utf-8 -*-
 """CUCM Media Configuration APIs."""
 
-from .abstract import AbstractAXLAPI, AbstractAXLDeviceAPI
+from .base import AbstractAXLAPI, AbstractAXLDeviceAPI
 
 
 class ConferenceBridge(AbstractAXLDeviceAPI):
 
-    _OBJECT_TYPE = 'conference_bridge'
-    _RETURN_OBJECT_NAME = 'conferenceBridge'
-    # locationName defaults to Hub_None, but is marked mandatory in the UI
     _ADD_API_MANDATORY_ATTRIBUTES = (
         "name",
         "product",
         "devicePoolName",
-        # "locationName",
     )
-
-    @property
-    def object_type(self):
-        return self._OBJECT_TYPE
-
-    @property
-    def return_object_name(self):
-        return self._RETURN_OBJECT_NAME
 
     @property
     def add_api_mandatory_attributes(self):
@@ -34,5 +22,5 @@ class ConferenceBridge(AbstractAXLDeviceAPI):
         default_kwargs = {
             "product": product,
         }
-        kwargs.update(default_kwargs)
-        return super(ConferenceBridge, self).add(**kwargs)
+        default_kwargs.update(kwargs)
+        return super().add(**default_kwargs)

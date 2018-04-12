@@ -15,6 +15,7 @@ from requests.auth import HTTPBasicAuth
 
 from .exceptions import ServiceProxyError
 from .model import axl_factory
+from .definitions import WSDL_URLS
 from .api import (
     ThinAXL as _ThinAXLAPI,
     Phone as _PhoneAPI,
@@ -32,19 +33,16 @@ from .api import (
     ConferenceBridge as _ConferenceBridgeAPI,
     Css as _CssAPI,
     CtiRoutePoint as _CtiRoutePointAPI,
-    DevicePool as _DevicePoolAPI
+    DevicePool as _DevicePoolAPI,
+    DateTimeGroup as _DateTimeGroupAPI,
+    DeviceProfile as _DeviceProfileAPI,
+    FacInfo as _FacInfoAPI,
+    HuntList as _HuntListAPI,
+    HuntPilot as _HuntPilotAPI,
+    LdapDirectory as _LdapDirectoryAPI,
+    LdapFilter as _LdapFilterAPI,
+    LdapSyncCustomField as _LdapSyncCustomFieldAPI
 )
-
-
-WSDL_URLS = {
-    "RisPort70": "https://{fqdn}:8443/realtimeservice2/services/RISService70?wsdl",
-    "CDRonDemand": "https://{fqdn}:8443/realtimeservice2/services/CDRonDemandService?wsdl",
-    "PerfMon": "https://{fqdn}:8443/perfmonservice2/services/PerfmonService?wsdl",
-    "ControlCenterServices": "https://{fqdn}:8443/controlcenterservice2/services/ControlCenterServices?wsdl",
-    "ControlCenterServicesExtended": "https://{fqdn}:8443/controlcenterservice2/services/ControlCenterServicesEx?wsdl",
-    "LogCollection": "https://{fqdn}:8443/logcollectionservice2/services/LogCollectionPortTypeService?wsdl",
-    "DimeGetFileService": "https://{fqdn}:8443/logcollectionservice/services/DimeGetFileService?wsdl"
-}
 
 
 def get_connection_kwargs(env_dict, kwargs):
@@ -75,8 +73,7 @@ class UCSOAPConnector:
                  tls_verify=False,
                  timeout=30,
                  is_async=False):
-        """
-        Instantiate UC SOAP Client Connector
+        """Instantiate UC SOAP Client Connector
 
         :param username: SOAP client connector username
         :param password: SOAP client connector password
@@ -149,7 +146,7 @@ class UCSOAPConnector:
         return self._service
 
 
-class UCMAXLConnector (UCSOAPConnector):
+class UCMAXLConnector(UCSOAPConnector):
 
     _ENV = {
         "username": "AXL_USERNAME",
@@ -159,41 +156,47 @@ class UCMAXLConnector (UCSOAPConnector):
     }
 
     def __init__(self, **kwargs):
-
         connection_kwargs = get_connection_kwargs(self._ENV, kwargs)
         connection_kwargs["binding_name"] = "{http://www.cisco.com/AXLAPIService/}AXLAPIBinding"
         connection_kwargs["address"] = "https://{fqdn}:8443/axl/".format(
             fqdn=connection_kwargs["fqdn"]
         )
         del connection_kwargs["fqdn"]  # remove fqdn as not used in super() call
-
-        UCSOAPConnector.__init__(self, **connection_kwargs)
+        super().__init__(**connection_kwargs)
 
         # sql API wrapper
         self.sql = _ThinAXLAPI(self, axl_factory)
 
         # device API wrappers
-        self.phones = _PhoneAPI(self, axl_factory)
-        self.lines = _LineAPI(self, axl_factory)
         self.cti_route_point = _CtiRoutePointAPI(self, axl_factory)
-        self.device_pool = _DevicePoolAPI(self, axl_factory)
+        self.line = _LineAPI(self, axl_factory)
+        self.phone = _PhoneAPI(self, axl_factory)
+        self.udp = _DeviceProfileAPI(self, axl_factory)
 
         # user API wrappers
-        self.users = _UserAPI(self, axl_factory)
+        self.user = _UserAPI(self, axl_factory)
 
         # dial plan API wrappers
-        self.route_partitions = _RoutePartitionAPI(self, axl_factory)
-        self.call_pickup_groups = _CallPickupGroupAPI(self, axl_factory)
         self.aar_group = _AarGroupAPI(self, axl_factory)
-        self.directed_call_park = _DirectedCallParkAPI(self, axl_factory)
+        self.call_pickup_group = _CallPickupGroupAPI(self, axl_factory)
         self.call_park = _CallParkAPI(self, axl_factory)
         self.called_party_xform_pattern = _CalledPartyTransformationPatternAPI(self, axl_factory)
         self.calling_party_xform_pattern = _CallingPartyTransformationPatternAPI(self, axl_factory)
         self.cmc = _CmcInfoAPI(self, axl_factory)
         self.css = _CssAPI(self, axl_factory)
+        self.directed_call_park = _DirectedCallParkAPI(self, axl_factory)
+        self.route_partition = _RoutePartitionAPI(self, axl_factory)
+        self.fac = _FacInfoAPI(self, axl_factory)
+        self.hunt_list = _HuntListAPI(self, axl_factory)
+        self.hunt_pilot = _HuntPilotAPI(self, axl_factory)
 
         # system API wrappers
         self.callmanager_group = _CallManagerGroupAPI(self, axl_factory)
+        self.date_time_group = _DateTimeGroupAPI(self, axl_factory)
+        self.device_pool = _DevicePoolAPI(self, axl_factory)
+        self.ldap_directory = _LdapDirectoryAPI(self, axl_factory)
+        self.ldap_filter = _LdapFilterAPI(self, axl_factory)
+        self.ldap_sync_custom_field = _LdapSyncCustomFieldAPI(self, axl_factory)
 
         # media API wrappers
         self.conference_bridge = _ConferenceBridgeAPI(self, axl_factory)
@@ -203,11 +206,10 @@ class UCMControlCenterConnector(UCSOAPConnector):
 
     def __init__(self, username, password, fqdn, tls_verify=True):
         _wsdl = WSDL_URLS["ControlCenterServicesExtended"].format(fqdn)
-        UCSOAPConnector.__init__(self,
-                                 username=username,
-                                 password=password,
-                                 wsdl=_wsdl,
-                                 tls_verify=tls_verify)
+        super().__init__(username=username,
+                         password=password,
+                         wsdl=_wsdl,
+                         tls_verify=tls_verify)
 
     def get_service_status(self, services=None):
         # check this comment on factory creation:
@@ -236,13 +238,12 @@ class UCMRisPortConnector(UCSOAPConnector):
         _wsdl = WSDL_URLS["RisPort70"].format(fqdn)
         _binding_name = "{http://schemas.cisco.com/ast/soap}RisBinding"
         _address = "https://{fqdn}:8443/realtimeservice2/services/RISService70".format(fqdn=fqdn)
-        UCSOAPConnector.__init__(self,
-                                 username=username,
-                                 password=password,
-                                 wsdl=_wsdl,
-                                 binding_name=_binding_name,
-                                 address=_address,
-                                 tls_verify=tls_verify)
+        super().__init__(username=username,
+                         password=password,
+                         wsdl=_wsdl,
+                         binding_name=_binding_name,
+                         address=_address,
+                         tls_verify=tls_verify)
 
     def select_cm_device(self, state_info=None, **cm_selection_criteria):
         # device_class = "Any",
@@ -304,13 +305,12 @@ class UCMPerMonConnector(UCSOAPConnector):
         _wsdl = WSDL_URLS["PerfMon"].format(fqdn)
         _binding_name = "{http://schemas.cisco.com/ast/soap}PerfmonBinding"
         _address = "https://{fqdn}:8443/perfmonservice2/services/PerfmonService".format(fqdn=fqdn)
-        UCSOAPConnector.__init__(self,
-                                 username=username,
-                                 password=password,
-                                 wsdl=_wsdl,
-                                 binding_name=_binding_name,
-                                 address=_address,
-                                 tls_verify=tls_verify)
+        super().__init__(username=username,
+                         password=password,
+                         wsdl=_wsdl,
+                         binding_name=_binding_name,
+                         address=_address,
+                         tls_verify=tls_verify)
 
     def open_session(self):
         # todo
@@ -398,9 +398,8 @@ class UCMLogCollectionConnector(UCSOAPConnector):
 
     def __init__(self, username, password, fqdn, tls_verify=False):
         _wsdl = WSDL_URLS["LogCollection"].format(fqdn)
-        UCSOAPConnector.__init__(self,
-                                 username=username,
-                                 password=password,
-                                 wsdl=_wsdl,
-                                 tls_verify=tls_verify)
+        super().__init__(username=username,
+                         password=password,
+                         wsdl=_wsdl,
+                         tls_verify=tls_verify)
 

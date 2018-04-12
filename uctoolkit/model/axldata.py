@@ -5,15 +5,15 @@
 from collections.abc import MutableMapping
 
 from ..exceptions import AXLAttributeError
-from ..helpers import sanitize_data_model_dict
+from ..helpers import sanitize_data_model_dict, to_csv
 
 
 class AXLDataModel(MutableMapping):
     """Model an AXL data object as a native Python object."""
 
     def __init__(self, axl_data):
-        super(AXLDataModel, self).__init__()
-        super(AXLDataModel, self).__setattr__('_axl_data', axl_data)
+        super().__init__()
+        super().__setattr__('_axl_data', axl_data)
 
     @property
     def axl_data(self):
@@ -69,4 +69,18 @@ class AXLDataModel(MutableMapping):
         self.__setitem__(key, value)
 
     def sanitize(self):
+        """Return a sanitized dict representation of the data model, removing nested references to
+        '_value_1', where python-zeep has interpreted the AXL schema's inclusion of uuid attributes."""
         return sanitize_data_model_dict(self._axl_data)
+
+
+class ThinAXLDataModel(AXLDataModel):
+    """Cisco CUCM Thin AXL data model."""
+
+    @property
+    def sql_response(self):
+        """Return sql response table"""
+        return self._axl_data
+
+    def to_csv(self, destination_path):
+        to_csv(self._axl_data, destination_path)
