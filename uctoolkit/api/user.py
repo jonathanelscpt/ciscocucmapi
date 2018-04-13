@@ -1,21 +1,12 @@
 # -*- coding: utf-8 -*-
 """CUCM AXL User APIs."""
 
-from .base import AbstractAXLAPI
+from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
+from .._internal_utils import flatten_signature_args
 
 
 class User(AbstractAXLAPI):
-    """Cisco CUCM User API.
+    _factory_descriptor = "user"
 
-    Wraps the CUCM AXL API and exposes the API as native Python
-    methods that return native Python objects.
-    """
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "userid",
-        "lastName"
-        "presenceGroupName"
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, userid, lastName, presenceGroupName, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))

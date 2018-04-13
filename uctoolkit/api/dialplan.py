@@ -2,165 +2,106 @@
 """CUCM Dial Plan Configuration APIs."""
 
 from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
+from .._internal_utils import flatten_signature_args
 from ..exceptions import AXLMethodDoesNotExist
 
 
 class AarGroup(AbstractAXLAPI):
+    _factory_descriptor = "aar_group"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, name, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class CallPickupGroup(AbstractAXLAPI):
+    _factory_descriptor = "call_pickup_group"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "pattern",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, name, pattern, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class CallPark(AbstractAXLAPI):
+    _factory_descriptor = "call_park"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "pattern",
-        "callManagerName",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, pattern, callManagerName, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class CalledPartyTransformationPattern(AbstractAXLAPI):
+    _factory_descriptor = "called_party_xform_pattern"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "pattern",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, pattern, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class CallingPartyTransformationPattern(AbstractAXLAPI):
+    _factory_descriptor = "calling_party_xform_pattern"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "pattern",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, pattern, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class CmcInfo(AbstractAXLAPI):
+    _factory_descriptor = "cmc"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "code",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, code, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class Css(AbstractAXLAPI):
+    _factory_descriptor = "css"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name"
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, name, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class DirectedCallPark(AbstractAXLDeviceAPI):
+    _factory_descriptor = "directed_call_park"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "pattern",
-        "retrievalPrefix"
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, pattern, retrievalPrefix, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class FacInfo(AbstractAXLAPI):
+    _factory_descriptor = "fac"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "code",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, name, code, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class HuntList(AbstractAXLDeviceAPI):
+    _factory_descriptor = "hunt_list"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "callManagerGroupName"
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
-
-    def add(self,
-            routeListEnabled="true",
-            **kwargs):
-        default_kwargs = {
-            "routeListEnabled": routeListEnabled,
-        }
-        default_kwargs.update(kwargs)
-        return super().add(**default_kwargs)
+    def add(self, name, callManagerGroupName, routeListEnabled="true", **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
-class LineGroup(AbstractAXLDeviceAPI):
+class HuntPilot(AbstractAXLAPI):
+    _factory_descriptor = "hunt_pilot"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, pattern, huntListName, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
-class HuntPilot(AbstractAXLDeviceAPI):
+class LineGroup(AbstractAXLAPI):
+    _factory_descriptor = "line_group"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "pattern",
-        "huntListName",
-    )
+    def add(self, name, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+
+class LocalRouteGroup(AbstractAXLAPI):
+    _factory_descriptor = "local_route_group"
+
+    def add(self, name, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class RoutePartition(AbstractAXLDeviceAPI):
+    _factory_descriptor = "partition"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, name, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
     def reset(self, **kwargs):
         # edge case for devices that are restart-able but not reset-able
@@ -169,5 +110,4 @@ class RoutePartition(AbstractAXLDeviceAPI):
             message="'Reset' method not available for {name} api endpoint.  "
                     "'Restart' and 'apply' methods exist.".format(
                         name=self.__class__.__name__
-                    )
-        )
+                    ))

@@ -1,26 +1,33 @@
 # -*- coding: utf-8 -*-
 """CUCM Media Configuration APIs."""
 
-from .base import AbstractAXLAPI, AbstractAXLDeviceAPI
+from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
+from .._internal_utils import flatten_signature_args
 
 
 class ConferenceBridge(AbstractAXLDeviceAPI):
+    _factory_descriptor = "conference_bridge"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "product",
-        "devicePoolName",
-    )
+    def add(self, name, devicePoolName, product="Cisco IOS Conference Bridge", **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
 
-    def add(self,
-            product="Cisco IOS Conference Bridge",
-            **kwargs):
-        default_kwargs = {
-            "product": product,
-        }
-        default_kwargs.update(kwargs)
-        return super().add(**default_kwargs)
+class MediaResourceGroup(AbstractAXLAPI):
+    _factory_descriptor = "mrg"
+
+    def add(self, name, members, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class MediaResourceList(AbstractAXLDeviceAPI):
+    _factory_descriptor = "mrgl"
+
+    def add(self, name, members, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class Mtp(AbstractAXLDeviceAPI):
+    _factory_descriptor = "mtp"
+
+    def add(self, name, devicePoolName, mtpType="Cisco IOS Enhanced Software Media Termination Point", **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))

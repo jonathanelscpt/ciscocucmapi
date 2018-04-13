@@ -1,52 +1,28 @@
 # -*- coding: utf-8 -*-
 """CUCM AXL Device APIs."""
 
-from .base import AbstractAXLDeviceAPI
+from .base import AbstractAXLDeviceAPI, AbstractAXLAPI, check_identifiers
+from .._internal_utils import flatten_signature_args
 
 
 class Line(AbstractAXLDeviceAPI):
+    _factory_descriptor = "line"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "pattern",
-        "routePartitionName"
-    )
+    def __init__(self, connector, object_factory):
+        super().__init__(connector, object_factory)
+        # self._factory_name = "line"
 
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, name, routePartitionName, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class Phone(AbstractAXLDeviceAPI):
+    _factory_descriptor = "phone"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "product",
-        "class",
-        "protocol",
-        "devicePoolName"
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
-
-    def add(self,
-            protocol="SIP",
-            **kwargs):
-        """Extend 'add' to provide defaults for attrs that constrant for this API call
-
-        :param protocol: defaults to 'SIP'
-        :param kwargs: phone attribute kwargs
-        :return: API Data Model object
-        """
-        # workaround for restricted 'class' attribute
-        if "class" not in kwargs:
+    def add(self, name, product, devicePoolName, protocol="SIP", **kwargs):
+        if "class" not in kwargs:  # workaround for restricted 'class' attribute
             kwargs["class"] = "Phone"
-        default_kwargs = {
-            "protocol": protocol,
-        }
-        default_kwargs.update(kwargs)
-        return super().add(**default_kwargs)
+        return super().add(**flatten_signature_args(self.add, locals()))
 
     def wipe(self, **kwargs):
         """Allows Cisco's newer Android-based devices, like the Cisco DX650,
@@ -55,7 +31,7 @@ class Phone(AbstractAXLDeviceAPI):
         :param kwargs: phone name or uuid
         :return: None
         """
-        self._check_identifiers(self._wsdl_objects["name_and_guid_model"],**kwargs)
+        check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         self._serialize_axl_object("wipe", **kwargs)
 
     def options(self, uuid, returned_choices=None):
@@ -65,70 +41,25 @@ class Phone(AbstractAXLDeviceAPI):
 
 
 class CtiRoutePoint(AbstractAXLDeviceAPI):
+    _factory_descriptor = "cti_route_point"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "product",
-        "class",
-        "protocol",
-        "devicePoolName"
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
-
-    def add(self,
-            product="CTI Route Point",
-            protocol="SCCP",
-            **kwargs):
-        """Extend 'add' to provide defaults for attrs that constrant for this API call
-
-        :param product: default kwarg for easy method-calling
-        :param protocol: default kwarg for easy method-calling
-        :param kwargs:
-        :return: API Data Model object
-        """
-        # workaround for restricted 'class' attribute
-        if "class" not in kwargs:
+    def add(self, name, devicePoolName, product="CTI Route Point", protocol="SCCP", **kwargs):
+        if "class" not in kwargs:  # workaround for restricted 'class' attribute
             kwargs["class"] = "CTI Route Point"
-        default_kwargs = {
-            "product": product,
-            "protocol": protocol,
-        }
-        default_kwargs.update(kwargs)
-        return super().add(**default_kwargs)
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class DeviceProfile(AbstractAXLDeviceAPI):
+    _factory_descriptor = "udp"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "product",
-        "class",
-        "protocol",
-        "phoneTemplateName",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
-
-    def add(self,
-            protocol="SIP",
-            **kwargs):
-        """Extend 'add' to provide defaults for attrs that constrant for this API call
-
-        :param protocol: default kwarg for easy method-calling
-        :param kwargs:
-        :return: API Data Model object
-        """
-        # workaround for restricted 'class' attribute
-        if "class" not in kwargs:
+    def add(self, name, product, phoneTemplateName, protocol="SIP", **kwargs):
+        if "class" not in kwargs:  # workaround for restricted 'class' attribute
             kwargs["class"] = "Device Profile"
-        default_kwargs = {
-            "protocol": protocol,
-        }
-        default_kwargs.update(kwargs)
-        return super().add(**default_kwargs)
+        return super().add(**flatten_signature_args(self.add, locals()))
 
+
+class PhoneButtonTemplate(AbstractAXLAPI):
+    _factory_descriptor = "phone_button_template"
+
+    def add(self, name, basePhoneTemplateName, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))

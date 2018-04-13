@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Abstract AXL APIs"""
+"""Base AXL APIs"""
 
-from abc import (
-    ABC,
-    abstractmethod
-)
 from operator import methodcaller
 from collections import OrderedDict
 
@@ -19,10 +15,10 @@ from ..exceptions import (
     IllegalSQLStatement
 )
 from .._internal_utils import (
-    has_mandatory_keys,
     check_valid_attribute_req_dict,
     element_list_to_ordered_dict,
-    downcase_string
+    downcase_string,
+    flatten_signature_args,
 )
 from ..helpers import (
     get_model_dict,
@@ -48,11 +44,36 @@ def _extract_get_choices(obj):
         )
 
 
-class AbstractAXLAPI(ABC):
+def check_identifiers(obj, **kwargs):
+    identifiers = _extract_get_choices(obj.elements_nested[0][1][0])
+    if not check_valid_attribute_req_dict(identifiers, kwargs):
+        raise TypeError("Supplied identifiers not supported for 'get' API call: {identifiers}".format(
+            identifiers=identifiers)
+        )
+
+
+def classproperty(f):
+    if not isinstance(f, (classmethod, staticmethod)):
+        f = classmethod(f)
+    return ClassPropertyDescriptor(f)
+
+
+class ClassPropertyDescriptor(object):
+    # setter wont work, but we don't want it at the class level in any case
+    def __init__(self, fget):
+        self.fget = fget
+
+    def __get__(self, obj, obj_class=None):
+        if obj_class is None:
+            obj_class = type(obj)
+        return self.fget.__get__(obj, obj_class)()
+
+
+class AbstractAXLAPI(object):
     """Abstract API Class enforcing common methods for AXL objects"""
+    _factory_descriptor = NotImplementedError
 
     def __init__(self, connector, object_factory):
-        super().__init__()
         self.connector = connector
         self.object_factory = object_factory
         self._return_name = downcase_string(self.__class__.__name__)
@@ -76,18 +97,9 @@ class AbstractAXLAPI(ABC):
             "name_and_guid_model": self._get_wsdl_obj("NameAndGUIDRequest")  # used in many AXL requests
         }
 
-    @property
-    @abstractmethod
-    def add_api_mandatory_attributes(self):
-        raise NotImplementedError
-
-    @staticmethod
-    def _check_identifiers(obj, **kwargs):
-        identifiers = _extract_get_choices(obj.elements_nested[0][1][0])
-        if not check_valid_attribute_req_dict(identifiers, kwargs):
-            raise TypeError("Supplied identifiers not supported for 'get' API call: {identifiers}".format(
-                identifiers=identifiers)
-            )
+    @classproperty
+    def factory_descriptor(cls):  # noqa
+        return cls._factory_descriptor
 
     def _get_wsdl_obj(self, obj_name):
         """Get an empty python-zeep complex type
@@ -100,6 +112,12 @@ class AbstractAXLAPI(ABC):
         ))
 
     def _axl_methodcaller(self, action, **kwargs):
+        """Map calling method to a concat of the action verb and the API class name
+
+        :param action: (str) API verb - 'add', 'get', 'list', etc.
+        :param kwargs: input kwargs for called method
+        :return: axl response zeep object
+        """
         try:
             axl_method = methodcaller("".join([action, self.__class__.__name__]), **kwargs)
             return axl_method(self.connector.service)
@@ -139,12 +157,8 @@ class AbstractAXLAPI(ABC):
         :param target_cls: dict or OrderedDict
         :return: empty data model dictionary
         """
-        if sanitized:
-            return sanitize_data_model_dict(
-                get_model_dict(self._wsdl_objects["add_model"], target_cls=target_cls)
-            )
-        else:
-            return get_model_dict(self._wsdl_objects["add_model"], target_cls=target_cls)
+        model = get_model_dict(self._wsdl_objects["add_model"], target_cls=target_cls)
+        return sanitize_data_model_dict(model) if sanitized else model
 
     def create(self, **kwargs):
         """Create AXL object locally for pre-processing"""
@@ -153,84 +167,94 @@ class AbstractAXLAPI(ABC):
         return self.object_factory(self.__name__, serialize_object(axl_add_obj))
 
     def add(self, **kwargs):
-        if not has_mandatory_keys(kwargs, self.add_api_mandatory_attributes):
-            raise TypeError("Mandatory 'add' API attributes were not all provided: {mandatory}".format(
-                mandatory=self.add_api_mandatory_attributes)
-            )
-        # wrap kwargs ourselves to simplify the 'add' method.
+        """Add method for API endpoint"""
         wrapped_kwargs = {
             self._return_name: kwargs
         }
         return self._serialize_uuid_only_resp("add", **wrapped_kwargs)
 
-    def get(self, returned_tags=None, **kwargs):
-        kwargs["returnedTags"] = returned_tags
-        self._check_identifiers(self._wsdl_objects["get_method"], **kwargs)
-        return self._serialize_axl_object("get", **kwargs)
+    def get(self, returnedTags=None, **kwargs):
+        """Get method for API endpoint"""
+        check_identifiers(self._wsdl_objects["get_method"], **kwargs)
+        return self._serialize_axl_object("get", **flatten_signature_args(self.get, locals()))
 
     def update(self, **kwargs):
-        self._check_identifiers(self._wsdl_objects["update_method"], **kwargs)
+        """Update method for API endpoint"""
+        check_identifiers(self._wsdl_objects["update_method"], **kwargs)
         return self._serialize_uuid_only_resp("update", **kwargs)
 
-    def list(self, search_criteria=None, returned_tags=None, skip=None, first=None):
+    def list(self, searchCriteria=None, returnedTags=None, skip=None, first=None):
+        """Fetch a list of API endpoint objects.
+
+        Warning:
+
+        'searchCriteria=None' or 'returnedTags=None' may have very verbose output
+        and create large responses over 8MB, potentially resulting in AXL errors for large data sets.
+
+        :param searchCriteria: (dict) search criteria for "list' method.  Wraps a 'fetch-all' if unspecified.
+        :param returnedTags: (dict) returned attributes.  If none, wrapper
+        :param skip: (int) skip number of results
+        :param first: (int) return first number of results
+        :return: list of Data Models for API Endpoint
+        """
         supported_criteria = [element[0] for element in self._wsdl_objects["list_method"].elements[0][1].type.elements]
-        list_api_kwargs = {
-            "searchCriteria": search_criteria if search_criteria else {supported_criteria[0]: "%"},
-            "returnedTags": returned_tags if returned_tags else get_model_dict(self._wsdl_objects["list_model"]),
-            "skip": skip,
-            "first": first
-        }
-        axl_resp = self._axl_methodcaller("list", **list_api_kwargs)
+        if not searchCriteria:
+            searchCriteria = {supported_criteria[0]: "%"}
+        if not returnedTags:
+            returnedTags = get_model_dict(self._wsdl_objects["list_model"])
+
+        axl_resp = self._axl_methodcaller("list", **flatten_signature_args(self.list, locals()))
         axl_list = serialize_object(axl_resp)["return"][self._return_name]
         return [self.object_factory(self.__name__, item) for item in axl_list]
 
     def remove(self, **kwargs):
-        self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
+        """Remove method for API endpoint"""
+        check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         return self._serialize_uuid_only_resp("remove", **kwargs)
 
 
 class AbstractAXLDeviceAPI(AbstractAXLAPI):
     """Abstract Device API class with additional device methods"""
 
-    @property
-    @abstractmethod
-    def add_api_mandatory_attributes(self):
-        raise NotImplementedError
-
     def apply(self, **kwargs):
-        """Apply config to CUCM device
+        """Apply config to API endpoint
 
         :param kwargs: uuid or name
         :return: (str) uuid
         """
-        self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
+        check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         return self._serialize_uuid_only_resp("apply", **kwargs)
 
     def restart(self, **kwargs):
-        """Restart CUCM device
+        """Restart API endpoint
 
         :param kwargs: uuid or name
         :return: (str) uuid
         """
-        self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
+        check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         return self._serialize_uuid_only_resp("restart", **kwargs)
 
     def reset(self, **kwargs):
-        """Reset CUCM device
+        """Reset API endpoint
 
         :param kwargs: uuid or name
         :return: (str) uuid
         """
-        self._check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
+        check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         return self._serialize_uuid_only_resp("reset", **kwargs)
 
 
-class ThinAXL:
+class ThinAXL(object):
     """Abstract API Class enforcing common methods for Thin AXL objects"""
+    _factory_descriptor = "sql"
 
     def __init__(self, connector, object_factory):
         self._connector = connector
         self._object_factory = object_factory
+
+    @classproperty
+    def factory_descriptor(cls):  # noqa
+        return cls._factory_descriptor
 
     def query(self, sql_statement):
         """Execute SQL query via Thin AXL
@@ -244,7 +268,7 @@ class ThinAXL:
                 serialized_thin_axl_resp = element_list_to_ordered_dict(
                     serialize_object(axl_resp)["return"]["rows"]
                 )
-            # AXL supplies different keyword used for single row return
+            # AXL supplies different keyword for single row return
             except KeyError:
                 serialized_thin_axl_resp = element_list_to_ordered_dict(
                     serialize_object(axl_resp)["return"]["row"]
@@ -257,7 +281,7 @@ class ThinAXL:
         """Execute SQL update via Thin AXL
 
         :param sql_statement: Informix-compliant SQL statement
-        :return: (int) rows updated
+        :return: (int) number of rows updated
         """
         try:
             axl_resp = self._connector.service.executeSQLUpdate(sql=sql_statement)

@@ -1,81 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import itertools
-
 from .base import ThinAXL
-from .device import (
-    Line,
-    Phone,
-    CtiRoutePoint,
-    DeviceProfile,
-)
-from .user import User
-from .dialplan import (
-    RoutePartition,
-    CallPickupGroup,
-    AarGroup,
-    DirectedCallPark,
-    CallPark,
-    CalledPartyTransformationPattern,
-    CallingPartyTransformationPattern,
-    CmcInfo,
-    Css,
-    FacInfo,
-    HuntList,
-    HuntPilot,
-    LineGroup
-)
-from .system import (
-    CallManagerGroup,
-    DevicePool,
-    DateTimeGroup,
-    LdapDirectory,
-    LdapFilter,
-    LdapSyncCustomField
-)
-from .media import (
-    ConferenceBridge,
-)
+from .device import *
+from .user import *
+from .dialplan import *
+from .system import *
+from .media import *
+from .serviceability import *
 
-_base = [
-    ThinAXL
+__all__ = [
+    ThinAXL,
+    "device",
+    "dialplan",
+    "media",
+    "serviceability",
+    "system",
+    "user",
+    "system"
 ]
-_devices = [
-    Line,
-    Phone,
-    CtiRoutePoint,
-    DeviceProfile,
-]
-_user = [
-    User,
-]
-_dial_plan = [
-    RoutePartition,
-    CallPickupGroup,
-    AarGroup,
-    DirectedCallPark,
-    CallPark,
-    CalledPartyTransformationPattern,
-    CallingPartyTransformationPattern,
-    CmcInfo,
-    Css,
-    FacInfo,
-    HuntList,
-    HuntPilot,
-    LineGroup
-]
-_system = [
-    CallManagerGroup,
-    DevicePool,
-    DateTimeGroup,
-    LdapDirectory,
-    LdapFilter,
-    LdapSyncCustomField
-]
-_media = [
-    ConferenceBridge
-]
-
-_all = [_base, _user, _devices, _dial_plan, _system]
-
-__all__ = list(itertools.chain.from_iterable(_all))

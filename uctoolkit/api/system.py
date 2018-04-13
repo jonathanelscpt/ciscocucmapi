@@ -3,87 +3,41 @@
 
 from datetime import datetime, timedelta
 
-from uctoolkit.api.base import AbstractAXLAPI, AbstractAXLDeviceAPI
+from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
+from .._internal_utils import flatten_signature_args
 
 
 class CallManagerGroup(AbstractAXLDeviceAPI):
+    _factory_descriptor = "callmanager_group"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "members"
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, name, members, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class DevicePool(AbstractAXLDeviceAPI):
+    _factory_descriptor = "device_pool"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "dateTimeSettingName",
-        "callManagerGroupName",
-        "regionName",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, name, callManagerGroupName, dateTimeSettingName, regionName, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class DateTimeGroup(AbstractAXLDeviceAPI):
+    _factory_descriptor = "date_time_group"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "timeZone",
-        "separator",
-        "dateformat",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
-
-    def add(self,
-            separator="-",
-            dateformat="M-D-Y",
-            **kwargs):
-        default_kwargs = {
-            "separator": separator,
-            "dateformat": dateformat
-        }
-        default_kwargs.update(kwargs)
-        return super().add(**default_kwargs)
+    def add(self, name, timeZone, separator="-", dateformat="M-D-Y", **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 class LdapDirectory(AbstractAXLAPI):
-
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "ldapDn",
-        "ldapPassword",
-        "userSearchBase",
-        "servers",
-        "nextExecTime"  # enforced by zeep, not AXL!
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    _factory_descriptor = "ldap_directory"
 
     def add(self,
+            name, ldapDn, ldapPassword, userSearchBase, servers,
             intervalValue=7,
             scheduleUnit="DAY",
-            nextExecTime=(datetime.now() + timedelta(days=8)).strftime("%y-%m-%d 00:00"),
+            nextExecTime=(datetime.now() + timedelta(days=8)).strftime("%y-%m-%d 00:00"),  # enforced by zeep, not AXL!
             **kwargs):
-        default_kwargs = {
-            "intervalValue": intervalValue,
-            "scheduleUnit": scheduleUnit,
-            "nextExecTime": nextExecTime,
-        }
-        default_kwargs.update(kwargs)
-        return super().add(**default_kwargs)
+        return super().add(**flatten_signature_args(self.add, locals()))
 
     def sync_now(self, **kwargs):
         # kwargs["synchronize"] = "true"
@@ -102,19 +56,15 @@ class LdapDirectory(AbstractAXLAPI):
 
 
 class LdapFilter(AbstractAXLAPI):
+    _factory_descriptor = "ldap_filter"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "filter",
-    )
-
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, name, filter, **kwargs):  # shadow not used
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
 # issue - not working!
 class LdapSyncCustomField(AbstractAXLAPI):
+    _factory_descriptor = "ldap_custom_field"
 
     _ADD_API_MANDATORY_ATTRIBUTES = (
         "ldapConfigurationName",
@@ -122,18 +72,31 @@ class LdapSyncCustomField(AbstractAXLAPI):
         "ldapUserField",
     )
 
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+    def add(self, ldapConfigurationName, customUserField, ldapUserField, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
 
-class LdapSystem(AbstractAXLAPI):
+class Location(AbstractAXLAPI):
+    _factory_descriptor = "location"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "name",
-        "filter",
-    )
+    def add(self, name, betweenLocations=None, **kwargs):
+        # this approach is probably not compatible with pre-9's flattened locations.
+        # if warranted in future, would require extension for a version check.
+        if not betweenLocations:
+            betweenLocations = {
+                "betweenLocation": {
+                    "locationName": "Hub_None",
+                    "audioBandwidth": 0,  # translates to 'UNLIMITED'
+                    "videoBandwidth": 384,
+                    "immersiveBandwidth": 384,
+                    "weight": 50
+                }
+            }
+        return super().add(**flatten_signature_args(self.add, locals()))
 
-    @property
-    def add_api_mandatory_attributes(self):
-        return self._ADD_API_MANDATORY_ATTRIBUTES
+
+class PhoneNtp(AbstractAXLAPI):
+    _factory_descriptor = "phone_ntp_reference"
+
+    def add(self, ipAddress, mode="Directed Broadcast", **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""python-zeep SOAP client wrappers"""
+"""python-zeep client wrappers for Cisco UC SOAP APIs"""
 
 import os
 import urllib3
@@ -15,7 +15,7 @@ from requests.auth import HTTPBasicAuth
 
 from .exceptions import ServiceProxyError
 from .model import axl_factory
-from .definitions import WSDL_URLS
+from .definitions import WSDL_URLS, API_ENDPOINTS
 from .api import (
     ThinAXL as _ThinAXLAPI,
     Phone as _PhoneAPI,
@@ -41,7 +41,15 @@ from .api import (
     HuntPilot as _HuntPilotAPI,
     LdapDirectory as _LdapDirectoryAPI,
     LdapFilter as _LdapFilterAPI,
-    LdapSyncCustomField as _LdapSyncCustomFieldAPI
+    LdapSyncCustomField as _LdapSyncCustomFieldAPI,
+    LineGroup as _LineGroupAPI,
+    LocalRouteGroup as _LocalRouteGroupAPI,
+    Location as _LocationAPI,
+    MediaResourceGroup as _MediaResourceGroupAPI,
+    MediaResourceList as _MediaResourceListAPI,
+    Mtp as _MtpAPI,
+    PhoneButtonTemplate as _PhoneButtonTemplateAPI,
+    PhoneNtp as _PhoneNtpAPI
 )
 
 
@@ -164,6 +172,9 @@ class UCMAXLConnector(UCSOAPConnector):
         del connection_kwargs["fqdn"]  # remove fqdn as not used in super() call
         super().__init__(**connection_kwargs)
 
+        # for api in API_ENDPOINTS.values():
+        #     setattr(self, api.factory_descriptor, api(self, axl_factory))
+
         # sql API wrapper
         self.sql = _ThinAXLAPI(self, axl_factory)
 
@@ -172,6 +183,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.line = _LineAPI(self, axl_factory)
         self.phone = _PhoneAPI(self, axl_factory)
         self.udp = _DeviceProfileAPI(self, axl_factory)
+        self.phone_button_template = _PhoneButtonTemplateAPI(self, axl_factory)
 
         # user API wrappers
         self.user = _UserAPI(self, axl_factory)
@@ -189,6 +201,8 @@ class UCMAXLConnector(UCSOAPConnector):
         self.fac = _FacInfoAPI(self, axl_factory)
         self.hunt_list = _HuntListAPI(self, axl_factory)
         self.hunt_pilot = _HuntPilotAPI(self, axl_factory)
+        self.line_group = _LineGroupAPI(self, axl_factory)
+        self.local_route_group = _LocalRouteGroupAPI(self, axl_factory)
 
         # system API wrappers
         self.callmanager_group = _CallManagerGroupAPI(self, axl_factory)
@@ -197,9 +211,14 @@ class UCMAXLConnector(UCSOAPConnector):
         self.ldap_directory = _LdapDirectoryAPI(self, axl_factory)
         self.ldap_filter = _LdapFilterAPI(self, axl_factory)
         self.ldap_sync_custom_field = _LdapSyncCustomFieldAPI(self, axl_factory)
+        self.location = _LocationAPI(self, axl_factory)
+        self.phone_ntp_reference = _PhoneNtpAPI(self, axl_factory)
 
         # media API wrappers
         self.conference_bridge = _ConferenceBridgeAPI(self, axl_factory)
+        self.mrg = _MediaResourceGroupAPI(self, axl_factory)
+        self.mrgl = _MediaResourceListAPI(self, axl_factory)
+        self.mtp = _MtpAPI(self, axl_factory)
 
 
 class UCMControlCenterConnector(UCSOAPConnector):
@@ -253,33 +272,6 @@ class UCMRisPortConnector(UCSOAPConnector):
         # selection_type = None,
         # node_name = None
         #
-        _selection_types = [
-            "Name",
-            "IPV4Address",
-            "DirNumber",
-            "Description",
-            "SIPStatus"
-        ]
-        _device_classes = [
-            'Any',
-            'Phone',
-            'Gateway',
-            'H323',
-            'Cti',
-            'VoiceMail',
-            'MediaResources',
-            'HuntList',
-            'SIPTrunk',
-            'unknown'
-        ]
-        _device_statuses = [
-            'Any',
-            'Registered',
-            'UnRegistered',
-            'Rejected',
-            'Unknown'
-        ]
-
         _max_devices = 1000  # assume CUCM 9.1 and above only
         _all_models = 255  # returns all models
 

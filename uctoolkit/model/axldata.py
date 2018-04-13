@@ -79,8 +79,10 @@ class ThinAXLDataModel(AXLDataModel):
 
     @property
     def sql_response(self):
-        """Return sql response table"""
+        """Friendly name for sql response"""
         return self._axl_data
 
     def to_csv(self, destination_path):
+        """Write to csv in common table format"""
+        # todo - test for single and duplicate base cases
         to_csv(self._axl_data, destination_path)
