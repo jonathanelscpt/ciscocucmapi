@@ -6,6 +6,17 @@ from .._internal_utils import flatten_signature_args
 from ..exceptions import AXLMethodDoesNotExist
 
 
+def _check_port_assignment(members):
+    if isinstance(members["member"], list):
+        for member in members["member"]:
+            if "port" not in member:
+                member["port"] = 0
+    elif isinstance(members["member"], dict):
+        if "port" not in members:
+            members["port"] = 0
+    return members
+
+
 class AarGroup(AbstractAXLAPI):
     _factory_descriptor = "aar_group"
 
@@ -97,6 +108,21 @@ class LocalRouteGroup(AbstractAXLAPI):
         return super().add(**flatten_signature_args(self.add, locals()))
 
 
+class RouteGroup(AbstractAXLDeviceAPI):
+    _factory_descriptor = "route_group"
+
+    def add(self, name, members, distributionAlgorithm="Circular", **kwargs):
+        _check_port_assignment(members)
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class RouteList(AbstractAXLDeviceAPI):
+    _factory_descriptor = "route_list"
+
+    def add(self, name, callManagerGroupName, runOnEveryNode="true", routeListEnabled="true", **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
 class RoutePartition(AbstractAXLDeviceAPI):
     _factory_descriptor = "partition"
 
@@ -104,10 +130,56 @@ class RoutePartition(AbstractAXLDeviceAPI):
         return super().add(**flatten_signature_args(self.add, locals()))
 
     def reset(self, **kwargs):
-        # edge case for devices that are restart-able but not reset-able
-        # todo - refactor and improve abstract class design
-        raise AXLMethodDoesNotExist(
-            message="'Reset' method not available for {name} api endpoint.  "
-                    "'Restart' and 'apply' methods exist.".format(
-                        name=self.__class__.__name__
-                    ))
+        raise AXLMethodDoesNotExist
+
+
+class RoutePattern(AbstractAXLAPI):
+    _factory_descriptor = "route_pattern"
+
+    def add(self, pattern, routePartitionName, destination,
+            blockEnable="false", provideOutsideDialtone="true", networkLocation="OffNet",
+            **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class SipRoutePattern(AbstractAXLAPI):
+    _factory_descriptor = "sip_route_pattern"
+
+    def add(self, pattern, routePartitionName, sipTrunkName,
+            usage="Domain Routing",
+            **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class TimePeriod(AbstractAXLAPI):
+    _factory_descriptor = "time_period"
+
+    def add(self, name, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class TimeSchedule(AbstractAXLAPI):
+    _factory_descriptor = "time_schedule"
+
+    def add(self, name, members, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class TodAccess(AbstractAXLAPI):
+    _factory_descriptor = "time_schedule"
+
+    def add(self, name, ownerIdName, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class TransPattern(AbstractAXLAPI):
+    _factory_descriptor = "translation_pattern"
+
+    def add(self, pattern, routePartitionName,
+            usage="Translation", provideOutsideDialtone="true", patternUrgency="true",
+            **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+    def get(self, dialPlanName=None, routeFilterName=None, returnedTags=None, **kwargs):
+        return super().get(**flatten_signature_args(self.get, locals()))
+

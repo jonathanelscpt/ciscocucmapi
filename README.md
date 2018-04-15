@@ -8,13 +8,15 @@ AXL connections and provide CRUD operations for common API endpoints.
 
 ## Features
 
- - Simplified Pythonic wrapping of Cisco UC SOAP-based APIs
- - Complete abstraction from AXL SOAP API
+ - Simplified Pythonic wrapping of Cisco UC SOAP APIs
+ - `python-zeep`-based client under the hood - much faster than `suds`
+ - Complete abstraction from AXL SOAP API - no xml!
  - Native Python tooling includes:
-   - API interactions using native Python tools
-   - Native returned AXL data objects modelled with `dict`-like characteristics
+   - Native returned AXL data objects modelled with a `dict`-like interface and characteristics
+   - xml order is honoured due to `OrderedDict` implementation
    - AXL crud operations supported using both Python objects and native AXL calling requirements
  - Transparent sourcing of AXL credentials from local environment variables
+ - Easy, template-able reading and writing to JSON objects, making Cisco UC DevOps implementations a reality
  
   
 ## Installation
@@ -34,6 +36,7 @@ Installing and upgrading `uctoolkit` is done with `pip`:
 
 ```python
 from uctoolkit import UCMAXLConnector
+import json
 
 
 axl = UCMAXLConnector()  # env vars for connection params
@@ -53,10 +56,15 @@ bot_device_attributes = {
     "useTrustedRelayPoint": "",
     "locationName": "",
 }
-axl.phones.create()
+new_bot_device = axl.phone.create()
 
+# adding phones
+axl.phone.add(**bot_device_attributes)  # can add with single kwargs
+axl.phone.add(name="SEPDEADDEADDEAD", product="Cisco 8841", devicePoolName="US_NYC_DP")  # minimalistic add
+axl.phone.add(**new_bot_device.axl_data)  # using previously created object
 
-# geting phones
+# getting phones
+axl.phone.get(returnedTags={"name": "", "callingSearchSpaceName": ""})
 
 # listing phones by name
 bot_names = {
@@ -67,58 +75,70 @@ returned_tags = {
     "description": "",
     "lines": ""
 }
-bot_devices = axl.phones.list(search_criteria=bot_names, returned_tags=returned_tags)
+bot_devices = axl.phone.list(searchCritera=bot_names, returnedTags=returned_tags)  # explicit search and return definitions
+all_devices = axl.phone.list()  # dynamically generated "all" return - use sparingly for large data sets!
 
-# accessing and updating phone attributes
+# property-like getters and setters
 botuser15 = next(filter(lambda person: person.name == 'BOTUSER015', bot_devices))
 botuser15.callingSearchSpaceName = "US_NYC_NATIONAL_CSS"
 
-# updating a phone using native api
+# updating a phone
 botuser15.callingSearchSpaceName = "US_NYC_INTERNAL_CSS"
-botuser15.newName = "BOTJONATHANELS"  # does not update botuser15.name attribute
+botuser15.newName = "BOTJONELS"  # does not update botuser15.name attribute
 botuser15.locationName = "US_NYC_LOC"
 kwargs = {
     "newName": botuser15.newName,
     "locationName": botuser15.locationName
 }
-axl.phones.update(name=botuser15.name, **kwargs)
+axl.phone.update(name=botuser15.name, **kwargs)
 
-# updating a phone from data model object
-axl.phones.update(botuser15)
 
 # deleting a phone
-axl.phones.remove(botuser15)  # using existing phone object
-axl.phones.remove(name="BOTUSER015")  # native API call
+axl.phone.remove(uuid=botuser15.uuid) 
 
-# execute sql queries
+# Thin AXL sql querying and execution also available
 numplan = axl.sql.query("SELECT * FROM numplan")
-dns = [_['dnorpattern'] for _ in numplan]
+directory_numbers = [row['dnorpattern'] for row in numplan]
+numplan.to_csv(destination_path="/path/to/datadump/numplan.csv")  # pathlib also supported
 
+# .model() produces empty data models for API template development
+with open("/path/to/templates/phone.json", "w") as _:
+    json.dump(axl.phone.model(), _, indent=4)
 ```
 
 
- ## Connector Environment Variables
+## Connector Environment Variables
  
  The following env vars are supported for easy of use:
  
- - AXL_USERNAME
- - AXL_PASSWORD
- - AXL_WSDL_URL
- - AXL_FQDN
+ - `AXL_USERNAME`
+ - `AXL_PASSWORD`
+ - `AXL_WSDL_URL`
+ - `AXL_FQDN`
+
+
+## API Endpoint Support
+
+Not all API Endpoints are supported, as API and data models are required to mitigate inconsistencies in the 
+AXL API.  If you'd to extend API support, please create a pull request, or raise a GitHub issue and I'll add
+an enhancement.
+
+I am not currently back-testing all version support, and do not intend to test against pre-9 UCM versions.  The package
+has been developed primarily against UCM 11.5.  If any API definitions interfere with the backwards compatibility of
+AXL for prior versions, please raise a GitHub issue and I will address this.
 
  
 ## Supported Languages and AXL Versions
 
- - Currently only Python 3.6 tested.   Python 2.7 not planned for support in the short-term.
+ - Currently only Python 3.6 is supported.   Python 2.7 not planned for support in the short-term.
  - All AXL versions *should* be supported, however only 11.5 has been currently tested.  All
    AXL data models include static metadata on mandatory params for `add` calls.  It  is 
    not expected that these should change across AXL schema versions.  Please raise a defect 
    if you encounter any issues.
- - Other API methods contain reliable information and can be queried from the 
-   schema dynamically.  
+ - Other API methods should contain reliable schema-driven metadata and attributes.
  
  
- ## Donate
+## Donate
  
 If this library has helped you, or if you would like to support future development, 
 donations are most welcome:
@@ -127,10 +147,10 @@ donations are most welcome:
  - ETH: xxxxxxxxxxxxxxx
  
  
- # Support
+# Support
  
- I'm also willing to discuss ad-hoc commercial support or DevOps implementations.
- Please contact me at [jonathanelscpt@gmail.com](mailto:jonathanelscpt@gmail.com) for more information. 
- Note that asking questions or reporting bugs via this e-mail address may not receive responses.
- Please create GitHub issues for this.
+I'm also willing to discuss ad-hoc commercial support or custom DevOps implementations.
+Please contact me at [jonathanelscpt@gmail.com](mailto:jonathanelscpt@gmail.com) for more information. 
+Note that asking questions or reporting bugs via this e-mail address may not receive responses.
+Please rather create GitHub issues for this.
  

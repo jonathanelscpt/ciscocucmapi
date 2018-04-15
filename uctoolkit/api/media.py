@@ -31,3 +31,11 @@ class Mtp(AbstractAXLDeviceAPI):
 
     def add(self, name, devicePoolName, mtpType="Cisco IOS Enhanced Software Media Termination Point", **kwargs):
         return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class Transcoder(AbstractAXLDeviceAPI):
+    _factory_descriptor = "transcoder"
+
+    def add(self, name, devicePoolName, product="Cisco IOS Enhanced Media Termination Point", **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+

@@ -100,3 +100,19 @@ class PhoneNtp(AbstractAXLAPI):
 
     def add(self, ipAddress, mode="Directed Broadcast", **kwargs):
         return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class Region(AbstractAXLAPI):
+    _factory_descriptor = "region"
+
+    def add(self, name, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class Srst(AbstractAXLAPI):
+    _factory_descriptor = "srst"
+
+    def add(self, name, ipAddress, SipNetwork=None, **kwargs):
+        if not SipNetwork:
+            SipNetwork=ipAddress
+        return super().add(**flatten_signature_args(self.add, locals()))

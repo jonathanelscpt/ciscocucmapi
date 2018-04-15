@@ -7,6 +7,8 @@ from .dialplan import *
 from .system import *
 from .media import *
 from .serviceability import *
+from .advanced import *
+
 
 __all__ = [
     ThinAXL,
@@ -16,5 +18,6 @@ __all__ = [
     "serviceability",
     "system",
     "user",
-    "system"
+    "system",
+    "advanced"
 ]

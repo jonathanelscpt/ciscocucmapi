@@ -15,7 +15,7 @@ from requests.auth import HTTPBasicAuth
 
 from .exceptions import ServiceProxyError
 from .model import axl_factory
-from .definitions import WSDL_URLS, API_ENDPOINTS
+from .definitions import WSDL_URLS
 from .api import (
     ThinAXL as _ThinAXLAPI,
     Phone as _PhoneAPI,
@@ -49,7 +49,25 @@ from .api import (
     MediaResourceList as _MediaResourceListAPI,
     Mtp as _MtpAPI,
     PhoneButtonTemplate as _PhoneButtonTemplateAPI,
-    PhoneNtp as _PhoneNtpAPI
+    PhoneNtp as _PhoneNtpAPI,
+    Region as _RegionAPI,
+    RouteGroup as _RouteGroupAPI,
+    RouteList as _RouteListAPI,
+    RoutePattern as _RoutePatternAPI,
+    SipRoutePattern as _SipRoutePatternAPI,
+    Srst as _SrstAPI,
+    Transcoder as _TranscoderAPI,
+    TransPattern as _TransPatternAPI,
+    VoiceMailPilot as _VoiceMailPilotAPI,
+    VoiceMailProfile as _VoiceMailProfileAPI,
+    UcService as _UcServiceAPI,
+    ServiceProfile as _ServiceProfileAPI,
+    SipTrunk as _SipTrunkAPI,
+    SipTrunkSecurityProfile as _SipTrunkSecurityProfileAPI,
+    SipProfile as _SipProfileAPI,
+    UserGroup as _UserGroupAPI,
+    TimePeriod as _TimePeriodAPI,
+    TimeSchedule as _TimeScheduleAPI
 )
 
 
@@ -73,6 +91,7 @@ class UCSOAPConnector:
     """
     Parent class for all Cisco UC SOAP Connectors
     """
+
     def __init__(self, username=None,
                  password=None,
                  wsdl=None,
@@ -155,7 +174,6 @@ class UCSOAPConnector:
 
 
 class UCMAXLConnector(UCSOAPConnector):
-
     _ENV = {
         "username": "AXL_USERNAME",
         "password": "AXL_PASSWORD",
@@ -184,9 +202,15 @@ class UCMAXLConnector(UCSOAPConnector):
         self.phone = _PhoneAPI(self, axl_factory)
         self.udp = _DeviceProfileAPI(self, axl_factory)
         self.phone_button_template = _PhoneButtonTemplateAPI(self, axl_factory)
+        self.sip_trunk = _SipTrunkAPI(self, axl_factory)
+        self.sip_trunk_security_profile = _SipTrunkSecurityProfileAPI(self, axl_factory)
+        self.sip_profile = _SipProfileAPI(self, axl_factory)
 
         # user API wrappers
         self.user = _UserAPI(self, axl_factory)
+        self.uc_service = _UcServiceAPI(self, axl_factory)
+        self.service_profile = _ServiceProfileAPI(self, axl_factory)
+        self.user_group = _UserGroupAPI(self, axl_factory)
 
         # dial plan API wrappers
         self.aar_group = _AarGroupAPI(self, axl_factory)
@@ -203,6 +227,13 @@ class UCMAXLConnector(UCSOAPConnector):
         self.hunt_pilot = _HuntPilotAPI(self, axl_factory)
         self.line_group = _LineGroupAPI(self, axl_factory)
         self.local_route_group = _LocalRouteGroupAPI(self, axl_factory)
+        self.route_group = _RouteGroupAPI(self, axl_factory)
+        self.route_list = _RouteListAPI(self, axl_factory)
+        self.route_pattern = _RoutePatternAPI(self, axl_factory)
+        self.sip_route_pattern = _SipRoutePatternAPI(self, axl_factory)
+        self.time_period = _TimePeriodAPI(self, axl_factory)
+        self.time_schedule = _TimeScheduleAPI(self, axl_factory)
+        self.translation_pattern = _TransPatternAPI(self, axl_factory)
 
         # system API wrappers
         self.callmanager_group = _CallManagerGroupAPI(self, axl_factory)
@@ -213,12 +244,19 @@ class UCMAXLConnector(UCSOAPConnector):
         self.ldap_sync_custom_field = _LdapSyncCustomFieldAPI(self, axl_factory)
         self.location = _LocationAPI(self, axl_factory)
         self.phone_ntp_reference = _PhoneNtpAPI(self, axl_factory)
+        self.region = _RegionAPI(self, axl_factory)
+        self.srst = _SrstAPI(self, axl_factory)
 
         # media API wrappers
         self.conference_bridge = _ConferenceBridgeAPI(self, axl_factory)
         self.mrg = _MediaResourceGroupAPI(self, axl_factory)
         self.mrgl = _MediaResourceListAPI(self, axl_factory)
         self.mtp = _MtpAPI(self, axl_factory)
+        self.transcoder = _TranscoderAPI(self, axl_factory)
+
+        # advanced API wrappers
+        self.voicemail_pilot = _VoiceMailPilotAPI(self, axl_factory)
+        self.voicemail_profile = _VoiceMailProfileAPI(self, axl_factory)
 
 
 class UCMControlCenterConnector(UCSOAPConnector):
@@ -394,4 +432,3 @@ class UCMLogCollectionConnector(UCSOAPConnector):
                          password=password,
                          wsdl=_wsdl,
                          tls_verify=tls_verify)
-

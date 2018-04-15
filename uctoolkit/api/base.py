@@ -26,15 +26,17 @@ from ..helpers import (
 )
 
 
-def _extract_get_choices(obj):
-    """Recursively inspects a zeep object and extracts the available choices available when performing
+def _get_choices(obj):
+    """Create tuple of available choices as defined in xsd
+
+    Recursively inspects a zeep object and extracts the available choices available when performing
     the specific AXL call, as defined in AXL xsd.
 
     :param obj: zeep Element data structure type
     :return: nested tuple of the xsd-defined choices for the AXL method
     """
     if isinstance(obj, (Choice, Sequence)):
-        return tuple([_extract_get_choices(_) for _ in obj])
+        return tuple([_get_choices(_) for _ in obj])
     elif isinstance(obj, Element):
         return obj.name
     else:
@@ -44,8 +46,8 @@ def _extract_get_choices(obj):
         )
 
 
-def check_identifiers(obj, **kwargs):
-    identifiers = _extract_get_choices(obj.elements_nested[0][1][0])
+def check_identifiers(wsdl_obj, **kwargs):
+    identifiers = _get_choices(wsdl_obj.elements_nested[0][1][0])
     if not check_valid_attribute_req_dict(identifiers, kwargs):
         raise TypeError("Supplied identifiers not supported for 'get' API call: {identifiers}".format(
             identifiers=identifiers)
@@ -85,6 +87,8 @@ class AbstractAXLAPI(object):
         list_method_name = "".join(["List", self.__class__.__name__, "Req"])
         list_model_name = "".join(["L", self.__class__.__name__])
 
+        # this looks expensive during __init__.
+        # may need to time this and move to individul methods.  cleaner code if here though
         self._wsdl_objects = {
             "add_method": NotImplementedError,  # not used in class
             "add_model": self._get_wsdl_obj(add_model_name),
@@ -134,7 +138,7 @@ class AbstractAXLAPI(object):
         """
         axl_resp = self._axl_methodcaller(action, **kwargs)
         return self.object_factory(
-            self.__name__,
+            self.__class__.__name__,
             serialize_object(axl_resp)["return"][self._return_name]
         )
 
@@ -148,7 +152,7 @@ class AbstractAXLAPI(object):
         axl_resp = self._axl_methodcaller(action, **kwargs)
         return serialize_object(axl_resp)["return"]
 
-    def model(self, sanitized=True, target_cls=OrderedDict):
+    def model(self, sanitized=True, target_cls=OrderedDict, include_types=False):
         """Get a empty serialized 'add' model for the API endpoint useful for inspecting the endpoint's
         schema and future template generation.
 
@@ -157,14 +161,14 @@ class AbstractAXLAPI(object):
         :param target_cls: dict or OrderedDict
         :return: empty data model dictionary
         """
-        model = get_model_dict(self._wsdl_objects["add_model"], target_cls=target_cls)
+        model = get_model_dict(self._wsdl_objects["add_model"], target_cls=target_cls, include_types=include_types)
         return sanitize_data_model_dict(model) if sanitized else model
 
     def create(self, **kwargs):
         """Create AXL object locally for pre-processing"""
         axl_add_method = methodcaller(self._wsdl_objects["add_model"].__class__.__name__, **kwargs)
         axl_add_obj = axl_add_method(self.connector.model_factory)
-        return self.object_factory(self.__name__, serialize_object(axl_add_obj))
+        return self.object_factory(self.__class__.__name__, serialize_object(axl_add_obj))
 
     def add(self, **kwargs):
         """Add method for API endpoint"""
@@ -202,10 +206,13 @@ class AbstractAXLAPI(object):
             searchCriteria = {supported_criteria[0]: "%"}
         if not returnedTags:
             returnedTags = get_model_dict(self._wsdl_objects["list_model"])
-
-        axl_resp = self._axl_methodcaller("list", **flatten_signature_args(self.list, locals()))
+        axl_resp = self._axl_methodcaller("list",
+                                          searchCriteria=searchCriteria,
+                                          returnedTags=returnedTags,
+                                          skip=skip,
+                                          first=first)
         axl_list = serialize_object(axl_resp)["return"][self._return_name]
-        return [self.object_factory(self.__name__, item) for item in axl_list]
+        return [self.object_factory(self.__class__.__name__, item) for item in axl_list]
 
     def remove(self, **kwargs):
         """Remove method for API endpoint"""
@@ -273,7 +280,7 @@ class ThinAXL(object):
                 serialized_thin_axl_resp = element_list_to_ordered_dict(
                     serialize_object(axl_resp)["return"]["row"]
                 )
-            return self._object_factory(self.__name__, serialized_thin_axl_resp)
+            return self._object_factory(self.__class__.__name__, serialized_thin_axl_resp)
         except Fault as fault:
             raise IllegalSQLStatement(message=fault.message)
 

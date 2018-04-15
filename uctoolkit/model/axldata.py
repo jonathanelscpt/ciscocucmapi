@@ -69,8 +69,11 @@ class AXLDataModel(MutableMapping):
         self.__setitem__(key, value)
 
     def sanitize(self):
-        """Return a sanitized dict representation of the data model, removing nested references to
-        '_value_1', where python-zeep has interpreted the AXL schema's inclusion of uuid attributes."""
+        """Return a sanitized dict representation of the data model
+
+        Removes nested references to '_value_1', where python-zeep has interpreted the
+        AXL schema's inclusion of uuid attributes.
+        """
         return sanitize_data_model_dict(self._axl_data)
 
 
@@ -82,7 +85,7 @@ class ThinAXLDataModel(AXLDataModel):
         """Friendly name for sql response"""
         return self._axl_data
 
-    def to_csv(self, destination_path):
-        """Write to csv in common table format"""
+    def csv(self, destination_path):
+        """Write to csv in familiar table format"""
         # todo - test for single and duplicate base cases
         to_csv(self._axl_data, destination_path)

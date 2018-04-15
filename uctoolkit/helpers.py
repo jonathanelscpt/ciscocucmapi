@@ -48,16 +48,13 @@ def to_csv(data_model_list, destination_path):
 
 
 def sanitize_data_model_dict(obj):
-    """Sanitize zeep output dict with `_value_N` references.  This is useful for
-    data processing where one wishes to consume the 'get' api data instead of re-purposing
-    it in e.g. an 'update' api call.
+    """Sanitize zeep output dict with `_value_N` references.
 
-    This is achieved by flattening the nested OrderedDict by replacing the nested dict for AXL's 'XFkType'
-    with the value specified in zeep's `_value_N` key.
+    This is useful for data processing where one wishes to consume the 'get' api data instead of re-purposing
+    it in e.g. an 'update' api call. Achieved by flattening the nested OrderedDict by replacing
+    the nested dict for AXL's 'XFkType' with the value specified in zeep's `_value_N` key.
 
-    Note:
-
-    Doing so disregards 'uuid' values.
+    Note: Doing so disregards 'uuid' values.
 
     Example:
 
@@ -92,9 +89,10 @@ def sanitize_data_model_dict(obj):
 
 
 def extract_pkid_from_uuid(pkid_or_uuid):
-    """Removes all braces braces encapsulation included with AXL uuid if it exists.  Does not use
-    regex matching on start/finish for speed.  No validation is provided on uuid format.  If braces
-    do not exist, the original string should be returned as-is.
+    """Removes all braces braces encapsulation included with AXL uuid if it exists.
+
+    Does not use regex matching on start/finish for speed.  No validation is provided on uuid format.
+    If braces do not exist, the original string should be returned as-is.
 
     :param pkid_or_uuid: (str) pkid or uuid
     :return: (str) pkid with stripped encapsulation
@@ -104,8 +102,15 @@ def extract_pkid_from_uuid(pkid_or_uuid):
 
 
 def filter_mandatory_attributes(zeep_axl_factory_object):
-    """Inspect the AXL schema and return a generator of an API endpoint's mandatory attributes
-    that should be validated when submitting an 'add' AXL request.
+    """Inspect the AXL schema and return a generator of an API endpoint's mandatory attributes.
+
+    Intended use if for local validation prior to submitting an 'add' AXL request to reduce the cost of
+    remote error responses from the AXL server.
+
+    Note:
+    EXPERIMENTAL ONLY.
+
+    Inconsistencies noted for determinations on minOccurs and nillable.  Suggested not to use.
 
     :param zeep_axl_factory_object: zeep AXL object generated from a 'get_type' factory call
     :return: generator of mandatory axl elements
@@ -119,20 +124,37 @@ def filter_mandatory_attributes(zeep_axl_factory_object):
             yield element[1]
 
 
-def get_model_dict(api_endpoint, target_cls=dict):
+def get_model_dict(api_endpoint, target_cls=dict, include_types=False):
     """Get an empty model dict or OrderedDict for an api endpoint from a complex zeep type
 
+    "target_cls' an output data structrure preference (default is dict, for speed) as xml element ordering
+    is not important for AXL requests.  Alternatively, an OrderedDict is useful for debugging and for
+    dumping to JSON objects for local template generation.
+
+    'include_types' is useful for quickly determining the API endpoints expected attribute type
+    (e.g. "hostName": "String128") without delving into the .xsd or API documentation.
+    Note that some output (e.g. "ldapPortNumber": "anySimpleType") may actually be of a sub-type
+    (i.e. "XInteger" in the case of "ldapPortNumber"), but this util does not yet provide that level of granularity
+    in its schema inspection.
+
     :param api_endpoint: zeep data structure
-    :param target_cls: requested type for instantiation - dict or OrderedDict
+    :param target_cls: (bool) requested model data structure - dict or OrderedDict
+    :param include_types: (bool) replace null string with string name of AXL type for each attr
     :return: (dict or OrderedDict) of soap api endpoint
     """
-    if target_cls is dict:
-        return {e[0]: "" if not hasattr(e[1].type, 'elements')
-                else get_model_dict(e[1].type)
-                for e in api_endpoint.elements}
-    elif target_cls is OrderedDict:
-        return OrderedDict((e[0], "") if not hasattr(e[1].type, 'elements')
-                           else (e[0], get_model_dict(e[1].type))
+    if target_cls is OrderedDict:
+        return OrderedDict((e[0], "" if not include_types else e[1].type.name)
+                           if not hasattr(e[1].type, 'elements') else (e[0], get_model_dict(
+                                e[1].type,
+                                target_cls=target_cls,
+                                include_types=include_types))
                            for e in api_endpoint.elements)
+    elif target_cls is dict:
+        return {e[0]: "" if not include_types else e[1].type.name
+                if not hasattr(e[1].type, 'elements') else get_model_dict(
+                    e[1].type,
+                    target_cls=target_cls,
+                    include_types=include_types)
+                for e in api_endpoint.elements}
     else:
-        raise TypeError("Invalid target class - only dictionary types supported")
+        raise TypeError("Invalid target class - dict or DefaultDict supported")
