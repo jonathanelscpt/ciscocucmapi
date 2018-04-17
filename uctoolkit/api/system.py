@@ -3,6 +3,8 @@
 
 from datetime import datetime, timedelta
 
+from zeep.helpers import serialize_object
+
 from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
 from .._internal_utils import flatten_signature_args
 
@@ -54,6 +56,13 @@ class LdapDirectory(AbstractAXLAPI):
                 sql_statement=sql_statement.format(name=ldap_dir.name)
             )
 
+    # def sync(self, name=None, uuid=None, sync="true"):
+    #     kwargs = {"name": name, "uuid": uuid, "sync": sync}
+    #     axl_resp = self.connector.service.doLdapSync(**kwargs)
+    #     return self.object_factory(
+    #         "doLdapSync",
+    #         serialize_object(axl_resp)["return"]["ldapSync"]
+    #     )
 
 class LdapFilter(AbstractAXLAPI):
     _factory_descriptor = "ldap_filter"

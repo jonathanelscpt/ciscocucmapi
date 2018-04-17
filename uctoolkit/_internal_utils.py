@@ -33,13 +33,15 @@ def downcase_string(s):
 def _get_signature_kwargs_key(f):
     """Get the key name for kwargs if a method signature"""
     keys = [k for k, v in signature(f).parameters.items() if v.kind == v.VAR_KEYWORD]
-    return keys[0] if len(keys) == 1 else None
+    # return keys[0] if len(keys) == 1 else None
+    return keys.pop() if len(keys) == 1 else None
 
 
 def flatten_signature_args(f, loc):
     """flatten a signature dict to include all kwargs as dict members instead of a nested dict"""
     kwargs_name = _get_signature_kwargs_key(f)
     attributes = loc.copy()
+    # todo - clean this up with a dict comprehension checked against signature(f).parameters.keys()
     # remove unwanted metadata for class methods
     for meta in ['__class__', 'self']:
         try:

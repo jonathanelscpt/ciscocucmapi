@@ -5,6 +5,7 @@ import os
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 import asyncio
+from lxml import etree
 
 from zeep import Client
 from zeep.cache import SqliteCache
@@ -12,6 +13,7 @@ from zeep.transports import Transport
 from zeep.asyncio import AsyncTransport
 from requests import Session
 from requests.auth import HTTPBasicAuth
+from zeep.plugins import HistoryPlugin, Plugin
 
 from .exceptions import ServiceProxyError
 from .model import axl_factory
@@ -67,7 +69,13 @@ from .api import (
     SipProfile as _SipProfileAPI,
     UserGroup as _UserGroupAPI,
     TimePeriod as _TimePeriodAPI,
-    TimeSchedule as _TimeScheduleAPI
+    TimeSchedule as _TimeScheduleAPI,
+    UserProfileProvision as _UserProfileProvisionAPI,
+    # UserPhoneAssociation as _UserPhoneAssociationAPI
+    UniversalDeviceTemplate as _UniversalDeviceTemplateAPI,
+    UniversalLineTemplate as _UniversalLineTemplateAPI,
+    RemoteDestination as _RemoteDestinationAPI,
+    RemoteDestinationProfile as _RemoteDestinationProfileAPI,
 )
 
 
@@ -87,10 +95,27 @@ def get_connection_kwargs(env_dict, kwargs):
     return connection_kwargs
 
 
-class UCSOAPConnector:
-    """
-    Parent class for all Cisco UC SOAP Connectors
-    """
+class AXLHistoryPlugin(HistoryPlugin):
+
+    @staticmethod
+    def _parse_envelope(envelope):
+        return etree.tostring(envelope, encoding="unicode", pretty_print=True)
+
+    @property
+    def last_sent(self):
+        last_tx = self._buffer[-1]
+        if last_tx:
+            return self._parse_envelope(last_tx['sent']['envelope'])
+
+    @property
+    def last_received(self):
+        last_tx = self._buffer[-1]
+        if last_tx:
+            return self._parse_envelope(last_tx['received']['envelope'])
+
+
+class UCSOAPConnector(object):
+    """Parent class for all Cisco UC SOAP Connectors"""
 
     def __init__(self, username=None,
                  password=None,
@@ -99,7 +124,9 @@ class UCSOAPConnector:
                  address=None,
                  tls_verify=False,
                  timeout=30,
-                 is_async=False):
+                 is_async=False,
+                 history=True,
+                 history_maxlen=1):
         """Instantiate UC SOAP Client Connector
 
         :param username: SOAP client connector username
@@ -119,9 +146,14 @@ class UCSOAPConnector:
         self._session = Session()
         self._session.auth = HTTPBasicAuth(username, password)
         self._session.verify = tls_verify
+        self._plugins = []
 
         if not self._session.verify:
             urllib3.disable_warnings(InsecureRequestWarning)
+
+        if history:
+            self._history = AXLHistoryPlugin(maxlen=history_maxlen)
+            self._plugins.append(self._history)
 
         # todo - extend necessary support for async
         if self.is_async:
@@ -138,7 +170,7 @@ class UCSOAPConnector:
                                   )
 
         # self._client = Client(wsdl=wsdl, transport=transport)
-        self._client = Client(wsdl=wsdl, transport=transport)
+        self._client = Client(wsdl=wsdl, transport=transport, plugins=self._plugins)
         if binding_name and address:
             # self._client = self._client.create_service(binding_name, address)
             self._service = self._client.create_service(binding_name, address)
@@ -171,6 +203,10 @@ class UCSOAPConnector:
     def service(self):
         """Direct access to zeep service for method-calling of proxied services"""
         return self._service
+
+    @property
+    def history(self):
+        return self._history
 
 
 class UCMAXLConnector(UCSOAPConnector):
@@ -205,12 +241,18 @@ class UCMAXLConnector(UCSOAPConnector):
         self.sip_trunk = _SipTrunkAPI(self, axl_factory)
         self.sip_trunk_security_profile = _SipTrunkSecurityProfileAPI(self, axl_factory)
         self.sip_profile = _SipProfileAPI(self, axl_factory)
+        self.udt = _UniversalDeviceTemplateAPI(self, axl_factory)
+        self.ult = _UniversalLineTemplateAPI(self, axl_factory)
+        self.remote_destination = _RemoteDestinationAPI(self, axl_factory)
+        self.rdp = _RemoteDestinationProfileAPI(self, axl_factory)
 
         # user API wrappers
         self.user = _UserAPI(self, axl_factory)
         self.uc_service = _UcServiceAPI(self, axl_factory)
         self.service_profile = _ServiceProfileAPI(self, axl_factory)
         self.user_group = _UserGroupAPI(self, axl_factory)
+        self.user_profile = _UserProfileProvisionAPI(self, axl_factory)
+        # self.quick_user_phone_add = _UserPhoneAssociationAPI(self, axl_factory)
 
         # dial plan API wrappers
         self.aar_group = _AarGroupAPI(self, axl_factory)

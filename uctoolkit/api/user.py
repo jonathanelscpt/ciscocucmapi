@@ -5,6 +5,7 @@ from collections import defaultdict
 
 from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
 from .._internal_utils import flatten_signature_args
+from ..exceptions import AXLMethodDoesNotExist
 
 
 class ServiceProfile(AbstractAXLAPI):
@@ -66,3 +67,35 @@ class UserGroup(AbstractAXLAPI):
     def add(self, name, members=None, userRoles=None, **kwargs):
         return super().add(**flatten_signature_args(self.add, locals()))
 
+
+# class UserPhoneAssociation(AbstractAXLAPI):
+#     _factory_descriptor = "quick_user_phone_add"
+#
+#     def add(self, userId, lastName, extension,
+#             firstName=None,
+#             routePartitionName=None,
+#             name=None, productType=None,
+#             **kwargs):
+#         return super().add(**flatten_signature_args(self.add, locals()))
+#
+#     def get(self, returnedTags=None, **kwargs):
+#         raise AXLMethodDoesNotExist()
+#
+#     def update(self, **kwargs):
+#         raise AXLMethodDoesNotExist()
+#
+#     def list(self, searchCriteria=None, returnedTags=None, skip=None, first=None):
+#         raise AXLMethodDoesNotExist()
+#
+#     def remove(self, **kwargs):
+#         raise AXLMethodDoesNotExist()
+
+
+class UserProfileProvision(AbstractAXLAPI):
+    _factory_descriptor = "user_profile"
+
+    def add(self, name,
+            profile=None, deskPhones=None, mobileDevices=None, defaultUserProfile=None,
+            universalLineTemplate=None, allowProvision="false",
+            **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))

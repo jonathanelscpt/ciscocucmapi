@@ -165,13 +165,6 @@ class TimeSchedule(AbstractAXLAPI):
         return super().add(**flatten_signature_args(self.add, locals()))
 
 
-class TodAccess(AbstractAXLAPI):
-    _factory_descriptor = "time_schedule"
-
-    def add(self, name, ownerIdName, **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
-
-
 class TransPattern(AbstractAXLAPI):
     _factory_descriptor = "translation_pattern"
 

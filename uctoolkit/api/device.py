@@ -29,7 +29,6 @@ class Line(AbstractAXLDeviceAPI):
 
     def __init__(self, connector, object_factory):
         super().__init__(connector, object_factory)
-        # self._factory_name = "line"
 
     def add(self, name, routePartitionName, **kwargs):
         return super().add(**flatten_signature_args(self.add, locals()))
@@ -66,6 +65,37 @@ class PhoneButtonTemplate(AbstractAXLAPI):
     _factory_descriptor = "phone_button_template"
 
     def add(self, name, basePhoneTemplateName, **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class RemoteDestination(AbstractAXLAPI):
+    _factory_descriptor = "remote_destination"
+
+    def add(self, destination, ownerUserId,
+            name=None,
+            enableUnifiedMobility="true",
+            enableMobileConnect="true",
+            isMobilePhone="true",
+            remoteDestinationProfileName=None,
+            dualModeDeviceName=None,
+            lineAssociations=None,
+            **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class RemoteDestinationProfile(AbstractAXLAPI):
+    _factory_descriptor = "rdp"
+
+    def add(self, name, devicePoolName, userId,
+            rerouteCallingSearchSpaceName=None,
+            callingSearchSpaceName=None,
+            lines=None,
+            product="Remote Destination Profile",
+            protocol="Remote Destination",
+            protocolSide="User",
+            **kwargs):
+        if "class" not in kwargs:  # workaround for restricted 'class' attribute
+            kwargs["class"] = "Remote Destination Profile"
         return super().add(**flatten_signature_args(self.add, locals()))
 
 
@@ -110,4 +140,36 @@ class SipTrunkSecurityProfile(AbstractAXLDeviceAPI):
             **kwargs):
         return super().add(**flatten_signature_args(self.add, locals()))
 
+
+class UniversalDeviceTemplate(AbstractAXLAPI):
+    _factory_descriptor = "udt"
+
+    def add(self, name, devicePool,
+            directoryNumber=None,
+            lineLabel=None,
+            displayCallerId=None,
+            callingSearchSpace=None,
+            sipProfile="Standard SIP Profile",
+            commonPhoneProfile="Standard Common Phone Profile",
+            phoneButtonTemplate="Universal Device Template Button Layout",
+            deviceSecurityProfile="Universal Device Template - Model-independent Security Profile",
+            blfPresenceGroup="Standard Presence group",
+            location="Hub_None",
+            **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
+
+
+class UniversalLineTemplate(AbstractAXLAPI):
+    _factory_descriptor = "ult"
+
+    def add(self, name,
+            lineDescription=None,
+            callingSearchSpace=None,
+            routePartition=None,
+            voiceMailProfile=None,
+            alertingName=None,
+            rejectAnonymousCall="false",
+            blfPresenceGroup="Standard Presence group",
+            **kwargs):
+        return super().add(**flatten_signature_args(self.add, locals()))
 
