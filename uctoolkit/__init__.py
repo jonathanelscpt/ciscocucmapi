@@ -35,6 +35,6 @@ __all__ = (
     UCMAXLConnector,
     # UCMControlCenterConnector,
     # UCMRisPortConnector,
-    # UCMPerMonConnector,
+    # UCMPerfMonConnector,
     # UCMLogCollectionConnector
 )

@@ -4,15 +4,15 @@
 from collections import defaultdict
 
 from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
-from .._internal_utils import flatten_signature_args
-from ..exceptions import AXLMethodDoesNotExist
+from .._internal_utils import flatten_signature_kwargs
 
 
 class ServiceProfile(AbstractAXLAPI):
     _factory_descriptor = "service_profile"
 
     def add(self, name, **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class UcService(AbstractAXLAPI):
@@ -27,11 +27,7 @@ class UcService(AbstractAXLAPI):
             Conferencing="WebEx (Conferencing)",
             Directory="Directory"
         )
-        protocols = defaultdict(
-            lambda: None,
-            CTI="TCP",
-            Voicemail="HTTPS"
-        )
+        # whitespace won't work with defaultdict, so if statements for the rest
         if not productType:
             if serviceType == "IM and Presence":
                 productType = "Unified CM (IM and Presence)"
@@ -39,16 +35,15 @@ class UcService(AbstractAXLAPI):
                 productType = "	Telepresence Management System"
             else:
                 productType = product_types[serviceType]
+        protocols = defaultdict(
+            lambda: None,
+            CTI="TCP",
+            Voicemail="HTTPS"
+        )
         if "protocol" not in kwargs:
             kwargs["protocol"] = protocols[serviceType]
-        # cannot use locals() as we've created local vars in this method
-        kwargs.update({
-            "name": name,
-            "serviceType": serviceType,
-            "hostnameorip": hostnameorip,
-            "productType": productType
-        })
-        return super().add(**kwargs)
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class User(AbstractAXLAPI):
@@ -57,7 +52,8 @@ class User(AbstractAXLAPI):
     def add(self, userid, lastName,
             presenceGroupName="Standard Presence group",
             **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class UserGroup(AbstractAXLAPI):
@@ -65,7 +61,8 @@ class UserGroup(AbstractAXLAPI):
     _factory_descriptor = "user_group"
 
     def add(self, name, members=None, userRoles=None, **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 # class UserPhoneAssociation(AbstractAXLAPI):
@@ -98,4 +95,5 @@ class UserProfileProvision(AbstractAXLAPI):
             profile=None, deskPhones=None, mobileDevices=None, defaultUserProfile=None,
             universalLineTemplate=None, allowProvision="false",
             **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)

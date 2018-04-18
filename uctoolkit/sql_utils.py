@@ -52,9 +52,14 @@ def associate_enduser_to_user_group(axl_connector, enduser_pkid_or_uuid, dirgrou
 
 def get_dn_pkid(axl_connector, dnorpattern, tkpatternusage=2):
     """Get dn pkid from the dnorpattern from numplan table.
-    'tkpatternusage' is specified to only return DNs.
 
-    Does not ensure uniqueness as does not include join on route partition table"""
+    Note:
+        Does not ensure uniqueness as does not include join on route partition table
+    :param axl_connector: (UCMAXLConnector) axl connector
+    :param (str) dnorpattern: pattern or DN
+    :param (int) tkpatternusage: defaults to 2 for DNs
+    :return: (str) pkid
+    """
     sql_statement = "select pkid from numplan " \
                     "where dnorpattern={dnorpattern} "\
                     "and tkpatternusage={tkpatternusage}".format(
@@ -82,3 +87,17 @@ def update_service_parameter(axl_connector, parameter_name, parameter_value):
                      parameter_name=parameter_name
                     )
     return axl_connector.sql.update(sql_statement)
+
+
+def ldap_sync(axl_connector, name=None, uuid=None):
+    """SQL-based LDAP sync fallback method for AXL versions not supporting doLdapSync"""
+    sql_statement = "update directorypluginconfig set syncnow = '1' where name = '{name}'"
+    try:
+        return axl_connector.sql.update(
+            sql_statement=sql_statement.format(name=name)
+        )
+    except TypeError:
+        name = extract_pkid_from_uuid(
+            axl_connector.ldap_directory.get(uuid=uuid, returned_tags={"name": ""})
+        )
+        return ldap_sync(axl_connector, name=name)

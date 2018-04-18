@@ -5,9 +5,9 @@ from inspect import signature
 from collections import OrderedDict, Iterable
 
 
-def element_list_to_ordered_dict(element_list):
+def element_list_to_ordered_dict(elements):
     """Converts a list of lists of zeep Element objects to a list of OrderedDicts"""
-    return [OrderedDict((element.tag, element.text) for element in row) for row in element_list]
+    return [OrderedDict((element.tag, element.text) for element in row) for row in elements]
 
 
 def _flatten(l):
@@ -37,18 +37,17 @@ def _get_signature_kwargs_key(f):
     return keys.pop() if len(keys) == 1 else None
 
 
-def flatten_signature_args(f, loc):
-    """flatten a signature dict to include all kwargs as dict members instead of a nested dict"""
+def flatten_signature_kwargs(f, loc):
+    """flatten a signature dict by one level to move kwargs keys to locals dict"""
     kwargs_name = _get_signature_kwargs_key(f)
-    attributes = loc.copy()
-    # todo - clean this up with a dict comprehension checked against signature(f).parameters.keys()
     # remove unwanted metadata for class methods
-    for meta in ['__class__', 'self']:
-        try:
-            del attributes[meta]
-        except KeyError:
-            pass
+    attributes = get_signature_locals(f, loc)
     if kwargs_name:
         attributes.pop(kwargs_name)
         attributes.update(loc[kwargs_name])
     return attributes
+
+
+def get_signature_locals(f, loc):
+    """Filters locals to only include keys in original method signature"""
+    return {k: v for k, v in loc.items() if k in signature(f).parameters}

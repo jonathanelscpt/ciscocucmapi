@@ -5,7 +5,7 @@
 from collections.abc import MutableMapping
 
 from ..exceptions import AXLAttributeError
-from ..helpers import sanitize_data_model_dict, to_csv
+from ..helpers import sanitize_model_dict, to_csv
 
 
 class AXLDataModel(MutableMapping):
@@ -74,7 +74,7 @@ class AXLDataModel(MutableMapping):
         Removes nested references to '_value_1', where python-zeep has interpreted the
         AXL schema's inclusion of uuid attributes.
         """
-        return sanitize_data_model_dict(self._axl_data)
+        return sanitize_model_dict(self._axl_data)
 
 
 class ThinAXLDataModel(AXLDataModel):
@@ -83,7 +83,7 @@ class ThinAXLDataModel(AXLDataModel):
     @property
     def sql_response(self):
         """Friendly name for sql response"""
-        return self._axl_data
+        return self.axl_data
 
     def csv(self, destination_path):
         """Write to csv in familiar table format"""

@@ -2,26 +2,33 @@
 """CUCM AXL Device APIs."""
 
 from .base import AbstractAXLDeviceAPI, AbstractAXLAPI, check_identifiers
-from .._internal_utils import flatten_signature_args
+from .._internal_utils import flatten_signature_kwargs
 from ..exceptions import AXLMethodDoesNotExist
 
 
 class CtiRoutePoint(AbstractAXLDeviceAPI):
     _factory_descriptor = "cti_route_point"
 
-    def add(self, name, devicePoolName, product="CTI Route Point", protocol="SCCP", **kwargs):
+    def add(self, name, devicePoolName,
+            product="CTI Route Point",
+            protocol="SCCP",
+            **kwargs):
         if "class" not in kwargs:  # workaround for restricted 'class' attribute
             kwargs["class"] = "CTI Route Point"
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class DeviceProfile(AbstractAXLDeviceAPI):
     _factory_descriptor = "udp"
 
-    def add(self, name, product, phoneTemplateName, protocol="SIP", **kwargs):
+    def add(self, name, product, phoneTemplateName,
+            protocol="SIP",
+            **kwargs):
         if "class" not in kwargs:  # workaround for restricted 'class' attribute
             kwargs["class"] = "Device Profile"
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class Line(AbstractAXLDeviceAPI):
@@ -31,7 +38,8 @@ class Line(AbstractAXLDeviceAPI):
         super().__init__(connector, object_factory)
 
     def add(self, name, routePartitionName, **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class Phone(AbstractAXLDeviceAPI):
@@ -43,7 +51,8 @@ class Phone(AbstractAXLDeviceAPI):
             **kwargs):
         if "class" not in kwargs:  # workaround for restricted 'class' attribute
             kwargs["class"] = "Phone"
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
     def wipe(self, **kwargs):
         """Allows Cisco's newer Android-based devices, like the Cisco DX650,
@@ -52,7 +61,7 @@ class Phone(AbstractAXLDeviceAPI):
         :param kwargs: phone name or uuid
         :return: None
         """
-        check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
+        # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         self._serialize_axl_object("wipe", **kwargs)
 
     def options(self, uuid, returned_choices=None):
@@ -65,7 +74,8 @@ class PhoneButtonTemplate(AbstractAXLAPI):
     _factory_descriptor = "phone_button_template"
 
     def add(self, name, basePhoneTemplateName, **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class RemoteDestination(AbstractAXLAPI):
@@ -80,7 +90,8 @@ class RemoteDestination(AbstractAXLAPI):
             dualModeDeviceName=None,
             lineAssociations=None,
             **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class RemoteDestinationProfile(AbstractAXLAPI):
@@ -96,7 +107,8 @@ class RemoteDestinationProfile(AbstractAXLAPI):
             **kwargs):
         if "class" not in kwargs:  # workaround for restricted 'class' attribute
             kwargs["class"] = "Remote Destination Profile"
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class SipTrunk(AbstractAXLDeviceAPI):
@@ -113,7 +125,8 @@ class SipTrunk(AbstractAXLDeviceAPI):
             **kwargs):
         if "class" not in kwargs:
             kwargs["class"] = "Trunk"
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class SipProfile(AbstractAXLDeviceAPI):
@@ -122,7 +135,8 @@ class SipProfile(AbstractAXLDeviceAPI):
     def add(self, name,
             sdpTransparency="Pass all unknown SDP attributes",
             **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
     def reset(self, **kwargs):
         raise AXLMethodDoesNotExist
@@ -138,7 +152,8 @@ class SipTrunkSecurityProfile(AbstractAXLDeviceAPI):
             allowReplaceHeader="false",
             transmitSecurityStatus="false",
             **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class UniversalDeviceTemplate(AbstractAXLAPI):
@@ -156,20 +171,21 @@ class UniversalDeviceTemplate(AbstractAXLAPI):
             blfPresenceGroup="Standard Presence group",
             location="Hub_None",
             **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class UniversalLineTemplate(AbstractAXLAPI):
     _factory_descriptor = "ult"
 
     def add(self, name,
+            routePartition=None,
             lineDescription=None,
             callingSearchSpace=None,
-            routePartition=None,
             voiceMailProfile=None,
             alertingName=None,
-            rejectAnonymousCall="false",
+            rejectAnonymousCall="false",  # overrides inconsistency between normal line add and ULT
             blfPresenceGroup="Standard Presence group",
             **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
-
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)

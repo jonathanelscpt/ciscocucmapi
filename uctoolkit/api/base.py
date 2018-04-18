@@ -18,11 +18,11 @@ from .._internal_utils import (
     check_valid_attribute_req_dict,
     element_list_to_ordered_dict,
     downcase_string,
-    flatten_signature_args,
+    flatten_signature_kwargs,
 )
 from ..helpers import (
     get_model_dict,
-    sanitize_data_model_dict
+    sanitize_model_dict
 )
 
 
@@ -49,7 +49,7 @@ def _get_choices(obj):
 def check_identifiers(wsdl_obj, **kwargs):
     identifiers = _get_choices(wsdl_obj.elements_nested[0][1][0])
     if not check_valid_attribute_req_dict(identifiers, kwargs):
-        raise TypeError("Supplied identifiers not supported for 'get' API call: {identifiers}".format(
+        raise TypeError("Supplied identifiers not supported for API call: {identifiers}".format(
             identifiers=identifiers)
         )
 
@@ -142,7 +142,7 @@ class AbstractAXLAPI(object):
             serialize_object(axl_resp)["return"][self._return_name]
         )
 
-    def _serialize_uuid_only_resp(self, action, **kwargs):
+    def _serialize_uuid_resp(self, action, **kwargs):
         """Serialize commons responses that return a uuid string only
 
         :param action: axl method verb
@@ -162,7 +162,7 @@ class AbstractAXLAPI(object):
         :return: empty data model dictionary
         """
         model = get_model_dict(self._wsdl_objects["add_model"], target_cls=target_cls, include_types=include_types)
-        return sanitize_data_model_dict(model) if sanitized else model
+        return sanitize_model_dict(model) if sanitized else model
 
     def create(self, **kwargs):
         """Create AXL object locally for pre-processing"""
@@ -175,24 +175,23 @@ class AbstractAXLAPI(object):
         wrapped_kwargs = {
             self._return_name: kwargs
         }
-        return self._serialize_uuid_only_resp("add", **wrapped_kwargs)
+        return self._serialize_uuid_resp("add", **wrapped_kwargs)
 
     def get(self, returnedTags=None, **kwargs):
         """Get method for API endpoint"""
         check_identifiers(self._wsdl_objects["get_method"], **kwargs)
-        return self._serialize_axl_object("get", **flatten_signature_args(self.get, locals()))
+        get_kwargs = flatten_signature_kwargs(self.get, locals())
+        return self._serialize_axl_object("get", **get_kwargs)
 
     def update(self, **kwargs):
         """Update method for API endpoint"""
-        check_identifiers(self._wsdl_objects["update_method"], **kwargs)
-        return self._serialize_uuid_only_resp("update", **kwargs)
+        return self._serialize_uuid_resp("update", **kwargs)
 
     def list(self, searchCriteria=None, returnedTags=None, skip=None, first=None):
         """Fetch a list of API endpoint objects.
 
-        Warning:
-
-        'searchCriteria=None' or 'returnedTags=None' may have very verbose output
+        Note:
+        'searchCriteria=None' or 'returnedTags=None' may have VERY verbose output
         and create large responses over 8MB, potentially resulting in AXL errors for large data sets.
 
         :param searchCriteria: (dict) search criteria for "list' method.  Wraps a 'fetch-all' if unspecified.
@@ -216,8 +215,8 @@ class AbstractAXLAPI(object):
 
     def remove(self, **kwargs):
         """Remove method for API endpoint"""
-        check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
-        return self._serialize_uuid_only_resp("remove", **kwargs)
+        # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
+        return self._serialize_uuid_resp("remove", **kwargs)
 
 
 class AbstractAXLDeviceAPI(AbstractAXLAPI):
@@ -229,8 +228,8 @@ class AbstractAXLDeviceAPI(AbstractAXLAPI):
         :param kwargs: uuid or name
         :return: (str) uuid
         """
-        check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
-        return self._serialize_uuid_only_resp("apply", **kwargs)
+        # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
+        return self._serialize_uuid_resp("apply", **kwargs)
 
     def restart(self, **kwargs):
         """Restart API endpoint
@@ -238,8 +237,8 @@ class AbstractAXLDeviceAPI(AbstractAXLAPI):
         :param kwargs: uuid or name
         :return: (str) uuid
         """
-        check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
-        return self._serialize_uuid_only_resp("restart", **kwargs)
+        # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
+        return self._serialize_uuid_resp("restart", **kwargs)
 
     def reset(self, **kwargs):
         """Reset API endpoint
@@ -247,8 +246,8 @@ class AbstractAXLDeviceAPI(AbstractAXLAPI):
         :param kwargs: uuid or name
         :return: (str) uuid
         """
-        check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
-        return self._serialize_uuid_only_resp("reset", **kwargs)
+        # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
+        return self._serialize_uuid_resp("reset", **kwargs)
 
 
 class ThinAXL(object):
@@ -272,15 +271,15 @@ class ThinAXL(object):
         try:
             axl_resp = self._connector.service.executeSQLQuery(sql=sql_statement)
             try:
-                serialized_thin_axl_resp = element_list_to_ordered_dict(
+                serialized_resp = element_list_to_ordered_dict(
                     serialize_object(axl_resp)["return"]["rows"]
                 )
             # AXL supplies different keyword for single row return
             except KeyError:
-                serialized_thin_axl_resp = element_list_to_ordered_dict(
+                serialized_resp = element_list_to_ordered_dict(
                     serialize_object(axl_resp)["return"]["row"]
                 )
-            return self._object_factory(self.__class__.__name__, serialized_thin_axl_resp)
+            return self._object_factory(self.__class__.__name__, serialized_resp)
         except Fault as fault:
             raise IllegalSQLStatement(message=fault.message)
 

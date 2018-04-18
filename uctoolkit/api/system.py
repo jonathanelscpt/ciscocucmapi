@@ -4,30 +4,35 @@
 from datetime import datetime, timedelta
 
 from zeep.helpers import serialize_object
+from zeep.exceptions import Fault
 
 from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
-from .._internal_utils import flatten_signature_args
+from .._internal_utils import flatten_signature_kwargs, get_signature_locals
+from ..exceptions import AXLError
 
 
 class CallManagerGroup(AbstractAXLDeviceAPI):
     _factory_descriptor = "callmanager_group"
 
     def add(self, name, members, **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class DevicePool(AbstractAXLDeviceAPI):
     _factory_descriptor = "device_pool"
 
     def add(self, name, callManagerGroupName, dateTimeSettingName, regionName, **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
-class DateTimeGroup(AbstractAXLDeviceAPI):
+class DateTimeGroup(AbstractAXLAPI):
     _factory_descriptor = "date_time_group"
 
     def add(self, name, timeZone, separator="-", dateformat="M-D-Y", **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class LdapDirectory(AbstractAXLAPI):
@@ -37,52 +42,45 @@ class LdapDirectory(AbstractAXLAPI):
             name, ldapDn, ldapPassword, userSearchBase, servers,
             intervalValue=7,
             scheduleUnit="DAY",
-            nextExecTime=(datetime.now() + timedelta(days=8)).strftime("%y-%m-%d 00:00"),  # enforced by zeep, not AXL!
+            nextExecTime=None,
             **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        if not nextExecTime:
+            nextExecTime = (datetime.now() + timedelta(days=intervalValue+1)).strftime("%y-%m-%d 00:00")
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
-    def sync_now(self, **kwargs):
-        # kwargs["synchronize"] = "true"
-        # return self.update(**kwargs)
-        # todo - workaround - why is the AXL call not working?
-        sql_statement = "update directorypluginconfig set syncnow = '1' where name = '{name}'"
-        if "name" in kwargs:
-            return self.connector.sql.update(
-                sql_statement=sql_statement.format(name=kwargs["name"])
-            )
-        elif "uuid" in kwargs:
-            ldap_dir = self.get(uuid=kwargs["uuid"], returned_tags={"name": ""})
-            return self.connector.sql.update(
-                sql_statement=sql_statement.format(name=ldap_dir.name)
-            )
+    def sync(self, name=None, uuid=None, sync="true"):
+        try:
+            kwargs = get_signature_locals(self.get_sync_status, locals())
+            axl_resp = self.connector.service.doLdapSync(**kwargs)
+            return serialize_object(axl_resp)["return"]
+        except Fault as fault:
+            raise AXLError(fault.message)
 
-    # def sync(self, name=None, uuid=None, sync="true"):
-    #     kwargs = {"name": name, "uuid": uuid, "sync": sync}
-    #     axl_resp = self.connector.service.doLdapSync(**kwargs)
-    #     return self.object_factory(
-    #         "doLdapSync",
-    #         serialize_object(axl_resp)["return"]["ldapSync"]
-    #     )
+    def get_sync_status(self, name=None, uuid=None):
+        try:
+            kwargs = get_signature_locals(self.get_sync_status, locals())
+            axl_resp = self.connector.service.getLdapSyncStatus(**kwargs)
+            return serialize_object(axl_resp)["return"]
+        except Fault as fault:
+            raise AXLError(fault.message)
+
 
 class LdapFilter(AbstractAXLAPI):
     _factory_descriptor = "ldap_filter"
 
     def add(self, name, filter, **kwargs):  # shadow not used
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 # issue - not working!
 class LdapSyncCustomField(AbstractAXLAPI):
     _factory_descriptor = "ldap_custom_field"
 
-    _ADD_API_MANDATORY_ATTRIBUTES = (
-        "ldapConfigurationName",
-        "customUserField",
-        "ldapUserField",
-    )
-
     def add(self, ldapConfigurationName, customUserField, ldapUserField, **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class Location(AbstractAXLAPI):
@@ -96,26 +94,29 @@ class Location(AbstractAXLAPI):
                 "betweenLocation": {
                     "locationName": "Hub_None",
                     "audioBandwidth": 0,  # translates to 'UNLIMITED'
-                    "videoBandwidth": 384,
+                    "videoBandwidth": 384,  # investigate default?
                     "immersiveBandwidth": 384,
                     "weight": 50
                 }
             }
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class PhoneNtp(AbstractAXLAPI):
     _factory_descriptor = "phone_ntp_reference"
 
     def add(self, ipAddress, mode="Directed Broadcast", **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class Region(AbstractAXLAPI):
     _factory_descriptor = "region"
 
     def add(self, name, **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class Srst(AbstractAXLAPI):
@@ -124,4 +125,5 @@ class Srst(AbstractAXLAPI):
     def add(self, name, ipAddress, SipNetwork=None, **kwargs):
         if not SipNetwork:
             SipNetwork=ipAddress
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)

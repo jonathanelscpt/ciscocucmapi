@@ -46,28 +46,21 @@ axl = UCMAXLConnector()  # env vars for connection params
 
 # api endpoints can be created prior to invoking axl method-calling for pre-processing
 bot_device_attributes = {
-    "name": "BOTJONATHANTEST",
-    "product": "",
-    "class": "",
-    "protocol": "SIP",
-    "protocolSide": "",
-    "devicePoolName": "Default",
-    "commonPhoneConfigName": "",
-    "useTrustedRelayPoint": "",
-    "locationName": "",
+    "name": "SEPDEADDEADDEAD",
+    "product": "Cisco 8821",
+    "devicePoolName": "US_NYC_DP",
 }
 new_bot_device = axl.phone.create()
 
 # adding phones
 axl.phone.add(**bot_device_attributes)  # can add with single kwargs
 axl.phone.add(name="SEPDEADDEADDEAD", product="Cisco 8841", devicePoolName="US_NYC_DP")  # minimalistic add
-axl.phone.add(**new_bot_device.axl_data)  # using previously created object
 
 # getting phones
-axl.phone.get(returnedTags={"name": "", "callingSearchSpaceName": ""})
+axl.phone.get(name="SEPDEADDEADDEAD", returnedTags={"name": "", "devicePoolName": "", "callingSearchSpaceName": ""})
 
 # listing phones by name
-bot_names = {
+bot_phones = {
     "name": "BOT%"
 }
 returned_tags = {
@@ -75,7 +68,7 @@ returned_tags = {
     "description": "",
     "lines": ""
 }
-bot_devices = axl.phone.list(searchCritera=bot_names, returnedTags=returned_tags)  # explicit search and return definitions
+bot_devices = axl.phone.list(searchCritera=bot_phones, returnedTags=returned_tags)  # explicit search and return definitions
 all_devices = axl.phone.list()  # dynamically generated "all" return - use sparingly for large data sets!
 
 # property-like getters and setters
@@ -84,14 +77,9 @@ botuser15.callingSearchSpaceName = "US_NYC_NATIONAL_CSS"
 
 # updating a phone
 botuser15.callingSearchSpaceName = "US_NYC_INTERNAL_CSS"
-botuser15.newName = "BOTJONELS"  # does not update botuser15.name attribute
-botuser15.locationName = "US_NYC_LOC"
-kwargs = {
-    "newName": botuser15.newName,
-    "locationName": botuser15.locationName
-}
-axl.phone.update(name=botuser15.name, **kwargs)
-
+botuser15.newName = "BOTJONELS"
+botuser15.locationName = "Hub_None"
+axl.phone.update(name=botuser15.name, newName=botuser15.newName, locationName=botuser15.locationName)
 
 # deleting a phone
 axl.phone.remove(uuid=botuser15.uuid) 

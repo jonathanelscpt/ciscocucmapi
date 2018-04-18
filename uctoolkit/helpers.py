@@ -47,7 +47,43 @@ def to_csv(data_model_list, destination_path):
         raise FileNotFoundError
 
 
-def sanitize_data_model_dict(obj):
+def get_model_dict(api_endpoint, target_cls=dict, include_types=False):
+    """Get an empty model dict or OrderedDict for an api endpoint from a complex zeep type
+
+    "target_cls' an output data structrure preference (default is dict, for speed) as xml element ordering
+    is not important for AXL requests.  Alternatively, an OrderedDict is useful for debugging and for
+    dumping to JSON objects for local template generation.
+
+    'include_types' is useful for quickly determining the API endpoints expected attribute type
+    (e.g. "hostName": "String128") without delving into the .xsd or API documentation.
+    Note that some output (e.g. "ldapPortNumber": "anySimpleType") may actually be of a sub-type
+    (i.e. "XInteger" in the case of "ldapPortNumber"), but this util does not yet provide that level of granularity
+    in its schema inspection.
+
+    :param api_endpoint: zeep data structure
+    :param target_cls: (bool) requested model data structure - dict or OrderedDict
+    :param include_types: (bool) replace null string with string name of AXL type for each attr
+    :return: (dict or OrderedDict) of soap api endpoint
+    """
+    if target_cls is OrderedDict:
+        return OrderedDict((e[0], "" if not include_types else e[1].type.name)
+                           if not hasattr(e[1].type, 'elements') else (e[0], get_model_dict(
+                                e[1].type,
+                                target_cls=target_cls,
+                                include_types=include_types))
+                           for e in api_endpoint.elements)
+    elif target_cls is dict:
+        return {e[0]: "" if not include_types else e[1].type.name
+                if not hasattr(e[1].type, 'elements') else get_model_dict(
+                    e[1].type,
+                    target_cls=target_cls,
+                    include_types=include_types)
+                for e in api_endpoint.elements}
+    else:
+        raise TypeError("Invalid target class - dict or DefaultDict supported")
+
+
+def sanitize_model_dict(obj):
     """Sanitize zeep output dict with `_value_N` references.
 
     This is useful for data processing where one wishes to consume the 'get' api data instead of re-purposing
@@ -84,7 +120,7 @@ def sanitize_data_model_dict(obj):
     else:
         for k, v in obj.items():
             if isinstance(v, dict):
-                obj[k] = sanitize_data_model_dict(v)
+                obj[k] = sanitize_model_dict(v)
     return obj
 
 
@@ -101,7 +137,7 @@ def extract_pkid_from_uuid(pkid_or_uuid):
     return pkid_or_uuid.replace('{', '').replace('}', '')
 
 
-def filter_mandatory_attributes(zeep_axl_factory_object):
+def _filter_mandatory_attributes(zeep_axl_factory_object):
     """Inspect the AXL schema and return a generator of an API endpoint's mandatory attributes.
 
     Intended use if for local validation prior to submitting an 'add' AXL request to reduce the cost of
@@ -122,39 +158,3 @@ def filter_mandatory_attributes(zeep_axl_factory_object):
                 and not element[1].nillable \
                 and not element[1].default:
             yield element[1]
-
-
-def get_model_dict(api_endpoint, target_cls=dict, include_types=False):
-    """Get an empty model dict or OrderedDict for an api endpoint from a complex zeep type
-
-    "target_cls' an output data structrure preference (default is dict, for speed) as xml element ordering
-    is not important for AXL requests.  Alternatively, an OrderedDict is useful for debugging and for
-    dumping to JSON objects for local template generation.
-
-    'include_types' is useful for quickly determining the API endpoints expected attribute type
-    (e.g. "hostName": "String128") without delving into the .xsd or API documentation.
-    Note that some output (e.g. "ldapPortNumber": "anySimpleType") may actually be of a sub-type
-    (i.e. "XInteger" in the case of "ldapPortNumber"), but this util does not yet provide that level of granularity
-    in its schema inspection.
-
-    :param api_endpoint: zeep data structure
-    :param target_cls: (bool) requested model data structure - dict or OrderedDict
-    :param include_types: (bool) replace null string with string name of AXL type for each attr
-    :return: (dict or OrderedDict) of soap api endpoint
-    """
-    if target_cls is OrderedDict:
-        return OrderedDict((e[0], "" if not include_types else e[1].type.name)
-                           if not hasattr(e[1].type, 'elements') else (e[0], get_model_dict(
-                                e[1].type,
-                                target_cls=target_cls,
-                                include_types=include_types))
-                           for e in api_endpoint.elements)
-    elif target_cls is dict:
-        return {e[0]: "" if not include_types else e[1].type.name
-                if not hasattr(e[1].type, 'elements') else get_model_dict(
-                    e[1].type,
-                    target_cls=target_cls,
-                    include_types=include_types)
-                for e in api_endpoint.elements}
-    else:
-        raise TypeError("Invalid target class - dict or DefaultDict supported")

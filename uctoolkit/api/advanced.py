@@ -2,19 +2,20 @@
 """CUCM AXL Advanced APIs."""
 
 from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
-from .._internal_utils import flatten_signature_args
+from .._internal_utils import flatten_signature_kwargs
 
 
-class VoiceMailPilot(AbstractAXLDeviceAPI):
+class VoiceMailPilot(AbstractAXLAPI):
     _factory_descriptor = "voicemail_pilot"
 
     def add(self, dirn, isDefault="false", **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class VoiceMailProfile(AbstractAXLDeviceAPI):
     _factory_descriptor = "voicemail_profile"
 
     def add(self, name, voiceMailPilot, **kwargs):
-        return super().add(**flatten_signature_args(self.add, locals()))
-
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)

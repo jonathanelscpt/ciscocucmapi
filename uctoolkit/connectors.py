@@ -371,7 +371,7 @@ class UCMRisPortConnector(UCSOAPConnector):
         raise NotImplementedError()
 
 
-class UCMPerMonConnector(UCSOAPConnector):
+class UCMPerfMonConnector(UCSOAPConnector):
 
     def __init__(self, username, password, fqdn, tls_verify=False):
         _wsdl = WSDL_URLS["PerfMon"].format(fqdn)
