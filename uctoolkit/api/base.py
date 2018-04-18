@@ -47,6 +47,7 @@ def _get_choices(obj):
 
 
 def _nullstring_dict(returned_tags):
+    """Convert list to nullstring dict"""
     return {_: "" for _ in returned_tags}
 
 
@@ -133,8 +134,9 @@ class AbstractAXLAPI(object):
             raise AXLError(fault.message)
 
     def _serialize_axl_object(self, action, **kwargs):
-        """Builds and AXL methodcaller using given action verb and the object type,
-        serializes the response and uses the resultant dict to instantiate a data model object
+        """Builds and AXL methodcaller using given action verb and the object type.
+
+        Serializes the response and uses the resultant dict to instantiate a data model object
 
         :param action: AXL action verb - 'add', 'get', 'update', 'remove', etc.
         :param kwargs: AXL method attribute kwargs dictionary
@@ -157,8 +159,9 @@ class AbstractAXLAPI(object):
         return serialize_object(axl_resp)["return"]
 
     def model(self, sanitized=True, target_cls=OrderedDict, include_types=False):
-        """Get a empty serialized 'add' model for the API endpoint useful for inspecting the endpoint's
-        schema and future template generation.
+        """Get a empty serialized 'add' model for the API endpoint
+
+        Useful for inspecting the endpoint's schema and future template generation.
 
         :param sanitized: collapse zeep's interpretation of the xsd nested dicts
         with '_value_1' and 'uuid' keys into a simple k,v pair with v as a (str)

@@ -38,12 +38,15 @@ class AXLDataModel(MutableMapping):
         return not self.__eq__(other)
 
     def __iter__(self):
+        """Iterable of AXL attribute dict"""
         return iter(self._axl_data)
 
     def __len__(self):
+        """Length of AXL attribute dict"""
         return len(self._axl_data)
 
     def __getitem__(self, key):
+        """Get item from AXL attribute dict"""
         try:
             return self._axl_data[key]
         except KeyError:
@@ -52,9 +55,11 @@ class AXLDataModel(MutableMapping):
             )
 
     def __setitem__(self, key, value):
+        """Set item in AXL attribute dict"""
         self._axl_data[key] = value
 
     def __delitem__(self, key):
+        """Delete item from AXL attribute dict"""
         try:
             del self._axl_data[key]
         except KeyError:
@@ -63,6 +68,7 @@ class AXLDataModel(MutableMapping):
             )
 
     def __getattr__(self, key):
+        """Get attribute from AXL attribute dict"""
         return self.__getitem__(key)
 
     def __setattr__(self, key, value):

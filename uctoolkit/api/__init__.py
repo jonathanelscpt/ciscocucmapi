@@ -8,16 +8,3 @@ from .system import *
 from .media import *
 from .serviceability import *
 from .advanced import *
-
-
-__all__ = [
-    ThinAXL,
-    "device",
-    "dialplan",
-    "media",
-    "serviceability",
-    "system",
-    "user",
-    "system",
-    "advanced"
-]

@@ -7,6 +7,7 @@ from ..exceptions import AXLMethodDoesNotExist
 
 
 def _check_route_group_port_assignment(members):
+    """Assign all ports for route groups members when not specified."""
     if isinstance(members["member"], list):
         for member in members["member"]:
             if "port" not in member:

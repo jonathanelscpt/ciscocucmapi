@@ -4,79 +4,21 @@
 import os
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
-import asyncio
 from lxml import etree
+# import asyncio
 
 from zeep import Client
 from zeep.cache import SqliteCache
 from zeep.transports import Transport
-from zeep.asyncio import AsyncTransport
+# from zeep.asyncio import AsyncTransport
 from requests import Session
 from requests.auth import HTTPBasicAuth
-from zeep.plugins import HistoryPlugin, Plugin
+from zeep.plugins import HistoryPlugin
 
 from .exceptions import ServiceProxyError
 from .model import axl_factory
 from .definitions import WSDL_URLS
-from .api import (
-    ThinAXL as _ThinAXLAPI,
-    Phone as _PhoneAPI,
-    Line as _LineAPI,
-    RoutePartition as _RoutePartitionAPI,
-    CallPickupGroup as _CallPickupGroupAPI,
-    User as _UserAPI,
-    AarGroup as _AarGroupAPI,
-    CallManagerGroup as _CallManagerGroupAPI,
-    DirectedCallPark as _DirectedCallParkAPI,
-    CallPark as _CallParkAPI,
-    CalledPartyTransformationPattern as _CalledPartyTransformationPatternAPI,
-    CallingPartyTransformationPattern as _CallingPartyTransformationPatternAPI,
-    CmcInfo as _CmcInfoAPI,
-    ConferenceBridge as _ConferenceBridgeAPI,
-    Css as _CssAPI,
-    CtiRoutePoint as _CtiRoutePointAPI,
-    DevicePool as _DevicePoolAPI,
-    DateTimeGroup as _DateTimeGroupAPI,
-    DeviceProfile as _DeviceProfileAPI,
-    FacInfo as _FacInfoAPI,
-    HuntList as _HuntListAPI,
-    HuntPilot as _HuntPilotAPI,
-    LdapDirectory as _LdapDirectoryAPI,
-    LdapFilter as _LdapFilterAPI,
-    LdapSyncCustomField as _LdapSyncCustomFieldAPI,
-    LineGroup as _LineGroupAPI,
-    LocalRouteGroup as _LocalRouteGroupAPI,
-    Location as _LocationAPI,
-    MediaResourceGroup as _MediaResourceGroupAPI,
-    MediaResourceList as _MediaResourceListAPI,
-    Mtp as _MtpAPI,
-    PhoneButtonTemplate as _PhoneButtonTemplateAPI,
-    PhoneNtp as _PhoneNtpAPI,
-    Region as _RegionAPI,
-    RouteGroup as _RouteGroupAPI,
-    RouteList as _RouteListAPI,
-    RoutePattern as _RoutePatternAPI,
-    SipRoutePattern as _SipRoutePatternAPI,
-    Srst as _SrstAPI,
-    Transcoder as _TranscoderAPI,
-    TransPattern as _TransPatternAPI,
-    VoiceMailPilot as _VoiceMailPilotAPI,
-    VoiceMailProfile as _VoiceMailProfileAPI,
-    UcService as _UcServiceAPI,
-    ServiceProfile as _ServiceProfileAPI,
-    SipTrunk as _SipTrunkAPI,
-    SipTrunkSecurityProfile as _SipTrunkSecurityProfileAPI,
-    SipProfile as _SipProfileAPI,
-    UserGroup as _UserGroupAPI,
-    TimePeriod as _TimePeriodAPI,
-    TimeSchedule as _TimeScheduleAPI,
-    UserProfileProvision as _UserProfileProvisionAPI,
-    # UserPhoneAssociation as _UserPhoneAssociationAPI
-    UniversalDeviceTemplate as _UniversalDeviceTemplateAPI,
-    UniversalLineTemplate as _UniversalLineTemplateAPI,
-    RemoteDestination as _RemoteDestinationAPI,
-    RemoteDestinationProfile as _RemoteDestinationProfileAPI,
-)
+from .api import *
 
 
 def get_connection_kwargs(env_dict, kwargs):
@@ -141,7 +83,7 @@ class UCSOAPConnector(object):
         self._username = username
         self._wsdl = wsdl
         self._timeout = timeout
-        self.is_async = is_async
+        # self.is_async = is_async
 
         self._session = Session()
         self._session.auth = HTTPBasicAuth(username, password)
@@ -156,18 +98,18 @@ class UCSOAPConnector(object):
             self._plugins.append(self._history)
 
         # todo - extend necessary support for async
-        if self.is_async:
-            loop = asyncio.get_event_loop()
-            transport = AsyncTransport(loop,
-                                       cache=SqliteCache(),
-                                       session=self._session,
-                                       timeout=self._timeout
-                                       )
-        else:
-            transport = Transport(cache=SqliteCache(),
-                                  session=self._session,
-                                  timeout=self._timeout
-                                  )
+        # if self.is_async:
+        #     loop = asyncio.get_event_loop()
+        #     transport = AsyncTransport(loop,
+        #                                cache=SqliteCache(),
+        #                                session=self._session,
+        #                                timeout=self._timeout
+        #                                )
+        # else:
+        transport = Transport(cache=SqliteCache(),
+                              session=self._session,
+                              timeout=self._timeout
+                              )
 
         # self._client = Client(wsdl=wsdl, transport=transport)
         self._client = Client(wsdl=wsdl, transport=transport, plugins=self._plugins)
@@ -230,75 +172,75 @@ class UCMAXLConnector(UCSOAPConnector):
         #     setattr(self, api.factory_descriptor, api(self, axl_factory))
 
         # sql API wrapper
-        self.sql = _ThinAXLAPI(self, axl_factory)
+        self.sql = ThinAXL(self, axl_factory)
 
         # device API wrappers
-        self.cti_route_point = _CtiRoutePointAPI(self, axl_factory)
-        self.line = _LineAPI(self, axl_factory)
-        self.phone = _PhoneAPI(self, axl_factory)
-        self.udp = _DeviceProfileAPI(self, axl_factory)
-        self.phone_button_template = _PhoneButtonTemplateAPI(self, axl_factory)
-        self.sip_trunk = _SipTrunkAPI(self, axl_factory)
-        self.sip_trunk_security_profile = _SipTrunkSecurityProfileAPI(self, axl_factory)
-        self.sip_profile = _SipProfileAPI(self, axl_factory)
-        self.udt = _UniversalDeviceTemplateAPI(self, axl_factory)
-        self.ult = _UniversalLineTemplateAPI(self, axl_factory)
-        self.remote_destination = _RemoteDestinationAPI(self, axl_factory)
-        self.rdp = _RemoteDestinationProfileAPI(self, axl_factory)
+        self.cti_route_point = CtiRoutePoint(self, axl_factory)
+        self.line = Line(self, axl_factory)
+        self.phone = Phone(self, axl_factory)
+        self.udp = DeviceProfile(self, axl_factory)
+        self.phone_button_template = PhoneButtonTemplate(self, axl_factory)
+        self.sip_trunk = SipTrunk(self, axl_factory)
+        self.sip_trunk_security_profile = SipTrunkSecurityProfile(self, axl_factory)
+        self.sip_profile = SipProfile(self, axl_factory)
+        self.udt = UniversalDeviceTemplate(self, axl_factory)
+        self.ult = UniversalLineTemplate(self, axl_factory)
+        self.remote_destination = RemoteDestination(self, axl_factory)
+        self.rdp = RemoteDestinationProfile(self, axl_factory)
 
         # user API wrappers
-        self.user = _UserAPI(self, axl_factory)
-        self.uc_service = _UcServiceAPI(self, axl_factory)
-        self.service_profile = _ServiceProfileAPI(self, axl_factory)
-        self.user_group = _UserGroupAPI(self, axl_factory)
-        self.user_profile = _UserProfileProvisionAPI(self, axl_factory)
+        self.user = User(self, axl_factory)
+        self.uc_service = UcService(self, axl_factory)
+        self.service_profile = ServiceProfile(self, axl_factory)
+        self.user_group = UserGroup(self, axl_factory)
+        self.user_profile = UserProfileProvision(self, axl_factory)
         # self.quick_user_phone_add = _UserPhoneAssociationAPI(self, axl_factory)
 
         # dial plan API wrappers
-        self.aar_group = _AarGroupAPI(self, axl_factory)
-        self.call_pickup_group = _CallPickupGroupAPI(self, axl_factory)
-        self.call_park = _CallParkAPI(self, axl_factory)
-        self.called_party_xform_pattern = _CalledPartyTransformationPatternAPI(self, axl_factory)
-        self.calling_party_xform_pattern = _CallingPartyTransformationPatternAPI(self, axl_factory)
-        self.cmc = _CmcInfoAPI(self, axl_factory)
-        self.css = _CssAPI(self, axl_factory)
-        self.directed_call_park = _DirectedCallParkAPI(self, axl_factory)
-        self.route_partition = _RoutePartitionAPI(self, axl_factory)
-        self.fac = _FacInfoAPI(self, axl_factory)
-        self.hunt_list = _HuntListAPI(self, axl_factory)
-        self.hunt_pilot = _HuntPilotAPI(self, axl_factory)
-        self.line_group = _LineGroupAPI(self, axl_factory)
-        self.local_route_group = _LocalRouteGroupAPI(self, axl_factory)
-        self.route_group = _RouteGroupAPI(self, axl_factory)
-        self.route_list = _RouteListAPI(self, axl_factory)
-        self.route_pattern = _RoutePatternAPI(self, axl_factory)
-        self.sip_route_pattern = _SipRoutePatternAPI(self, axl_factory)
-        self.time_period = _TimePeriodAPI(self, axl_factory)
-        self.time_schedule = _TimeScheduleAPI(self, axl_factory)
-        self.translation_pattern = _TransPatternAPI(self, axl_factory)
+        self.aar_group = AarGroup(self, axl_factory)
+        self.call_pickup_group = CallPickupGroup(self, axl_factory)
+        self.call_park = CallPark(self, axl_factory)
+        self.called_party_xform_pattern = CalledPartyTransformationPattern(self, axl_factory)
+        self.calling_party_xform_pattern = CallingPartyTransformationPattern(self, axl_factory)
+        self.cmc = CmcInfo(self, axl_factory)
+        self.css = Css(self, axl_factory)
+        self.directed_call_park = DirectedCallPark(self, axl_factory)
+        self.route_partition = RoutePartition(self, axl_factory)
+        self.fac = FacInfo(self, axl_factory)
+        self.hunt_list = HuntList(self, axl_factory)
+        self.hunt_pilot = HuntPilot(self, axl_factory)
+        self.line_group = LineGroup(self, axl_factory)
+        self.local_route_group = LocalRouteGroup(self, axl_factory)
+        self.route_group = RouteGroup(self, axl_factory)
+        self.route_list = RouteList(self, axl_factory)
+        self.route_pattern = RoutePattern(self, axl_factory)
+        self.sip_route_pattern = SipRoutePattern(self, axl_factory)
+        self.time_period = TimePeriod(self, axl_factory)
+        self.time_schedule = TimeSchedule(self, axl_factory)
+        self.translation_pattern = TransPattern(self, axl_factory)
 
         # system API wrappers
-        self.callmanager_group = _CallManagerGroupAPI(self, axl_factory)
-        self.date_time_group = _DateTimeGroupAPI(self, axl_factory)
-        self.device_pool = _DevicePoolAPI(self, axl_factory)
-        self.ldap_directory = _LdapDirectoryAPI(self, axl_factory)
-        self.ldap_filter = _LdapFilterAPI(self, axl_factory)
-        self.ldap_sync_custom_field = _LdapSyncCustomFieldAPI(self, axl_factory)
-        self.location = _LocationAPI(self, axl_factory)
-        self.phone_ntp_reference = _PhoneNtpAPI(self, axl_factory)
-        self.region = _RegionAPI(self, axl_factory)
-        self.srst = _SrstAPI(self, axl_factory)
+        self.callmanager_group = CallManagerGroup(self, axl_factory)
+        self.date_time_group = DateTimeGroup(self, axl_factory)
+        self.device_pool = DevicePool(self, axl_factory)
+        self.ldap_directory = LdapDirectory(self, axl_factory)
+        self.ldap_filter = LdapFilter(self, axl_factory)
+        self.ldap_sync_custom_field = LdapSyncCustomField(self, axl_factory)
+        self.location = Location(self, axl_factory)
+        self.phone_ntp_reference = PhoneNtp(self, axl_factory)
+        self.region = Region(self, axl_factory)
+        self.srst = Srst(self, axl_factory)
 
         # media API wrappers
-        self.conference_bridge = _ConferenceBridgeAPI(self, axl_factory)
-        self.mrg = _MediaResourceGroupAPI(self, axl_factory)
-        self.mrgl = _MediaResourceListAPI(self, axl_factory)
-        self.mtp = _MtpAPI(self, axl_factory)
-        self.transcoder = _TranscoderAPI(self, axl_factory)
+        self.conference_bridge = ConferenceBridge(self, axl_factory)
+        self.mrg = MediaResourceGroup(self, axl_factory)
+        self.mrgl = MediaResourceList(self, axl_factory)
+        self.mtp = Mtp(self, axl_factory)
+        self.transcoder = Transcoder(self, axl_factory)
 
         # advanced API wrappers
-        self.voicemail_pilot = _VoiceMailPilotAPI(self, axl_factory)
-        self.voicemail_profile = _VoiceMailProfileAPI(self, axl_factory)
+        self.voicemail_pilot = VoiceMailPilot(self, axl_factory)
+        self.voicemail_profile = VoiceMailProfile(self, axl_factory)
 
 
 class UCMControlCenterConnector(UCSOAPConnector):
