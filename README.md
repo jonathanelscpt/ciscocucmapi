@@ -48,43 +48,44 @@ bot_device_attributes = {
     "devicePoolName": "US_NYC_DP",
 }
 axl.phone.add(**bot_device_attributes)
-axl.phone.add(name="SEPDEADDEADDEAD",
-              product="Cisco 8841",
-              devicePoolName="US_NYC_DP"
-              )
 
 # api endpoints can be created prior to invoking axl method-calling for pre-processing
 new_bot_device = axl.phone.create()
+# very useful API template development!
+with open("/path/to/templates/phone.json", "w") as _:
+    json.dump(axl.phone.model(), _, indent=4)
 
-# getting existing phones
-axl.phone.get(name="SEPDEADDEADDEAD", 
-              returnedTags={"name": "", "devicePoolName": "", "callingSearchSpaceName": ""}
-              )
+# getting existing phones with null-string dicts or lists of `returnedTags`
+dead_device = axl.phone.get(name="SEPDEADDEADDEAD", 
+                            returnedTags={"name": "", "devicePoolName": "", "callingSearchSpaceName": ""}
+                            )
+beefy_device = axl.phone.get(name="SEPBEEFBEEFBEEF", 
+                            returnedTags=["name", "devicePoolName", "callingSearchSpaceName"]
+                            )
 
 # listing phones by name
-bot_phones = {
-    "name": "BOT%"
+nyc_bot_attrs = {
+    "name": "SEP%",
+    "devicePoolName": "US_NYC%",
+    "callingSearchSpaceName": "US_%"
 }
-returned_tags = {
-    "name": "",
-    "description": "",
-    "lines": ""
-}
-bot_devices = axl.phone.list(searchCritera=bot_phones,  # explicit search and return definitions
-                             returnedTags=returned_tags
+nyc_bot_devices = axl.phone.list(searchCriteria=nyc_bot_attrs,
+                             returnedTags=["name", "description", "lines"]
                              )
-all_devices = axl.phone.list()  # implicit "all" return - use sparingly for large data sets!
+# implicit "return all" available for `searchCriteria` and `returnedTags` - use sparingly for large data sets!
+all_devices = axl.phone.list()
 
 # property-like getters and setters
-botuser15 = next(filter(lambda person: person.name == 'BOTUSER015', bot_devices))
+botuser15 = next(filter(lambda person: person.name == 'BOTUSER015', nyc_bot_devices))
 botuser15.callingSearchSpaceName = "US_NYC_NATIONAL_CSS"
 
 # updating a phone
-botuser15.callingSearchSpaceName = "US_NYC_INTERNAL_CSS"
+botuser15.callingSearchSpaceName = "US_NYC_INTERNATIONAL_CSS"
 botuser15.newName = "BOTJONELS"
 botuser15.locationName = "Hub_None"
 axl.phone.update(name=botuser15.name,
                  newName=botuser15.newName,
+                 callingSearchSpaceName=botuser15.callingSearchSpaceName,
                  locationName=botuser15.locationName
                  )
 
@@ -95,10 +96,6 @@ axl.phone.remove(uuid=botuser15.uuid)
 numplan = axl.sql.query("SELECT * FROM numplan")
 directory_numbers = [row['dnorpattern'] for row in numplan]
 numplan.to_csv(destination_path="/path/to/datadump/numplan.csv")  # pathlib also supported
-
-# .model() produces empty data models for API template development
-with open("/path/to/templates/phone.json", "w") as _:
-    json.dump(axl.phone.model(), _, indent=4)
 ```
 
 
