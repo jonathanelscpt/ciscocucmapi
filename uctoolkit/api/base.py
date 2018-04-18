@@ -46,6 +46,10 @@ def _get_choices(obj):
         )
 
 
+def _nullstring_dict(returned_tags):
+    return {_: "" for _ in returned_tags}
+
+
 def check_identifiers(wsdl_obj, **kwargs):
     identifiers = _get_choices(wsdl_obj.elements_nested[0][1][0])
     if not check_valid_attribute_req_dict(identifiers, kwargs):
@@ -179,6 +183,8 @@ class AbstractAXLAPI(object):
 
     def get(self, returnedTags=None, **kwargs):
         """Get method for API endpoint"""
+        if isinstance(returnedTags, list):
+            returnedTags = _nullstring_dict(returnedTags)
         check_identifiers(self._wsdl_objects["get_method"], **kwargs)
         get_kwargs = flatten_signature_kwargs(self.get, locals())
         return self._serialize_axl_object("get", **get_kwargs)
@@ -205,6 +211,8 @@ class AbstractAXLAPI(object):
             searchCriteria = {supported_criteria[0]: "%"}
         if not returnedTags:
             returnedTags = get_model_dict(self._wsdl_objects["list_model"])
+        elif isinstance(returnedTags, list):
+            returnedTags = _nullstring_dict(returnedTags)
         axl_resp = self._axl_methodcaller("list",
                                           searchCriteria=searchCriteria,
                                           returnedTags=returnedTags,
