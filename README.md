@@ -41,23 +41,25 @@ import json
 
 axl = UCMAXLConnector()  # env vars for connection params
 
-# adding a phone
-# todo
-
-# api endpoints can be created prior to invoking axl method-calling for pre-processing
+# adding phones
 bot_device_attributes = {
     "name": "SEPDEADDEADDEAD",
     "product": "Cisco 8821",
     "devicePoolName": "US_NYC_DP",
 }
+axl.phone.add(**bot_device_attributes)
+axl.phone.add(name="SEPDEADDEADDEAD",
+              product="Cisco 8841",
+              devicePoolName="US_NYC_DP"
+              )
+
+# api endpoints can be created prior to invoking axl method-calling for pre-processing
 new_bot_device = axl.phone.create()
 
-# adding phones
-axl.phone.add(**bot_device_attributes)  # can add with single kwargs
-axl.phone.add(name="SEPDEADDEADDEAD", product="Cisco 8841", devicePoolName="US_NYC_DP")  # minimalistic add
-
-# getting phones
-axl.phone.get(name="SEPDEADDEADDEAD", returnedTags={"name": "", "devicePoolName": "", "callingSearchSpaceName": ""})
+# getting existing phones
+axl.phone.get(name="SEPDEADDEADDEAD", 
+              returnedTags={"name": "", "devicePoolName": "", "callingSearchSpaceName": ""}
+              )
 
 # listing phones by name
 bot_phones = {
@@ -68,8 +70,10 @@ returned_tags = {
     "description": "",
     "lines": ""
 }
-bot_devices = axl.phone.list(searchCritera=bot_phones, returnedTags=returned_tags)  # explicit search and return definitions
-all_devices = axl.phone.list()  # dynamically generated "all" return - use sparingly for large data sets!
+bot_devices = axl.phone.list(searchCritera=bot_phones,  # explicit search and return definitions
+                             returnedTags=returned_tags
+                             )
+all_devices = axl.phone.list()  # implicit "all" return - use sparingly for large data sets!
 
 # property-like getters and setters
 botuser15 = next(filter(lambda person: person.name == 'BOTUSER015', bot_devices))
@@ -79,7 +83,10 @@ botuser15.callingSearchSpaceName = "US_NYC_NATIONAL_CSS"
 botuser15.callingSearchSpaceName = "US_NYC_INTERNAL_CSS"
 botuser15.newName = "BOTJONELS"
 botuser15.locationName = "Hub_None"
-axl.phone.update(name=botuser15.name, newName=botuser15.newName, locationName=botuser15.locationName)
+axl.phone.update(name=botuser15.name,
+                 newName=botuser15.newName,
+                 locationName=botuser15.locationName
+                 )
 
 # deleting a phone
 axl.phone.remove(uuid=botuser15.uuid) 
@@ -137,7 +144,7 @@ donations are most welcome:
  
 # Support
  
-I'm also willing to discuss ad-hoc commercial support or custom DevOps implementations.
+I'm open to discussing ad-hoc commercial support or custom DevOps implementations.
 Please contact me at [jonathanelscpt@gmail.com](mailto:jonathanelscpt@gmail.com) for more information. 
 Note that asking questions or reporting bugs via this e-mail address may not receive responses.
 Please rather create GitHub issues for this.
