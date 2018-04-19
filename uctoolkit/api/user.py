@@ -7,6 +7,18 @@ from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 
 
+class AppUser(AbstractAXLAPI):
+    _factory_descriptor = "application_user"
+
+    def add(self, userid,
+            associatedDevices=None,
+            associatedGroups=None,
+            ctiControlledDeviceProfiles=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class ServiceProfile(AbstractAXLAPI):
     _factory_descriptor = "service_profile"
 

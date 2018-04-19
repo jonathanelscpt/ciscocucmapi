@@ -6,6 +6,40 @@ from .._internal_utils import flatten_signature_kwargs
 from ..exceptions import AXLMethodDoesNotExist
 
 
+class CommonDeviceConfig(AbstractAXLDeviceAPI):
+    _factory_descriptor = "common_device_config"
+
+    def add(self, name,
+            softkeyTemplateName=None,
+            userLocale=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+    def restart(self, **kwargs):
+        raise AXLMethodDoesNotExist
+
+    def reset(self, **kwargs):
+        raise AXLMethodDoesNotExist
+
+
+class CommonPhoneConfig(AbstractAXLDeviceAPI):
+    _factory_descriptor = "common_phone_profile"
+
+    def add(self, name,
+            unlockPwd=None,
+            featureControlPolicy=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+    def restart(self, **kwargs):
+        raise AXLMethodDoesNotExist
+
+    def reset(self, **kwargs):
+        raise AXLMethodDoesNotExist
+
+
 class CtiRoutePoint(AbstractAXLDeviceAPI):
     _factory_descriptor = "cti_route_point"
 
@@ -27,6 +61,31 @@ class DeviceProfile(AbstractAXLDeviceAPI):
             **kwargs):
         if "class" not in kwargs:  # workaround for restricted 'class' attribute
             kwargs["class"] = "Device Profile"
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class FeatureControlPolicy(AbstractAXLAPI):
+    _factory_descriptor = "feature_control_policy"
+
+    def add(self, name,
+            features=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class IpPhoneServices(AbstractAXLAPI):
+    _factory_descriptor = "ip_phone_service"
+
+    def add(self, serviceName, asciiServiceName, serviceUrl,
+            secureServiceUrl=None,
+            serviceCategory="XML Service",
+            serviceType="Standard IP Phone Service",
+            enabled=True,
+            enterpriseSubscription=False,
+            parameters=None,
+            **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -74,6 +133,32 @@ class PhoneButtonTemplate(AbstractAXLAPI):
     _factory_descriptor = "phone_button_template"
 
     def add(self, name, basePhoneTemplateName, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class PhoneSecurityProfile(AbstractAXLAPI):
+    _factory_descriptor = "phone_security_profile"
+
+    def add(self, name,
+            phoneType="Universal Device Template",
+            protocol="Protocol Not Specified",
+            deviceSecurityMode=None,
+            authenticationMode="By Null String",
+            keySize=1024,
+            transportType="TCP+UDP",
+            sipPhonePort=5060,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class RecordingProfile(AbstractAXLAPI):
+    _factory_descriptor = "recording_profile"
+
+    def add(self, name, recorderDestination,
+            recordingCssName=None,
+            **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -154,6 +239,29 @@ class SipTrunkSecurityProfile(AbstractAXLDeviceAPI):
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
+
+
+class SoftKeyTemplate(AbstractAXLDeviceAPI):
+    _factory_descriptor = "softkey_template"
+
+    def add(self, name, description,
+            baseSoftkeyTemplateName="Standard User",
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+    def reset(self, **kwargs):
+        raise AXLMethodDoesNotExist
+
+
+class SoftKeySet(AbstractAXLAPI):
+    _factory_descriptor = "softkey_set"
+
+    def add(self, **kwargs):
+        raise AXLMethodDoesNotExist
+
+    def remove(self, **kwargs):
+        raise AXLMethodDoesNotExist
 
 
 class UniversalDeviceTemplate(AbstractAXLAPI):

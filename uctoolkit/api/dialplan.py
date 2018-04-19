@@ -82,10 +82,50 @@ class DirectedCallPark(AbstractAXLDeviceAPI):
         return super().add(**add_kwargs)
 
 
+class EnterpriseFeatureAccessConfiguration(AbstractAXLAPI):
+    _factory_descriptor = "mobility_enterprise_feature_access_number"
+
+    def add(self, patter,
+            routePartitionName=None,
+            isDefaultEafNumber=False,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class FacInfo(AbstractAXLAPI):
     _factory_descriptor = "fac"
 
     def add(self, name, code, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class Mobility(AbstractAXLAPI):
+    _factory_descriptor = "handoff_mobility"
+
+    def add(self, handoffNumber,
+            handoffPartitionName=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+    def list(self, **kwargs):
+        raise AXLMethodDoesNotExist
+
+    def remove(self, **kwargs):
+        raise AXLMethodDoesNotExist
+
+
+class MobilityProfile(AbstractAXLAPI):
+    _factory_descriptor = "mobility_profile"
+
+    def add(self, name,
+            mobileClientCallingOption="Dial via Office Reverse",
+            dvofServiceAccessNumber=None,
+            dirn=None,
+            dvorCallerId=None,
+            **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 

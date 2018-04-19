@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """AXL definitions"""
 
-from .api import __all__ as _api_all
 
 # API_ENDPOINTS = {api.__name__: api for api in _api_all}
 

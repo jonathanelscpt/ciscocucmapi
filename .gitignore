@@ -101,7 +101,11 @@ ENV/
 .mypy_cache/
 
 
-# ignore AXL schemas
+# AXL schemas
 schema/
+
+# IntelliJ files
 .idea/
+
+# output
 out/

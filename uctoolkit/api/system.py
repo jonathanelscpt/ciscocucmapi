@@ -19,6 +19,22 @@ class CallManagerGroup(AbstractAXLDeviceAPI):
         return super().add(**add_kwargs)
 
 
+class DeviceMobilityGroup(AbstractAXLAPI):
+    _factory_descriptor = "device_mobility_group"
+
+    def add(self, name, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class DeviceMobility(AbstractAXLAPI):
+    _factory_descriptor = "device_mobility_info"
+
+    def add(self, name, subNet, subNetMaskSz, members, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class DevicePool(AbstractAXLDeviceAPI):
     _factory_descriptor = "device_pool"
 
@@ -30,7 +46,10 @@ class DevicePool(AbstractAXLDeviceAPI):
 class DateTimeGroup(AbstractAXLAPI):
     _factory_descriptor = "date_time_group"
 
-    def add(self, name, timeZone, separator="-", dateformat="M-D-Y", **kwargs):
+    def add(self, name, timeZone,
+            separator="-",
+            dateformat="M-D-Y",
+            **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -83,10 +102,34 @@ class LdapSyncCustomField(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
+class LbmGroup(AbstractAXLAPI):
+    _factory_descriptor = "lbm_group"
+
+    def add(self, name, ProcessnodeActive,
+            ProcessnodeStandby=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class LbmHubGroup(AbstractAXLAPI):
+    _factory_descriptor = "lbm_hub_group"
+
+    def add(self, name, member1,
+            member2=None,
+            member3=None,
+            members=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class Location(AbstractAXLAPI):
     _factory_descriptor = "location"
 
-    def add(self, name, betweenLocations=None, **kwargs):
+    def add(self, name,
+            betweenLocations=None,
+            **kwargs):
         # this approach is probably not compatible with pre-9's flattened locations.
         # if warranted in future, would require extension for a version check.
         if not betweenLocations:
@@ -103,10 +146,37 @@ class Location(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
+class PresenceRedundancyGroup(AbstractAXLAPI):
+    _factory_descriptor = "presence_redundancy_group"
+
+    def add(self, name, server1,
+            server2=None,
+            haEnabled=False,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class PhoneNtp(AbstractAXLAPI):
     _factory_descriptor = "phone_ntp_reference"
 
     def add(self, ipAddress, mode="Directed Broadcast", **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class PhysicalLocation(AbstractAXLAPI):
+    _factory_descriptor = "physical_location"
+
+    def add(self, name, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class PresenceGroup(AbstractAXLAPI):
+    _factory_descriptor = "presence_group"
+
+    def add(self, name, presenceGroups=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 

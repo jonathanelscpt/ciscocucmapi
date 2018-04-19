@@ -21,7 +21,7 @@ from .._internal_utils import (
     flatten_signature_kwargs,
 )
 from ..helpers import (
-    get_model_dict,
+    model_dict,
     sanitize_model_dict
 )
 
@@ -85,25 +85,23 @@ class AbstractAXLAPI(object):
         self.object_factory = object_factory
         self._return_name = downcase_string(self.__class__.__name__)
 
-        add_model_name = "".join(["X", self.__class__.__name__])
-        get_method_name = "".join(["Get", self.__class__.__name__, "Req"])
-        get_model_name = "".join(["R", self.__class__.__name__])
-        update_method_name = "".join(["Update", self.__class__.__name__, "Req"])
-        list_method_name = "".join(["List", self.__class__.__name__, "Req"])
-        list_model_name = "".join(["L", self.__class__.__name__])
+        # add_model_name = "".join(["X", self.__class__.__name__])
+        # get_method_name = "".join(["Get", self.__class__.__name__, "Req"])
+        # get_model_name = "".join(["R", self.__class__.__name__])
+        # update_method_name = "".join(["Update", self.__class__.__name__, "Req"])
+        # list_method_name = "".join(["List", self.__class__.__name__, "Req"])
+        # list_model_name = "".join(["L", self.__class__.__name__])
 
         # this looks expensive during __init__.
         # may need to time this and move to individul methods.  cleaner code if here though
         self._wsdl_objects = {
-            "add_method": NotImplementedError,  # not used in class
-            "add_model": self._get_wsdl_obj(add_model_name),
-            "get_method": self._get_wsdl_obj(get_method_name),
-            "get_model": self._get_wsdl_obj(get_model_name),
-            "list_method": self._get_wsdl_obj(list_method_name),
-            "list_model": self._get_wsdl_obj(list_model_name),
-            "update_method": self._get_wsdl_obj(update_method_name),
-            "update_model": NotImplementedError,  # doesn't exist in schema
-            "name_and_guid_model": self._get_wsdl_obj("NameAndGUIDRequest")  # used in many AXL requests
+            # "add_model": self._get_wsdl_obj(add_model_name),
+            # "get_method": self._get_wsdl_obj(get_method_name),
+            # "get_model": self._get_wsdl_obj(get_model_name),
+            # "list_method": self._get_wsdl_obj(list_method_name),
+            # "list_model": self._get_wsdl_obj(list_model_name),
+            # "update_method": self._get_wsdl_obj(update_method_name),
+            # "name_and_guid_model": self._get_wsdl_obj("NameAndGUIDRequest")  # used in many AXL requests
         }
 
     @classproperty
@@ -158,6 +156,10 @@ class AbstractAXLAPI(object):
         axl_resp = self._axl_methodcaller(action, **kwargs)
         return serialize_object(axl_resp)["return"]
 
+    def _fetch_add_model(self):
+        add_model_name = "".join(["X", self.__class__.__name__])
+        return self._get_wsdl_obj(add_model_name)
+
     def model(self, sanitized=True, target_cls=OrderedDict, include_types=False):
         """Get a empty serialized 'add' model for the API endpoint
 
@@ -168,12 +170,12 @@ class AbstractAXLAPI(object):
         :param target_cls: dict or OrderedDict
         :return: empty data model dictionary
         """
-        model = get_model_dict(self._wsdl_objects["add_model"], target_cls=target_cls, include_types=include_types)
+        model = model_dict(self._fetch_add_model(), target_cls=target_cls, include_types=include_types)
         return sanitize_model_dict(model) if sanitized else model
 
     def create(self, **kwargs):
         """Create AXL object locally for pre-processing"""
-        axl_add_method = methodcaller(self._wsdl_objects["add_model"].__class__.__name__, **kwargs)
+        axl_add_method = methodcaller(self._fetch_add_model().__class__.__name__, **kwargs)
         axl_add_obj = axl_add_method(self.connector.model_factory)
         return self.object_factory(self.__class__.__name__, serialize_object(axl_add_obj))
 
@@ -188,7 +190,11 @@ class AbstractAXLAPI(object):
         """Get method for API endpoint"""
         if isinstance(returnedTags, list):
             returnedTags = _nullstring_dict(returnedTags)
-        check_identifiers(self._wsdl_objects["get_method"], **kwargs)
+        # define zeep objects for method generically
+        get_method_name = "".join(["Get", self.__class__.__name__, "Req"])
+        get_model_name = "".join(["R", self.__class__.__name__])
+        get_method = self._get_wsdl_obj(get_method_name)
+        check_identifiers(get_method, **kwargs)
         get_kwargs = flatten_signature_kwargs(self.get, locals())
         return self._serialize_axl_object("get", **get_kwargs)
 
@@ -209,11 +215,18 @@ class AbstractAXLAPI(object):
         :param first: (int) return first number of results
         :return: list of Data Models for API Endpoint
         """
-        supported_criteria = [element[0] for element in self._wsdl_objects["list_method"].elements[0][1].type.elements]
+        list_method_name = "".join(["List", self.__class__.__name__, "Req"])
+        list_model_name = "".join(["L", self.__class__.__name__])
+        list_method = self._get_wsdl_obj(list_method_name)
+        list_model = self._get_wsdl_obj(list_model_name)
+
         if not searchCriteria:
+            # this is presumptive and may not work in all cases.
+            supported_criteria = [element[0] for element in list_method.elements[0][1].type.elements]
             searchCriteria = {supported_criteria[0]: "%"}
         if not returnedTags:
-            returnedTags = get_model_dict(self._wsdl_objects["list_model"])
+            returnedTags = model_dict(list_model)
+            print(model_dict(list_model))
         elif isinstance(returnedTags, list):
             returnedTags = _nullstring_dict(returnedTags)
         axl_resp = self._axl_methodcaller("list",
@@ -239,7 +252,6 @@ class AbstractAXLDeviceAPI(AbstractAXLAPI):
         :param kwargs: uuid or name
         :return: (str) uuid
         """
-        # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         return self._serialize_uuid_resp("apply", **kwargs)
 
     def restart(self, **kwargs):
@@ -248,7 +260,6 @@ class AbstractAXLDeviceAPI(AbstractAXLAPI):
         :param kwargs: uuid or name
         :return: (str) uuid
         """
-        # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         return self._serialize_uuid_resp("restart", **kwargs)
 
     def reset(self, **kwargs):
@@ -257,7 +268,6 @@ class AbstractAXLDeviceAPI(AbstractAXLAPI):
         :param kwargs: uuid or name
         :return: (str) uuid
         """
-        # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         return self._serialize_uuid_resp("reset", **kwargs)
 
 

@@ -47,7 +47,7 @@ def to_csv(data_model_list, destination_path):
         raise FileNotFoundError
 
 
-def get_model_dict(api_endpoint, target_cls=dict, include_types=False):
+def model_dict(api_endpoint, target_cls=dict, include_types=False):
     """Get an empty model dict or OrderedDict for an api endpoint from a complex zeep type
 
     "target_cls' an output data structrure preference (default is dict, for speed) as xml element ordering
@@ -67,14 +67,14 @@ def get_model_dict(api_endpoint, target_cls=dict, include_types=False):
     """
     if target_cls is OrderedDict:
         return OrderedDict((e[0], "" if not include_types else e[1].type.name)
-                           if not hasattr(e[1].type, 'elements') else (e[0], get_model_dict(
+                           if not hasattr(e[1].type, 'elements') else (e[0], model_dict(
                                 e[1].type,
                                 target_cls=target_cls,
                                 include_types=include_types))
                            for e in api_endpoint.elements)
     elif target_cls is dict:
-        return {e[0]: "" if not include_types else e[1].type.name
-                if not hasattr(e[1].type, 'elements') else get_model_dict(
+        return {e[0]: ("" if not include_types else e[1].type.name)
+                if not hasattr(e[1].type, 'elements') else model_dict(
                     e[1].type,
                     target_cls=target_cls,
                     include_types=include_types)
@@ -158,3 +158,20 @@ def _filter_mandatory_attributes(zeep_axl_factory_object):
                 and not element[1].nillable \
                 and not element[1].default:
             yield element[1]
+
+
+def filter_attributes(target, model):
+    """Filter attributes in dict to only include those in a target model
+
+    :param target: (dict) target model
+    :param model: (dict) current model
+    :return: (dict) filtered model
+    """
+    if isinstance(target, dict):
+        return {k: target[k] if not isinstance(v, dict) else filter_attributes(target[k], model[k])
+                for k, v in model.items()}
+    elif isinstance(target, OrderedDict):
+        return OrderedDict((k, target[k] if not isinstance(v, dict) else filter_attributes(target[k], model[k]))
+                           for k, v in model.items())
+    else:
+        raise TypeError("Invalid target class - dict or DefaultDict supported")
