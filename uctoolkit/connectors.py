@@ -261,6 +261,11 @@ class UCMAXLConnector(UCSOAPConnector):
         self.voicemail_pilot = VoiceMailPilot(self, axl_factory)
         self.voicemail_profile = VoiceMailProfile(self, axl_factory)
 
+        # serviceability API wrappers
+        self.billing_server = BillingServer(self, axl_factory)
+        self.snmp_community_string = SNMPCommunityString(self, axl_factory)
+        self.snmp_user = SNMPUser(self, axl_factory)
+
 
 class UCMControlCenterConnector(UCSOAPConnector):
 
