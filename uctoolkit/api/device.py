@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """CUCM AXL Device APIs."""
 
+from zeep.helpers import serialize_object
+
 from .base import AbstractAXLDeviceAPI, AbstractAXLAPI, check_identifiers
 from .._internal_utils import flatten_signature_kwargs
 from ..exceptions import AXLMethodDoesNotExist
@@ -123,10 +125,15 @@ class Phone(AbstractAXLDeviceAPI):
         # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         self._serialize_axl_object("wipe", **kwargs)
 
-    def options(self, uuid, returned_choices=None):
-        # self._client.getPhoneOptions(uuid, returnedChoices=returned_choices)
-        # todo - needs further AXL API review
-        raise NotImplementedError
+    def options(self, uuid, returnedChoices=None):
+        axl_resp = self.connector.service.getPhoneeOptions(
+            uuid=uuid,
+            returnedChoices=returnedChoices
+        )
+        return self.object_factory(
+            "".join([self.__class__.__name__, "Options"]),
+            serialize_object(axl_resp)["return"]["phone"]
+        )
 
 
 class PhoneButtonTemplate(AbstractAXLAPI):
@@ -225,6 +232,16 @@ class SipProfile(AbstractAXLDeviceAPI):
 
     def reset(self, **kwargs):
         raise AXLMethodDoesNotExist
+
+    def options(self, uuid, returnedChoices=None):
+        axl_resp = self.connector.service.getSipProfileOptions(
+            uuid=uuid,
+            returnedChoices=returnedChoices
+        )
+        return self.object_factory(
+            "".join([self.__class__.__name__, "Options"]),
+            serialize_object(axl_resp)["return"]["sipProfile"]
+        )
 
 
 class SipTrunkSecurityProfile(AbstractAXLDeviceAPI):
