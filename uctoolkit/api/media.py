@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """CUCM Media Configuration APIs."""
 
-from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
+from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 
 
-class ConferenceBridge(AbstractAXLDeviceAPI):
+class ConferenceBridge(DeviceAXLAPI):
     _factory_descriptor = "conference_bridge"
 
     def add(self, name, devicePoolName,
@@ -15,7 +15,7 @@ class ConferenceBridge(AbstractAXLDeviceAPI):
         return super().add(**add_kwargs)
 
 
-class MediaResourceGroup(AbstractAXLAPI):
+class MediaResourceGroup(SimpleAXLAPI):
     _factory_descriptor = "mrg"
 
     def add(self, name, members, **kwargs):
@@ -23,7 +23,7 @@ class MediaResourceGroup(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class MediaResourceList(AbstractAXLDeviceAPI):
+class MediaResourceList(SimpleAXLAPI):
     _factory_descriptor = "mrgl"
 
     def add(self, name, members, **kwargs):
@@ -31,7 +31,7 @@ class MediaResourceList(AbstractAXLDeviceAPI):
         return super().add(**add_kwargs)
 
 
-class Mtp(AbstractAXLDeviceAPI):
+class Mtp(DeviceAXLAPI):
     _factory_descriptor = "mtp"
 
     def add(self, name, devicePoolName,
@@ -41,12 +41,12 @@ class Mtp(AbstractAXLDeviceAPI):
         return super().add(**add_kwargs)
 
 
-class Transcoder(AbstractAXLDeviceAPI):
+class Transcoder(DeviceAXLAPI):
     _factory_descriptor = "transcoder"
+    supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "reset"]
 
     def add(self, name, devicePoolName,
             product="Cisco IOS Enhanced Media Termination Point",
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
-

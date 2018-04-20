@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """CUCM Dial Plan Configuration APIs."""
 
-from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
+from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 from ..exceptions import AXLMethodDoesNotExist
 
@@ -18,7 +18,7 @@ def _check_route_group_port_assignment(members):
     return members
 
 
-class AarGroup(AbstractAXLAPI):
+class AarGroup(SimpleAXLAPI):
     _factory_descriptor = "aar_group"
 
     def add(self, name, **kwargs):
@@ -26,7 +26,7 @@ class AarGroup(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class CallPickupGroup(AbstractAXLAPI):
+class CallPickupGroup(SimpleAXLAPI):
     _factory_descriptor = "call_pickup_group"
 
     def add(self, name, pattern, **kwargs):
@@ -34,7 +34,7 @@ class CallPickupGroup(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class CallPark(AbstractAXLAPI):
+class CallPark(SimpleAXLAPI):
     _factory_descriptor = "call_park"
 
     def add(self, pattern, callManagerName, **kwargs):
@@ -42,7 +42,7 @@ class CallPark(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class CalledPartyTransformationPattern(AbstractAXLAPI):
+class CalledPartyTransformationPattern(SimpleAXLAPI):
     _factory_descriptor = "called_party_xform_pattern"
 
     def add(self, pattern, **kwargs):
@@ -50,7 +50,7 @@ class CalledPartyTransformationPattern(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class CallingPartyTransformationPattern(AbstractAXLAPI):
+class CallingPartyTransformationPattern(SimpleAXLAPI):
     _factory_descriptor = "calling_party_xform_pattern"
 
     def add(self, pattern, **kwargs):
@@ -58,7 +58,7 @@ class CallingPartyTransformationPattern(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class CmcInfo(AbstractAXLAPI):
+class CmcInfo(SimpleAXLAPI):
     _factory_descriptor = "cmc"
 
     def add(self, code, **kwargs):
@@ -66,7 +66,7 @@ class CmcInfo(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class Css(AbstractAXLAPI):
+class Css(SimpleAXLAPI):
     _factory_descriptor = "css"
 
     def add(self, name, **kwargs):
@@ -74,15 +74,16 @@ class Css(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class DirectedCallPark(AbstractAXLDeviceAPI):
+class DirectedCallPark(DeviceAXLAPI):
     _factory_descriptor = "directed_call_park"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "reset"]
 
     def add(self, pattern, retrievalPrefix, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
 
-class EnterpriseFeatureAccessConfiguration(AbstractAXLAPI):
+class EnterpriseFeatureAccessConfiguration(SimpleAXLAPI):
     _factory_descriptor = "mobility_enterprise_feature_access_number"
 
     def add(self, patter,
@@ -93,7 +94,7 @@ class EnterpriseFeatureAccessConfiguration(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class FacInfo(AbstractAXLAPI):
+class FacInfo(SimpleAXLAPI):
     _factory_descriptor = "fac"
 
     def add(self, name, code, **kwargs):
@@ -101,7 +102,53 @@ class FacInfo(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class Mobility(AbstractAXLAPI):
+class HuntList(DeviceAXLAPI):
+    _factory_descriptor = "hunt_list"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "reset"]
+
+    def add(self, name,callManagerGroupName,
+            routeListEnabled=True,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class HuntPilot(SimpleAXLAPI):
+    _factory_descriptor = "hunt_pilot"
+
+    def add(self, pattern, huntListName, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class LineGroup(SimpleAXLAPI):
+    _factory_descriptor = "line_group"
+
+    def add(self, name, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class LocalRouteGroup(SimpleAXLAPI):
+    _factory_descriptor = "local_route_group"
+
+    def add(self, name, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class MeetMe(SimpleAXLAPI):
+    _factory_descriptor = "meetme"
+
+    def add(self, pattern,
+            routePartitionName=None,
+            minimumSecurityLevel="Non Secure",
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class Mobility(SimpleAXLAPI):
     _factory_descriptor = "handoff_mobility"
 
     def add(self, handoffNumber,
@@ -117,7 +164,7 @@ class Mobility(AbstractAXLAPI):
         raise AXLMethodDoesNotExist
 
 
-class MobilityProfile(AbstractAXLAPI):
+class MobilityProfile(SimpleAXLAPI):
     _factory_descriptor = "mobility_profile"
 
     def add(self, name,
@@ -130,41 +177,7 @@ class MobilityProfile(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class HuntList(AbstractAXLDeviceAPI):
-    _factory_descriptor = "hunt_list"
-
-    def add(self, name,callManagerGroupName,
-            routeListEnabled="true",
-            **kwargs):
-        add_kwargs = flatten_signature_kwargs(self.add, locals())
-        return super().add(**add_kwargs)
-
-
-class HuntPilot(AbstractAXLAPI):
-    _factory_descriptor = "hunt_pilot"
-
-    def add(self, pattern, huntListName, **kwargs):
-        add_kwargs = flatten_signature_kwargs(self.add, locals())
-        return super().add(**add_kwargs)
-
-
-class LineGroup(AbstractAXLAPI):
-    _factory_descriptor = "line_group"
-
-    def add(self, name, **kwargs):
-        add_kwargs = flatten_signature_kwargs(self.add, locals())
-        return super().add(**add_kwargs)
-
-
-class LocalRouteGroup(AbstractAXLAPI):
-    _factory_descriptor = "local_route_group"
-
-    def add(self, name, **kwargs):
-        add_kwargs = flatten_signature_kwargs(self.add, locals())
-        return super().add(**add_kwargs)
-
-
-class RouteGroup(AbstractAXLAPI):
+class RouteGroup(SimpleAXLAPI):
     _factory_descriptor = "route_group"
 
     def add(self, name, members,
@@ -175,41 +188,40 @@ class RouteGroup(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class RouteList(AbstractAXLDeviceAPI):
+class RouteList(DeviceAXLAPI):
     _factory_descriptor = "route_list"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "reset"]
 
     def add(self, name, callManagerGroupName,
-            runOnEveryNode="true",
-            routeListEnabled="true",
+            runOnEveryNode=True,
+            routeListEnabled=True,
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
 
-class RoutePartition(AbstractAXLDeviceAPI):
-    _factory_descriptor = "partition"
+class RoutePartition(DeviceAXLAPI):
+    _factory_descriptor = "route_partition"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "restart"]
 
     def add(self, name, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
-    def reset(self, **kwargs):
-        raise AXLMethodDoesNotExist
 
-
-class RoutePattern(AbstractAXLAPI):
+class RoutePattern(SimpleAXLAPI):
     _factory_descriptor = "route_pattern"
 
     def add(self, pattern, routePartitionName, destination,
-            blockEnable="false",
-            provideOutsideDialtone="true",
+            blockEnable=False,
+            provideOutsideDialtone=True,
             networkLocation="OffNet",
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
 
-class SipRoutePattern(AbstractAXLAPI):
+class SipRoutePattern(SimpleAXLAPI):
     _factory_descriptor = "sip_route_pattern"
 
     def add(self, pattern, routePartitionName, sipTrunkName,
@@ -219,7 +231,7 @@ class SipRoutePattern(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class TimePeriod(AbstractAXLAPI):
+class TimePeriod(SimpleAXLAPI):
     _factory_descriptor = "time_period"
 
     def add(self, name, **kwargs):
@@ -227,7 +239,7 @@ class TimePeriod(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class TimeSchedule(AbstractAXLAPI):
+class TimeSchedule(SimpleAXLAPI):
     _factory_descriptor = "time_schedule"
 
     def add(self, name, members, **kwargs):
@@ -235,13 +247,14 @@ class TimeSchedule(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class TransPattern(AbstractAXLAPI):
+class TransPattern(SimpleAXLAPI):
     _factory_descriptor = "translation_pattern"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "options"]
 
     def add(self, pattern, routePartitionName,
             usage="Translation",
-            provideOutsideDialtone="true",
-            patternUrgency="true",
+            provideOutsideDialtone=True,
+            patternUrgency=True,
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)

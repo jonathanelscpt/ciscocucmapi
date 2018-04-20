@@ -6,20 +6,21 @@ from datetime import datetime, timedelta
 from zeep.helpers import serialize_object
 from zeep.exceptions import Fault
 
-from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
+from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs, get_signature_locals
 from ..exceptions import AXLError
 
 
-class CallManagerGroup(AbstractAXLDeviceAPI):
+class CallManagerGroup(DeviceAXLAPI):
     _factory_descriptor = "callmanager_group"
+    supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "reset"]
 
     def add(self, name, members, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
 
-class DeviceMobilityGroup(AbstractAXLAPI):
+class DeviceMobilityGroup(SimpleAXLAPI):
     _factory_descriptor = "device_mobility_group"
 
     def add(self, name, **kwargs):
@@ -27,7 +28,7 @@ class DeviceMobilityGroup(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class DeviceMobility(AbstractAXLAPI):
+class DeviceMobility(SimpleAXLAPI):
     _factory_descriptor = "device_mobility_info"
 
     def add(self, name, subNet, subNetMaskSz, members, **kwargs):
@@ -35,16 +36,18 @@ class DeviceMobility(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class DevicePool(AbstractAXLDeviceAPI):
+class DevicePool(DeviceAXLAPI):
     _factory_descriptor = "device_pool"
+    supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "reset"]
 
     def add(self, name, callManagerGroupName, dateTimeSettingName, regionName, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
 
-class DateTimeGroup(AbstractAXLAPI):
+class DateTimeGroup(DeviceAXLAPI):
     _factory_descriptor = "date_time_group"
+    supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "reset"]
 
     def add(self, name, timeZone,
             separator="-",
@@ -54,7 +57,7 @@ class DateTimeGroup(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class LdapDirectory(AbstractAXLAPI):
+class LdapDirectory(SimpleAXLAPI):
     _factory_descriptor = "ldap_directory"
 
     def add(self,
@@ -68,7 +71,7 @@ class LdapDirectory(AbstractAXLAPI):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
-    def sync(self, name=None, uuid=None, sync="true"):
+    def sync(self, name=None, uuid=None, sync=True):
         try:
             kwargs = get_signature_locals(self.get_sync_status, locals())
             axl_resp = self.connector.service.doLdapSync(**kwargs)
@@ -85,7 +88,7 @@ class LdapDirectory(AbstractAXLAPI):
             raise AXLError(fault.message)
 
 
-class LdapFilter(AbstractAXLAPI):
+class LdapFilter(SimpleAXLAPI):
     _factory_descriptor = "ldap_filter"
 
     def add(self, name, filter, **kwargs):  # shadow not used
@@ -94,7 +97,7 @@ class LdapFilter(AbstractAXLAPI):
 
 
 # issue - not working!
-class LdapSyncCustomField(AbstractAXLAPI):
+class LdapSyncCustomField(SimpleAXLAPI):
     _factory_descriptor = "ldap_custom_field"
 
     def add(self, ldapConfigurationName, customUserField, ldapUserField, **kwargs):
@@ -102,7 +105,7 @@ class LdapSyncCustomField(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class LbmGroup(AbstractAXLAPI):
+class LbmGroup(SimpleAXLAPI):
     _factory_descriptor = "lbm_group"
 
     def add(self, name, ProcessnodeActive,
@@ -112,7 +115,7 @@ class LbmGroup(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class LbmHubGroup(AbstractAXLAPI):
+class LbmHubGroup(SimpleAXLAPI):
     _factory_descriptor = "lbm_hub_group"
 
     def add(self, name, member1,
@@ -124,7 +127,7 @@ class LbmHubGroup(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class Location(AbstractAXLAPI):
+class Location(SimpleAXLAPI):
     _factory_descriptor = "location"
 
     def add(self, name,
@@ -146,7 +149,7 @@ class Location(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class PresenceRedundancyGroup(AbstractAXLAPI):
+class PresenceRedundancyGroup(SimpleAXLAPI):
     _factory_descriptor = "presence_redundancy_group"
 
     def add(self, name, server1,
@@ -157,7 +160,7 @@ class PresenceRedundancyGroup(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class PhoneNtp(AbstractAXLAPI):
+class PhoneNtp(SimpleAXLAPI):
     _factory_descriptor = "phone_ntp_reference"
 
     def add(self, ipAddress, mode="Directed Broadcast", **kwargs):
@@ -165,7 +168,7 @@ class PhoneNtp(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class PhysicalLocation(AbstractAXLAPI):
+class PhysicalLocation(SimpleAXLAPI):
     _factory_descriptor = "physical_location"
 
     def add(self, name, **kwargs):
@@ -173,7 +176,7 @@ class PhysicalLocation(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class PresenceGroup(AbstractAXLAPI):
+class PresenceGroup(SimpleAXLAPI):
     _factory_descriptor = "presence_group"
 
     def add(self, name, presenceGroups=None, **kwargs):
@@ -181,18 +184,20 @@ class PresenceGroup(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class Region(AbstractAXLAPI):
+class Region(DeviceAXLAPI):
     _factory_descriptor = "region"
+    supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "restart"]
 
     def add(self, name, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
 
-class Srst(AbstractAXLAPI):
+class Srst(DeviceAXLAPI):
     _factory_descriptor = "srst"
 
     def add(self, name, ipAddress, SipNetwork=None, **kwargs):
+        # there are corner cases, but this is a good for optimized usability
         if not SipNetwork:
             SipNetwork=ipAddress
         add_kwargs = flatten_signature_kwargs(self.add, locals())

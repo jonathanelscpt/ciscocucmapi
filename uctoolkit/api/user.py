@@ -3,11 +3,11 @@
 
 from collections import defaultdict
 
-from .base import AbstractAXLDeviceAPI, AbstractAXLAPI
+from .base import SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 
 
-class AppUser(AbstractAXLAPI):
+class AppUser(SimpleAXLAPI):
     _factory_descriptor = "application_user"
 
     def add(self, userid,
@@ -19,7 +19,23 @@ class AppUser(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class ServiceProfile(AbstractAXLAPI):
+class FeatureGroupTemplate(SimpleAXLAPI):
+    _factory_descriptor = "feature_group_template"
+
+    def add(self, name,
+            serviceProfile=None,
+            userProfile=None,
+            homeCluster=True,
+            imAndUcPresenceEnable=True,
+            meetingInformation=True,
+            allowCTIControl=True,
+            BLFPresenceGp="Standard Presence group",
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class ServiceProfile(SimpleAXLAPI):
     _factory_descriptor = "service_profile"
 
     def add(self, name, **kwargs):
@@ -27,7 +43,7 @@ class ServiceProfile(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class UcService(AbstractAXLAPI):
+class UcService(SimpleAXLAPI):
     _factory_descriptor = "uc_service"
 
     def add(self, name, serviceType, hostnameorip, productType=None, **kwargs):
@@ -58,7 +74,7 @@ class UcService(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class User(AbstractAXLAPI):
+class User(SimpleAXLAPI):
     _factory_descriptor = "user"
 
     def add(self, userid, lastName,
@@ -68,7 +84,7 @@ class User(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class UserGroup(AbstractAXLAPI):
+class UserGroup(SimpleAXLAPI):
     """Access Control Groups API"""
     _factory_descriptor = "user_group"
 
@@ -100,12 +116,12 @@ class UserGroup(AbstractAXLAPI):
 #         raise AXLMethodDoesNotExist()
 
 
-class UserProfileProvision(AbstractAXLAPI):
+class UserProfileProvision(SimpleAXLAPI):
     _factory_descriptor = "user_profile"
 
     def add(self, name,
             profile=None, deskPhones=None, mobileDevices=None, defaultUserProfile=None,
-            universalLineTemplate=None, allowProvision="false",
+            universalLineTemplate=None, allowProvision=False,
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)

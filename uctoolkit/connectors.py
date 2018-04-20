@@ -172,7 +172,7 @@ class UCMAXLConnector(UCSOAPConnector):
         #     setattr(self, api.factory_descriptor, api(self, axl_factory))
 
         # sql API wrapper
-        self.sql = ThinAXL(self, axl_factory)
+        self.sql = ThinAXLAPI(self, axl_factory)
 
         # device API wrappers
         self.common_device_config = CommonDeviceConfig(self, axl_factory)
@@ -182,6 +182,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.ip_phone_service = IpPhoneServices(self, axl_factory)
         self.line = Line(self, axl_factory)
         self.phone = Phone(self, axl_factory)
+        self.default_device_profile = DefaultDeviceProfile(self, axl_factory)
         self.udp = DeviceProfile(self, axl_factory)
         self.phone_button_template = PhoneButtonTemplate(self, axl_factory)
         self.phone_security_profile = PhoneSecurityProfile(self, axl_factory)
@@ -198,6 +199,7 @@ class UCMAXLConnector(UCSOAPConnector):
 
         # user API wrappers
         self.application_user = AppUser(self, axl_factory)
+        self.feature_group_template = FeatureGroupTemplate(self, axl_factory)
         self.user = User(self, axl_factory)
         self.uc_service = UcService(self, axl_factory)
         self.service_profile = ServiceProfile(self, axl_factory)
@@ -217,6 +219,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.mobility_enterprise_feature_access_number = EnterpriseFeatureAccessConfiguration(self, axl_factory)
         self.fac = FacInfo(self, axl_factory)
         self.handoff_mobility = Mobility(self, axl_factory)
+        self.meetme = MeetMe(self, axl_factory)
         self.mobility_profile = MobilityProfile(self, axl_factory)
         self.hunt_list = HuntList(self, axl_factory)
         self.hunt_pilot = HuntPilot(self, axl_factory)

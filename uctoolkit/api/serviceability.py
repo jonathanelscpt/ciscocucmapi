@@ -3,11 +3,11 @@
 
 from zeep.helpers import serialize_object
 
-from .base import AbstractAXLAPI
+from .base import SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 
 
-class BillingServer(AbstractAXLAPI):
+class BillingServer(SimpleAXLAPI):
     _factory_descriptor = "billing_server"
 
     def add(self, hostName, userId, password,
@@ -19,8 +19,9 @@ class BillingServer(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class SNMPCommunityString(AbstractAXLAPI):
+class SNMPCommunityString(SimpleAXLAPI):
     _factory_descriptor = "snmp_community_string"
+    supported_methods = ["model", "create", "add", "get", "update", "remove"]
 
     def add(self, communityName, ArrayOfHosts,
             accessPrivilege=None,
@@ -38,8 +39,9 @@ class SNMPCommunityString(AbstractAXLAPI):
         )
 
 
-class SNMPUser(AbstractAXLAPI):
+class SNMPUser(SimpleAXLAPI):
     _factory_descriptor = "snmp_user"
+    supported_methods = ["model", "create", "add", "get", "update", "remove"]
 
     def add(self, userName, ArrayOfHosts,
             accessPrivilege=None,

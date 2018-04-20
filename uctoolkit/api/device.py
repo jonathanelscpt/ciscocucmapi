@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """CUCM AXL Device APIs."""
 
-from zeep.helpers import serialize_object
-
-from .base import AbstractAXLDeviceAPI, AbstractAXLAPI, check_identifiers
+from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 from ..exceptions import AXLMethodDoesNotExist
 
 
-class CommonDeviceConfig(AbstractAXLDeviceAPI):
+class CommonDeviceConfig(DeviceAXLAPI):
     _factory_descriptor = "common_device_config"
+    supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "reset"]
 
     def add(self, name,
             softkeyTemplateName=None,
@@ -18,15 +17,10 @@ class CommonDeviceConfig(AbstractAXLDeviceAPI):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
-    def restart(self, **kwargs):
-        raise AXLMethodDoesNotExist
 
-    def reset(self, **kwargs):
-        raise AXLMethodDoesNotExist
-
-
-class CommonPhoneConfig(AbstractAXLDeviceAPI):
+class CommonPhoneConfig(DeviceAXLAPI):
     _factory_descriptor = "common_phone_profile"
+    supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "reset"]
 
     def add(self, name,
             unlockPwd=None,
@@ -35,14 +29,8 @@ class CommonPhoneConfig(AbstractAXLDeviceAPI):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
-    def restart(self, **kwargs):
-        raise AXLMethodDoesNotExist
 
-    def reset(self, **kwargs):
-        raise AXLMethodDoesNotExist
-
-
-class CtiRoutePoint(AbstractAXLDeviceAPI):
+class CtiRoutePoint(DeviceAXLAPI):
     _factory_descriptor = "cti_route_point"
 
     def add(self, name, devicePoolName,
@@ -55,8 +43,27 @@ class CtiRoutePoint(AbstractAXLDeviceAPI):
         return super().add(**add_kwargs)
 
 
-class DeviceProfile(AbstractAXLDeviceAPI):
+class DefaultDeviceProfile(SimpleAXLAPI):
+    _factory_descriptor = "default_device_profile"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "options"]
+
+    def add(self, name, product,
+            phoneButtonTemplate="Universal Device Template Button Layout",
+            softkeyTemplate=None,
+            protocol="SIP",
+            protocolSide="User",
+            **kwargs):
+        # the name is not obvious in the UI.  It appears to default to a concat of product and protocol.
+        # it may be useful to log a warning for this...
+        if "class" not in kwargs:  # workaround for restricted 'class' attribute
+            kwargs["class"] = "Device Profile"
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class DeviceProfile(SimpleAXLAPI):
     _factory_descriptor = "udp"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "options"]
 
     def add(self, name, product, phoneTemplateName,
             protocol="SIP",
@@ -67,7 +74,7 @@ class DeviceProfile(AbstractAXLDeviceAPI):
         return super().add(**add_kwargs)
 
 
-class FeatureControlPolicy(AbstractAXLAPI):
+class FeatureControlPolicy(SimpleAXLAPI):
     _factory_descriptor = "feature_control_policy"
 
     def add(self, name,
@@ -77,7 +84,7 @@ class FeatureControlPolicy(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class IpPhoneServices(AbstractAXLAPI):
+class IpPhoneServices(SimpleAXLAPI):
     _factory_descriptor = "ip_phone_service"
 
     def add(self, serviceName, asciiServiceName, serviceUrl,
@@ -92,8 +99,11 @@ class IpPhoneServices(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class Line(AbstractAXLDeviceAPI):
+class Line(DeviceAXLAPI):
     _factory_descriptor = "line"
+    supported_methods = [
+        "model", "create", "add", "get", "update", "list", "remove", "options", "apply", "restart", "reset"
+    ]
 
     def __init__(self, connector, object_factory):
         super().__init__(connector, object_factory)
@@ -102,19 +112,12 @@ class Line(AbstractAXLDeviceAPI):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
-    def options(self, uuid, returnedChoices=None):
-        axl_resp = self.connector.service.getLineOptions(
-            uuid=uuid,
-            returnedChoices=returnedChoices
-        )
-        return self.object_factory(
-            "".join([self.__class__.__name__, "Options"]),
-            serialize_object(axl_resp)["return"]["line"]
-        )
 
-
-class Phone(AbstractAXLDeviceAPI):
+class Phone(DeviceAXLAPI):
     _factory_descriptor = "phone"
+    supported_methods = [
+        "model", "create", "add", "get", "update", "list", "remove", "options", "apply", "restart", "reset", "wipe"
+    ]
 
     def add(self, name, product, devicePoolName,
             locationName="Hub_None",
@@ -135,27 +138,19 @@ class Phone(AbstractAXLDeviceAPI):
         # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         self._serialize_axl_object("wipe", **kwargs)
 
-    def options(self, uuid, returnedChoices=None):
-        axl_resp = self.connector.service.getPhoneOptions(
-            uuid=uuid,
-            returnedChoices=returnedChoices
-        )
-        return self.object_factory(
-            "".join([self.__class__.__name__, "Options"]),
-            serialize_object(axl_resp)["return"]["phone"]
-        )
 
-
-class PhoneButtonTemplate(AbstractAXLAPI):
+class PhoneButtonTemplate(DeviceAXLAPI):
     _factory_descriptor = "phone_button_template"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "restart"]
 
     def add(self, name, basePhoneTemplateName, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
 
-class PhoneSecurityProfile(AbstractAXLAPI):
+class PhoneSecurityProfile(DeviceAXLAPI):
     _factory_descriptor = "phone_security_profile"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "restart"]
 
     def add(self, name,
             phoneType="Universal Device Template",
@@ -170,7 +165,7 @@ class PhoneSecurityProfile(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class RecordingProfile(AbstractAXLAPI):
+class RecordingProfile(SimpleAXLAPI):
     _factory_descriptor = "recording_profile"
 
     def add(self, name, recorderDestination,
@@ -180,14 +175,14 @@ class RecordingProfile(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class RemoteDestination(AbstractAXLAPI):
+class RemoteDestination(SimpleAXLAPI):
     _factory_descriptor = "remote_destination"
 
     def add(self, destination, ownerUserId,
             name=None,
-            enableUnifiedMobility="true",
-            enableMobileConnect="true",
-            isMobilePhone="true",
+            enableUnifiedMobility=True,
+            enableMobileConnect=True,
+            isMobilePhone=True,
             remoteDestinationProfileName=None,
             dualModeDeviceName=None,
             lineAssociations=None,
@@ -196,7 +191,7 @@ class RemoteDestination(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class RemoteDestinationProfile(AbstractAXLAPI):
+class RemoteDestinationProfile(SimpleAXLAPI):
     _factory_descriptor = "rdp"
 
     def add(self, name, devicePoolName, userId,
@@ -213,7 +208,7 @@ class RemoteDestinationProfile(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class SipTrunk(AbstractAXLDeviceAPI):
+class SipTrunk(DeviceAXLAPI):
     _factory_descriptor = "sip_trunk"
 
     def add(self, name, devicePoolName, destinations,
@@ -231,8 +226,9 @@ class SipTrunk(AbstractAXLDeviceAPI):
         return super().add(**add_kwargs)
 
 
-class SipProfile(AbstractAXLDeviceAPI):
+class SipProfile(DeviceAXLAPI):
     _factory_descriptor = "sip_profile"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "options", "apply", "restart"]
 
     def add(self, name,
             sdpTransparency="Pass all unknown SDP attributes",
@@ -240,36 +236,25 @@ class SipProfile(AbstractAXLDeviceAPI):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
-    def reset(self, **kwargs):
-        raise AXLMethodDoesNotExist
 
-    def options(self, uuid, returnedChoices=None):
-        axl_resp = self.connector.service.getSipProfileOptions(
-            uuid=uuid,
-            returnedChoices=returnedChoices
-        )
-        return self.object_factory(
-            "".join([self.__class__.__name__, "Options"]),
-            serialize_object(axl_resp)["return"]["sipProfile"]
-        )
-
-
-class SipTrunkSecurityProfile(AbstractAXLDeviceAPI):
+class SipTrunkSecurityProfile(DeviceAXLAPI):
     _factory_descriptor = "sip_trunk_security_profile"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "reset"]
 
     def add(self, name,
-            acceptPresenceSubscription="false",
-            acceptOutOfDialogRefer="false",
-            acceptUnsolicitedNotification="false",
-            allowReplaceHeader="false",
-            transmitSecurityStatus="false",
+            acceptPresenceSubscription=False,
+            acceptOutOfDialogRefer=False,
+            acceptUnsolicitedNotification=False,
+            allowReplaceHeader=False,
+            transmitSecurityStatus=False,
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
 
-class SoftKeyTemplate(AbstractAXLDeviceAPI):
+class SoftKeyTemplate(DeviceAXLAPI):
     _factory_descriptor = "softkey_template"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "restart"]
 
     def add(self, name, description,
             baseSoftkeyTemplateName="Standard User",
@@ -281,17 +266,12 @@ class SoftKeyTemplate(AbstractAXLDeviceAPI):
         raise AXLMethodDoesNotExist
 
 
-class SoftKeySet(AbstractAXLAPI):
+class SoftKeySet(SimpleAXLAPI):
     _factory_descriptor = "softkey_set"
-
-    def add(self, **kwargs):
-        raise AXLMethodDoesNotExist
-
-    def remove(self, **kwargs):
-        raise AXLMethodDoesNotExist
+    supported_methods = ["get", "update"]
 
 
-class UniversalDeviceTemplate(AbstractAXLAPI):
+class UniversalDeviceTemplate(SimpleAXLAPI):
     _factory_descriptor = "udt"
 
     def add(self, name, devicePool,
@@ -310,7 +290,7 @@ class UniversalDeviceTemplate(AbstractAXLAPI):
         return super().add(**add_kwargs)
 
 
-class UniversalLineTemplate(AbstractAXLAPI):
+class UniversalLineTemplate(SimpleAXLAPI):
     _factory_descriptor = "ult"
 
     def add(self, name,
@@ -319,7 +299,7 @@ class UniversalLineTemplate(AbstractAXLAPI):
             callingSearchSpace=None,
             voiceMailProfile=None,
             alertingName=None,
-            rejectAnonymousCall="false",  # overrides inconsistency between normal line add and ULT
+            rejectAnonymousCall=False,  # override inconsistency between normal line add and ULT
             blfPresenceGroup="Standard Presence group",
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())

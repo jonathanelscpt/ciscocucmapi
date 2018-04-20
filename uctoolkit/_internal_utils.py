@@ -51,3 +51,9 @@ def flatten_signature_kwargs(f, loc):
 def get_signature_locals(f, loc):
     """Filters locals to only include keys in original method signature"""
     return {k: v for k, v in loc.items() if k in signature(f).parameters}
+
+
+def nullstring_dict(returned_tags):
+    """Convert list to nullstring dict"""
+    return {_: "" for _ in returned_tags}
+
