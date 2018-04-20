@@ -32,7 +32,7 @@ class SNMPCommunityString(AbstractAXLAPI):
         # this violates LSP due to invalid method signature.  a case for class re-design
         """Get method for SNMP Community String"""
         axl_resp = self.connector.service.getSNMPCommunityString(communityName=communityName)
-        self.object_factory(
+        return self.object_factory(
             self.__class__.__name__,
             serialize_object(axl_resp)["return"]["SNMPUser"]
         )
