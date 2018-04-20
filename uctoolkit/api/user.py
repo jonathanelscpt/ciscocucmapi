@@ -43,6 +43,16 @@ class ServiceProfile(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
 
+
+class SipRealm(SimpleAXLAPI):
+    _factory_descriptor = "sip_realm"
+
+    def add(self, realm, userid, digestCredentials,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class UcService(SimpleAXLAPI):
     _factory_descriptor = "uc_service"
 

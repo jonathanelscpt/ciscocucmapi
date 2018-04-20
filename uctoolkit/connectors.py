@@ -181,6 +181,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.feature_control_policy = FeatureControlPolicy(self, axl_factory)
         self.ip_phone_service = IpPhoneServices(self, axl_factory)
         self.line = Line(self, axl_factory)
+        self.network_access_profile = NetworkAccessProfile(self, axl_factory)
         self.phone = Phone(self, axl_factory)
         self.default_device_profile = DefaultDeviceProfile(self, axl_factory)
         self.udp = DeviceProfile(self, axl_factory)
@@ -196,6 +197,9 @@ class UCMAXLConnector(UCSOAPConnector):
         self.ult = UniversalLineTemplate(self, axl_factory)
         self.remote_destination = RemoteDestination(self, axl_factory)
         self.rdp = RemoteDestinationProfile(self, axl_factory)
+        self.wifi_hotspot = WifiHotspot(self, axl_factory)
+        self.wlan_profile = WLANProfile(self, axl_factory)
+        self.wlan_profile_group = WlanProfileGroup(self, axl_factory)
 
         # user API wrappers
         self.application_user = AppUser(self, axl_factory)
@@ -229,6 +233,8 @@ class UCMAXLConnector(UCSOAPConnector):
         self.route_list = RouteList(self, axl_factory)
         self.route_partition = RoutePartition(self, axl_factory)
         self.route_pattern = RoutePattern(self, axl_factory)
+        self.sip_dial_rules = SipDialRules(self, axl_factory)
+        self.sip_realm = SipRealm(self, axl_factory)
         self.sip_route_pattern = SipRoutePattern(self, axl_factory)
         self.time_period = TimePeriod(self, axl_factory)
         self.time_schedule = TimeSchedule(self, axl_factory)
@@ -259,10 +265,14 @@ class UCMAXLConnector(UCSOAPConnector):
         self.mrgl = MediaResourceList(self, axl_factory)
         self.mtp = Mtp(self, axl_factory)
         self.transcoder = Transcoder(self, axl_factory)
+        self.voh_server = VohServer(self, axl_factory)
 
         # advanced API wrappers
         self.voicemail_pilot = VoiceMailPilot(self, axl_factory)
         self.voicemail_profile = VoiceMailProfile(self, axl_factory)
+        self.vpn_gateway = VpnGateway(self, axl_factory)
+        self.vpn_group = VpnGroup(self, axl_factory)
+        self.vpn_profile = VpnProfile(self, axl_factory)
 
         # serviceability API wrappers
         self.billing_server = BillingServer(self, axl_factory)

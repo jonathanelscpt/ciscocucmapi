@@ -113,6 +113,18 @@ class Line(DeviceAXLAPI):
         return super().add(**add_kwargs)
 
 
+class NetworkAccessProfile(SimpleAXLAPI):
+    _factory_descriptor = "network_access_profile"
+
+    def add(self, name,
+            vpnRequired="Default",
+            proxySettings="None",
+            proxyHostname="",
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class Phone(DeviceAXLAPI):
     _factory_descriptor = "phone"
     supported_methods = [
@@ -304,3 +316,41 @@ class UniversalLineTemplate(SimpleAXLAPI):
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
+
+
+class WifiHotspot(SimpleAXLAPI):
+    _factory_descriptor = "wifi_hotspot"
+
+    def add(self, name, ssidPrefix,
+            frequencyBand="Auto",
+            userModifiable="Allowed",
+            authenticationMethod="None",
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class WLANProfile(SimpleAXLAPI):
+    _factory_descriptor = "wlan_profile"
+
+    def add(self, name, ssid,
+            frequencyBand="Auto",
+            userModifiable="Allowed",
+            authMethod="EAP-FAST",
+            networkAccessProfile=None,
+            userName="",
+            password="",
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class WlanProfileGroup(SimpleAXLAPI):
+    _factory_descriptor = "wlan_profile_group"
+
+    def add(self, name,
+            members=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+

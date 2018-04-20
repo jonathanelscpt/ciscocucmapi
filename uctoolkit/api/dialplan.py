@@ -221,6 +221,18 @@ class RoutePattern(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
 
+class SipDialRules(SimpleAXLAPI):
+    _factory_descriptor = "sip_dial_rules"
+
+    def add(self, name,
+            patterns=None,
+            plars=None,
+            dialPattern="7940_7960_OTHER",
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class SipRoutePattern(SimpleAXLAPI):
     _factory_descriptor = "sip_route_pattern"
 

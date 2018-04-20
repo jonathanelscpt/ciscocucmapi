@@ -50,3 +50,13 @@ class Transcoder(DeviceAXLAPI):
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
+
+
+class VohServer(SimpleAXLAPI):
+    _factory_descriptor = "voh_server"
+
+    def add(self, name, sipTrunkName,
+            defaultVideoStreamId="SampleVideo",
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
