@@ -102,6 +102,16 @@ class Line(AbstractAXLDeviceAPI):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
+    def options(self, uuid, returnedChoices=None):
+        axl_resp = self.connector.service.getLineOptions(
+            uuid=uuid,
+            returnedChoices=returnedChoices
+        )
+        return self.object_factory(
+            "".join([self.__class__.__name__, "Options"]),
+            serialize_object(axl_resp)["return"]["line"]
+        )
+
 
 class Phone(AbstractAXLDeviceAPI):
     _factory_descriptor = "phone"
@@ -126,7 +136,7 @@ class Phone(AbstractAXLDeviceAPI):
         self._serialize_axl_object("wipe", **kwargs)
 
     def options(self, uuid, returnedChoices=None):
-        axl_resp = self.connector.service.getPhoneeOptions(
+        axl_resp = self.connector.service.getPhoneOptions(
             uuid=uuid,
             returnedChoices=returnedChoices
         )
