@@ -26,6 +26,35 @@ class AarGroup(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
 
+class AdvertisedPatterns(SimpleAXLAPI):
+    _factory_descriptor = "advertised_patterns"
+
+    def add(self, pattern,
+            patternType="Enterprise Number",
+            hostedRoutePSTNRule="No PSTN",
+            pstnFailStrip=0,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class BlockedLearnedPatterns(SimpleAXLAPI):
+    _factory_descriptor = "blocked_learned_patterns"
+
+    def add(self,
+            pattern=None,
+            prefix=None,
+            clusterId=None,
+            patternType=None,
+            **kwargs):
+        if not (pattern or prefix or clusterId):
+            raise ValueError("At least one of the match criteria must be specified: {criteria}".format(
+                criteria=("pattern", "prefix", "clusterId")
+            ))
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class CallPickupGroup(SimpleAXLAPI):
     _factory_descriptor = "call_pickup_group"
 
@@ -62,6 +91,18 @@ class CmcInfo(SimpleAXLAPI):
     _factory_descriptor = "cmc"
 
     def add(self, code, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class ConferenceNow(SimpleAXLAPI):
+    _factory_descriptor = "conference_now"
+
+    def add(self, conferenceNowNumber,
+            routePartitionName=None,
+            maxWaitTimeForHost=15,
+            MohAudioSourceId=None,
+            **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 

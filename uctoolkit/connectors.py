@@ -212,11 +212,14 @@ class UCMAXLConnector(UCSOAPConnector):
         # self.quick_user_phone_add = _UserPhoneAssociationAPI(self, axl_factory)
 
         # dial plan API wrappers
+        self.advertised_patterns = AdvertisedPatterns(self, axl_factory)
         self.aar_group = AarGroup(self, axl_factory)
+        self.blocked_learned_patterns = BlockedLearnedPatterns(self, axl_factory)
         self.call_pickup_group = CallPickupGroup(self, axl_factory)
         self.call_park = CallPark(self, axl_factory)
         self.called_party_xform_pattern = CalledPartyTransformationPattern(self, axl_factory)
         self.calling_party_xform_pattern = CallingPartyTransformationPattern(self, axl_factory)
+        self.conference_now = ConferenceNow(self, axl_factory)
         self.cmc = CmcInfo(self, axl_factory)
         self.css = Css(self, axl_factory)
         self.directed_call_park = DirectedCallPark(self, axl_factory)
@@ -241,6 +244,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.translation_pattern = TransPattern(self, axl_factory)
 
         # system API wrappers
+        self.audio_codec_preference_list = AudioCodecPreferenceList(self, axl_factory)
         self.callmanager_group = CallManagerGroup(self, axl_factory)
         self.date_time_group = DateTimeGroup(self, axl_factory)
         self.device_mobility_group = DeviceMobilityGroup(self, axl_factory)
@@ -268,6 +272,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.voh_server = VohServer(self, axl_factory)
 
         # advanced API wrappers
+        self.remote_cluster = RemoteCluster(self, axl_factory)
         self.voicemail_pilot = VoiceMailPilot(self, axl_factory)
         self.voicemail_profile = VoiceMailProfile(self, axl_factory)
         self.vpn_gateway = VpnGateway(self, axl_factory)

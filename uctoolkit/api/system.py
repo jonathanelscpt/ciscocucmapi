@@ -11,6 +11,14 @@ from .._internal_utils import flatten_signature_kwargs, get_signature_locals
 from ..exceptions import AXLError
 
 
+class AudioCodecPreferenceList(SimpleAXLAPI):
+    _factory_descriptor = "audio_codec_preference_list"
+
+    def add(self, name, description, codecsInList, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class CallManagerGroup(DeviceAXLAPI):
     _factory_descriptor = "callmanager_group"
     supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "reset"]

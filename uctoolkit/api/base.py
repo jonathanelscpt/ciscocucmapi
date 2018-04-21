@@ -56,10 +56,10 @@ def check_identifiers(wsdl_obj, **kwargs):
         )
 
 
-def classproperty(f):
-    if not isinstance(f, (classmethod, staticmethod)):
-        f = classmethod(f)
-    return ClassPropertyDescriptor(f)
+def classproperty(func):
+    if not isinstance(func, (classmethod, staticmethod)):
+        func = classmethod(func)
+    return ClassPropertyDescriptor(func)
 
 
 class ClassPropertyDescriptor(object):
@@ -254,13 +254,20 @@ class SimpleAXLAPI(BaseAXLAPI):
     @BaseAXLAPI.assert_supported
     def options(self, uuid, returnedChoices=None):
         try:
-            options_method = methodcaller("".join(["get", self.__class__.__name__, "Options"]), **locals())
+            kwargs = {
+                "uuid": uuid,
+                "returnedChoices": returnedChoices
+            }
+            options_method = methodcaller("".join(["get", self.__class__.__name__, "Options"]), **kwargs)
+            print("".join(["get", self.__class__.__name__, "Options"]))
+            print(kwargs)
             axl_resp = options_method(self.connector.service)
             return self.object_factory(
                 "".join([self.__class__.__name__, "Options"]),
                 serialize_object(axl_resp)["return"][self._return_name]
             )
         except Fault as fault:
+            print("herro")
             raise AXLError(fault.message)
 
 
