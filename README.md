@@ -95,7 +95,7 @@ axl.phone.remove(uuid=botuser15.uuid)
 # Thin AXL sql querying and execution also available
 numplan = axl.sql.query("SELECT * FROM numplan")
 directory_numbers = [row['dnorpattern'] for row in numplan]
-numplan.to_csv(destination_path="/path/to/datadump/numplan.csv")  # pathlib also supported
+numplan.csv(destination_path="/path/to/datadump/numplan.csv")  # pathlib also supported
 ```
 
 
