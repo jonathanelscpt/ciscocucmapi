@@ -12,7 +12,7 @@ from zeep.xsd.elements.indicators import Sequence
 from zeep.xsd.elements.element import Element
 
 from ..exceptions import (
-    AXLError,
+    AXLFault,
     IllegalSQLStatement
 )
 from .._internal_utils import (
@@ -122,7 +122,7 @@ class BaseAXLAPI(object):
             axl_method = methodcaller("".join([action, self.__class__.__name__]), **kwargs)
             return axl_method(self.connector.service)
         except Fault as fault:
-            raise AXLError(fault.message)
+            raise AXLFault(fault.message)
 
     def _serialize_axl_object(self, action, **kwargs):
         """Builds and AXL methodcaller using given action verb and the object type.
@@ -268,7 +268,7 @@ class SimpleAXLAPI(BaseAXLAPI):
             )
         except Fault as fault:
             print("herro")
-            raise AXLError(fault.message)
+            raise AXLFault(fault.message)
 
 
 class DeviceAXLAPI(SimpleAXLAPI):

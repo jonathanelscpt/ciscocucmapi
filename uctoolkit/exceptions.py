@@ -13,30 +13,13 @@ class UCToolkitException(Exception):
         return '%s(%r)' % (self.__class__.__name__, self.message)
 
 
-class ServiceProxyError(UCToolkitException):
-    """Unable to create ServiceProxy object with given parameters"""
-
-
-class UCToolkitConnectionException(UCToolkitException):
-    """Exceptions for invalid connection params"""
-
-
-class AXLError(UCToolkitException):
-    """Bubble error received from AXL API"""
-
-
-class AXLAttributeError(AXLError):
+class AXLAttributeError(UCToolkitException):
     """Invalid attribute for AXL API endpoint"""
 
 
-class AXLMethodDoesNotExist(AXLError):
-    """Method override for scenarios where certain methods do not exist of an api endpoint"""
-
-    def __init__(self, message=None):
-        if not message:
-            message = "Requested method not available for api endpoint."
-        super().__init__(message)
+class AXLFault(UCToolkitException):
+    """Bubble error received from AXL API in zeep Fault"""
 
 
-class IllegalSQLStatement(AXLError):
+class IllegalSQLStatement(AXLFault):
     """Illegal SQL Statement response from CUCM"""

@@ -8,7 +8,7 @@ from zeep.exceptions import Fault
 
 from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs, get_signature_locals
-from ..exceptions import AXLError
+from ..exceptions import AXLFault
 
 
 class AudioCodecPreferenceList(SimpleAXLAPI):
@@ -85,7 +85,7 @@ class LdapDirectory(SimpleAXLAPI):
             axl_resp = self.connector.service.doLdapSync(**kwargs)
             return serialize_object(axl_resp)["return"]
         except Fault as fault:
-            raise AXLError(fault.message)
+            raise AXLFault(fault.message)
 
     def get_sync_status(self, name=None, uuid=None):
         try:
@@ -93,7 +93,7 @@ class LdapDirectory(SimpleAXLAPI):
             axl_resp = self.connector.service.getLdapSyncStatus(**kwargs)
             return serialize_object(axl_resp)["return"]
         except Fault as fault:
-            raise AXLError(fault.message)
+            raise AXLFault(fault.message)
 
 
 class LdapFilter(SimpleAXLAPI):

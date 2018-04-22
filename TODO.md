@@ -5,20 +5,13 @@
 ### Outstanding
 
  - add `__copy__` and `__deep__` to base model class
- - determine how to cater for singleton classes
- 
+
  
  ## Known Issues
  
  - `first` and `skip` for list not available for all apis - need child class extension to 
    include support for this for limited set of endpoints apis
  - revisit `__getitem__` and `__getattr__` interference
-
-
-## Clean-up
-
- - split `reset` method to separate mixin so that it is possible to segregate devices that 
-   are not able to be reset (e.g. RoutePartition).  Clean up RoutePartition once done.
 
  
 ## Completed
@@ -33,14 +26,17 @@
  - **[DONE]** move `ucdevops` samples to separate repo
  - **[DONE]** convert `AbstractAXLDeviceAPI` to a mixin and move `_serialize_axl_object` and 
    `_axl_methodcaller` to module methods to prevent abstract inheritance mess
- - **[DROPPED - private method issues]** convert to absolute package imports
+ - **[DROPPED]** convert to absolute package imports
  - **[DONE]** fix `__eq__` to compare `_axl_dict`
  - **[DONE]** clean up `ThinAXLAPI`
- - **[DROPPED - refactoring]**rename `_RETURN_OBJECT_NAME` to `_API_ENDPOINT_NAME`
+ - **[REFACTORED]** rename `_RETURN_OBJECT_NAME` to `_API_ENDPOINT_NAME`
  - **[DONE]** Check if sql updates are returning the number of rows affected
  - **[DONE]** extend use of zeep factory in connector to abstract classes
-
-
+ - **[DONE]** split `reset` method to separate mixin so that it is possible to segregate devices that 
+   are not able to be reset (e.g. RoutePartition).  Clean up RoutePartition once done.
+ - **[DONE]** determine how to cater for singleton classes
+ 
+ 
 ## Future Extensions
  - add notes for incorporating PAWS and CUCM AXL WSDLs.  Should not be included in library.
  - Add support for async client

@@ -11,11 +11,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 packages = ['uctoolkit']
 
 requires = [
-    'aiohttp==>=3.1.2',
-    'future>=0.16.0',
     'requests>=2.18.4',
     'urllib3>=1.22',
     'zeep>=2.5.0',
+    'lxml>=4.2.1'
 ]
 # test_requirements = [
 #     'pytest-httpbin==0.0.7',

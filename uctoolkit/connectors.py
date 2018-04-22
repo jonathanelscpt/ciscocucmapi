@@ -38,22 +38,23 @@ def get_connection_kwargs(env_dict, kwargs):
 
 
 class AXLHistoryPlugin(HistoryPlugin):
+    """Simple HistoryPlugin extension for easy xml extraction"""
 
     @staticmethod
     def _parse_envelope(envelope):
         return etree.tostring(envelope, encoding="unicode", pretty_print=True)
 
     @property
-    def last_sent(self):
-        last_tx = self._buffer[-1]
-        if last_tx:
-            return self._parse_envelope(last_tx['sent']['envelope'])
-
-    @property
-    def last_received(self):
+    def last_received_xml(self):
         last_tx = self._buffer[-1]
         if last_tx:
             return self._parse_envelope(last_tx['received']['envelope'])
+
+    @property
+    def last_sent_xml(self):
+        last_tx = self._buffer[-1]
+        if last_tx:
+            return self._parse_envelope(last_tx['sent']['envelope'])
 
 
 class UCSOAPConnector(object):
@@ -66,7 +67,7 @@ class UCSOAPConnector(object):
                  address=None,
                  tls_verify=False,
                  timeout=30,
-                 is_async=False,
+                 # is_async=False,
                  history=True,
                  history_maxlen=1):
         """Instantiate UC SOAP Client Connector
@@ -114,17 +115,12 @@ class UCSOAPConnector(object):
         # self._client = Client(wsdl=wsdl, transport=transport)
         self._client = Client(wsdl=wsdl, transport=transport, plugins=self._plugins)
         if binding_name and address:
-            # self._client = self._client.create_service(binding_name, address)
             self._service = self._client.create_service(binding_name, address)
         elif binding_name or address:
-            raise ServiceProxyError(
+            raise TypeError(
                 message="Incomplete parameters for ServiceProxy Object creation.  "
-                        "Requires both 'binding_name' and 'address'"
+                        "Requires 'binding_name' and 'address'"
             )
-        else:
-            # use first service and first port within that service - zeep default behaviour
-            self._service = ServiceProxyError("ServiceProxy not used for this connector")
-
         self.model_factory = self._client.type_factory('ns0')
 
     @property
@@ -152,6 +148,8 @@ class UCSOAPConnector(object):
 
 
 class UCMAXLConnector(UCSOAPConnector):
+    """UCM AXL API Connector"""
+
     _ENV = {
         "username": "AXL_USERNAME",
         "password": "AXL_PASSWORD",
@@ -286,6 +284,7 @@ class UCMAXLConnector(UCSOAPConnector):
 
 
 class UCMControlCenterConnector(UCSOAPConnector):
+    """UCM ControlCenter API Connector"""
 
     def __init__(self, username, password, fqdn, tls_verify=True):
         _wsdl = WSDL_URLS["ControlCenterServicesExtended"].format(fqdn)
@@ -316,6 +315,7 @@ class UCMControlCenterConnector(UCSOAPConnector):
 
 
 class UCMRisPortConnector(UCSOAPConnector):
+    """UCM RisPort API Connector"""
 
     def __init__(self, username, password, fqdn, tls_verify=False):
         _wsdl = WSDL_URLS["RisPort70"].format(fqdn)
@@ -356,6 +356,7 @@ class UCMRisPortConnector(UCSOAPConnector):
 
 
 class UCMPerfMonConnector(UCSOAPConnector):
+    """UCM PerfMon API Connector"""
 
     def __init__(self, username, password, fqdn, tls_verify=False):
         _wsdl = WSDL_URLS["PerfMon"].format(fqdn)
@@ -451,6 +452,7 @@ class UCMPerfMonConnector(UCSOAPConnector):
 
 
 class UCMLogCollectionConnector(UCSOAPConnector):
+    """UCM Log Collection API Connector"""
 
     def __init__(self, username, password, fqdn, tls_verify=False):
         _wsdl = WSDL_URLS["LogCollection"].format(fqdn)

@@ -8,7 +8,7 @@ from zeep.exceptions import Fault
 
 from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
-from ..exceptions import AXLError
+from ..exceptions import AXLFault
 
 
 class RemoteCluster(SimpleAXLAPI):
@@ -38,7 +38,7 @@ class RemoteCluster(SimpleAXLAPI):
                 serialize_object(axl_resp)["return"]
             )
         except Fault as fault:
-            raise AXLError(fault.message)
+            raise AXLFault(fault.message)
 
 
 class VoiceMailPilot(SimpleAXLAPI):

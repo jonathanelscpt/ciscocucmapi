@@ -3,7 +3,6 @@
 
 from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
-from ..exceptions import AXLMethodDoesNotExist
 
 
 class CommonDeviceConfig(DeviceAXLAPI):
@@ -273,9 +272,6 @@ class SoftKeyTemplate(DeviceAXLAPI):
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
-
-    def reset(self, **kwargs):
-        raise AXLMethodDoesNotExist
 
 
 class SoftKeySet(SimpleAXLAPI):

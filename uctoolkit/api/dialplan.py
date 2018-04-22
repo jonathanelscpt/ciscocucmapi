@@ -3,7 +3,6 @@
 
 from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
-from ..exceptions import AXLMethodDoesNotExist
 
 
 def _check_route_group_port_assignment(members):
@@ -191,18 +190,13 @@ class MeetMe(SimpleAXLAPI):
 
 class Mobility(SimpleAXLAPI):
     _factory_descriptor = "handoff_mobility"
+    supported_methods = ["model", "create", "add", "get", "update"]
 
     def add(self, handoffNumber,
             handoffPartitionName=None,
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
-
-    def list(self, **kwargs):
-        raise AXLMethodDoesNotExist
-
-    def remove(self, **kwargs):
-        raise AXLMethodDoesNotExist
 
 
 class MobilityProfile(SimpleAXLAPI):
