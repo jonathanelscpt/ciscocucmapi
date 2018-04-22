@@ -15,7 +15,6 @@ from requests import Session
 from requests.auth import HTTPBasicAuth
 from zeep.plugins import HistoryPlugin
 
-from .exceptions import ServiceProxyError
 from .model import axl_factory
 from .definitions import WSDL_URLS
 from .api import *

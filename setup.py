@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-packages = ['uctoolkit']
+# packages = ['uctoolkit']
 
 requires = [
     'requests>=2.18.4',

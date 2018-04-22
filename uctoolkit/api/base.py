@@ -259,15 +259,12 @@ class SimpleAXLAPI(BaseAXLAPI):
                 "returnedChoices": returnedChoices
             }
             options_method = methodcaller("".join(["get", self.__class__.__name__, "Options"]), **kwargs)
-            print("".join(["get", self.__class__.__name__, "Options"]))
-            print(kwargs)
             axl_resp = options_method(self.connector.service)
             return self.object_factory(
                 "".join([self.__class__.__name__, "Options"]),
                 serialize_object(axl_resp)["return"][self._return_name]
             )
         except Fault as fault:
-            print("herro")
             raise AXLFault(fault.message)
 
 
