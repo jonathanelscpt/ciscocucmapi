@@ -159,9 +159,7 @@ class UCMAXLConnector(UCSOAPConnector):
     def __init__(self, **kwargs):
         connection_kwargs = get_connection_kwargs(self._ENV, kwargs)
         connection_kwargs["binding_name"] = "{http://www.cisco.com/AXLAPIService/}AXLAPIBinding"
-        connection_kwargs["address"] = "https://{fqdn}:8443/axl/".format(
-            fqdn=connection_kwargs["fqdn"]
-        )
+        connection_kwargs["address"] = "https://{fqdn}:8443/axl/".format(**connection_kwargs)
         del connection_kwargs["fqdn"]  # remove fqdn as not used in super() call
         super().__init__(**connection_kwargs)
 
@@ -319,7 +317,7 @@ class UCMRisPortConnector(UCSOAPConnector):
     def __init__(self, username, password, fqdn, tls_verify=False):
         _wsdl = WSDL_URLS["RisPort70"].format(fqdn)
         _binding_name = "{http://schemas.cisco.com/ast/soap}RisBinding"
-        _address = "https://{fqdn}:8443/realtimeservice2/services/RISService70".format(fqdn=fqdn)
+        _address = f"https://{fqdn}:8443/realtimeservice2/services/RISService70"
         super().__init__(username=username,
                          password=password,
                          wsdl=_wsdl,
@@ -360,7 +358,7 @@ class UCMPerfMonConnector(UCSOAPConnector):
     def __init__(self, username, password, fqdn, tls_verify=False):
         _wsdl = WSDL_URLS["PerfMon"].format(fqdn)
         _binding_name = "{http://schemas.cisco.com/ast/soap}PerfmonBinding"
-        _address = "https://{fqdn}:8443/perfmonservice2/services/PerfmonService".format(fqdn=fqdn)
+        _address = f"https://{fqdn}:8443/perfmonservice2/services/PerfmonService"
         super().__init__(username=username,
                          password=password,
                          wsdl=_wsdl,

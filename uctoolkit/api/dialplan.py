@@ -47,9 +47,8 @@ class BlockedLearnedPatterns(SimpleAXLAPI):
             patternType=None,
             **kwargs):
         if not (pattern or prefix or clusterId):
-            raise ValueError("At least one of the match criteria must be specified: {criteria}".format(
-                criteria=("pattern", "prefix", "clusterId")
-            ))
+            criteria = ("pattern", "prefix", "clusterId")
+            raise ValueError(f"At least one of the match criteria must be specified: {criteria}")
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 

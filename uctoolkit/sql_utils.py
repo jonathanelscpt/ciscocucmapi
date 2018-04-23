@@ -7,21 +7,13 @@ from .helpers import extract_pkid_from_uuid
 
 def get_device_pkid(axl_connector, device_name):
     """Get a device pkid from the device name"""
-    sql_statement = "select pkid " \
-            "from device " \
-            "where name={device_name}".format(
-             device_name=device_name
-            )
+    sql_statement = f"select pkid from device where name={device_name}"
     return axl_connector.sql.query(sql_statement)
 
 
 def get_enduser_pkid(axl_connector, userid):
     """Get an enduser pkid from the enduser userid"""
-    sql_statement = "select pkid " \
-            "from enduser " \
-            "where userid={userid}".format(
-             userid=userid
-            )
+    sql_statement = f"select pkid from enduser where userid={userid}"
     return axl_connector.sql.query(sql_statement)
 
 
@@ -29,12 +21,8 @@ def associate_device_to_enduser(axl_connector, enduser_pkid_or_uuid, device_pkid
     """Insert row into enduserdevicemap table to add user/device association"""
     enduser_pkid = extract_pkid_from_uuid(enduser_pkid_or_uuid)
     device_pkid = extract_pkid_from_uuid(device_pkid_or_uuid)
-    sql_statement = "insert into enduserdevicemap (fkenduser, fkdevice, defaultprofile, tkuserassociation)" \
-                    "values ('{enduser_pkid}','{device_pkid}','f','{tkuserassociation}')".format(
-                     enduser_pkid=enduser_pkid,
-                     device_pkid=device_pkid,
-                     tkuserassociation=tkuserassociation
-                    )
+    sql_statement = f"insert into enduserdevicemap (fkenduser, fkdevice, defaultprofile, tkuserassociation)" \
+                    f"values ('{enduser_pkid}','{device_pkid}','f','{tkuserassociation}')"
     return axl_connector.sql.update(sql_statement)
 
 
@@ -42,11 +30,8 @@ def associate_enduser_to_user_group(axl_connector, enduser_pkid_or_uuid, dirgrou
     """Insert row into enduserdirgroupmap table to add enduser/user group association"""
     enduser_pkid = extract_pkid_from_uuid(enduser_pkid_or_uuid)
     dirgroup_pkid = extract_pkid_from_uuid(dirgroup_pkid_or_uuid)
-    sql_statement = "insert into enduserdirgroupmap (fkenduser, fkdirgroup) " \
-                    "values ('{enduser_pkid}', '{dirgroup_pkid}')".format(
-                     enduser_pkid=enduser_pkid,
-                     dirgroup_pkid=dirgroup_pkid
-                    )
+    sql_statement = f"insert into enduserdirgroupmap (fkenduser, fkdirgroup) " \
+                    f"values ('{enduser_pkid}', '{dirgroup_pkid}')"
     return axl_connector.sql.update(sql_statement)
 
 
@@ -60,41 +45,32 @@ def get_dn_pkid(axl_connector, dnorpattern, tkpatternusage=2):
     :param (int) tkpatternusage: defaults to 2 for DNs
     :return: (str) pkid
     """
-    sql_statement = "select pkid from numplan " \
-                    "where dnorpattern={dnorpattern} "\
-                    "and tkpatternusage={tkpatternusage}".format(
-                     dnorpattern=dnorpattern,
-                     tkpatternusage=tkpatternusage
-                     )
+    sql_statement = f"select pkid from numplan " \
+                    f"where dnorpattern={dnorpattern} "\
+                    f"and tkpatternusage={tkpatternusage}"
     return axl_connector.sql.query(sql_statement)
 
 
 def get_service_parameter_details(axl_connector, parameter_name):
     """Get individual service parameters tuple"""
-    sql_statement = "select * from processconfig "  \
-                    "where paramname = '{parameter_name}'".format(
-                     parameter_name=parameter_name
-                    )
+    sql_statement = f"select * from processconfig "  \
+                    f"where paramname = '{parameter_name}'"
     return axl_connector.sql.query(sql_statement)
 
 
 def update_service_parameter(axl_connector, parameter_name, parameter_value):
     """Update service parameter with specified value"""
-    sql_statement = "update processconfig " \
-                    "set paramvalue = '{parameter_value}' " \
-                    "where paramname = '{parameter_name}'".format(
-                     parameter_value=parameter_value,
-                     parameter_name=parameter_name
-                    )
+    sql_statement = f"update processconfig " \
+                    f"set paramvalue = '{parameter_value}' " \
+                    f"where paramname = '{parameter_name}'"
     return axl_connector.sql.update(sql_statement)
 
 
 def ldap_sync(axl_connector, name=None, uuid=None):
     """SQL-based LDAP sync fallback method for AXL versions not supporting doLdapSync"""
-    sql_statement = "update directorypluginconfig set syncnow = '1' where name = '{name}'"
     try:
         return axl_connector.sql.update(
-            sql_statement=sql_statement.format(name=name)
+            sql_statement=f"update directorypluginconfig set syncnow = '1' where name = '{name}'"
         )
     except TypeError:
         name = extract_pkid_from_uuid(

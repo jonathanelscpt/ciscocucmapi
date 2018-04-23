@@ -42,18 +42,14 @@ def _get_choices(obj):
     elif isinstance(obj, Element):
         return obj.name
     else:
-        raise TypeError("Only Choice, Sequence and Element classes inspected, Type '{cls}' found.".format(
-            cls=obj.__class__.__name__
-            )
-        )
+        raise TypeError(
+            f"Only Choice, Sequence and Element classes inspected, Type '{obj.__class__.__name__}' found.")
 
 
 def check_identifiers(wsdl_obj, **kwargs):
     identifiers = _get_choices(wsdl_obj.elements_nested[0][1][0])
     if not check_valid_attribute_req_dict(identifiers, kwargs):
-        raise TypeError("Supplied identifiers not supported for API call: {identifiers}".format(
-            identifiers=identifiers)
-        )
+        raise TypeError(f"Supplied identifiers not supported for API call: {identifiers}")
 
 
 def classproperty(func):
@@ -93,10 +89,8 @@ class BaseAXLAPI(object):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             if func.__name__ not in self.supported_methods:
-                raise AttributeError("{api_endpoint} API does not support '{function_name}' method.".format(
-                    api_endpoint=self.__class__.__name__,
-                    function_name=func.__name__
-                ))
+                raise AttributeError(
+                    f"{self.__class__.__name__} API does not support '{func.__name__}' method.")
             return func(self, *args, **kwargs)
 
         return wrapper
@@ -107,9 +101,7 @@ class BaseAXLAPI(object):
         :param obj_name: name of AXL type
         :return: empty zeep complex type obj
         """
-        return self.connector.client.get_type('ns0:{name}'.format(
-            name=obj_name
-        ))
+        return self.connector.client.get_type(f'ns0:{obj_name}')
 
     def _axl_methodcaller(self, action, **kwargs):
         """Map calling method to a concat of the action verb and the API class name
@@ -271,7 +263,10 @@ class SimpleAXLAPI(BaseAXLAPI):
 class DeviceAXLAPI(SimpleAXLAPI):
     """AXL API support additional device-related methods"""
 
-    supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "restart", "reset"]
+    supported_methods = [
+        "model", "create", "add", "get", "list", "update", "remove",
+        "apply", "restart", "reset"
+    ]
 
     @BaseAXLAPI.assert_supported
     def apply(self, **kwargs):

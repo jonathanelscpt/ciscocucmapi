@@ -22,8 +22,7 @@ def to_json_dict(json_data):
         return json.loads(json_data, object_hook=OrderedDict)
     else:
         raise TypeError(
-            "'json_data' must be a dict or valid JSON string; "
-            "received: {!r}".format(json_data)
+            f"'json_data' must be a dict or valid JSON string; received: {json_data!r}"
         )
 
 

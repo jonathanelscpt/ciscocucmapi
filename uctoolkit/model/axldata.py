@@ -22,11 +22,11 @@ class AXLDataModel(MutableMapping):
 
     def __str__(self):
         """A human-readable string representation of this object."""
-        return "{}:\n{}".format(self.__class__.__name__, self._axl_data)
+        return f"{self.__class__.__name__}:\n{self._axl_data}"
 
     def __repr__(self):
         """A string representing this object as valid Python expression."""
-        return "{}({})".format(self.__class__.__name__, self._axl_data)
+        return f"{self.__class__.__name__}({self._axl_data})"
 
     def __eq__(self, other):
         """AXL objects equality using on uuid"""
@@ -51,7 +51,7 @@ class AXLDataModel(MutableMapping):
             return self._axl_data[key]
         except KeyError:
             raise AXLAttributeError(
-                "Unknown AXL attribute for API endpoint: {key}".format(key=key)
+                f"Unknown AXL attribute for API endpoint: {key}"
             )
 
     def __setitem__(self, key, value):
@@ -64,7 +64,7 @@ class AXLDataModel(MutableMapping):
             del self._axl_data[key]
         except KeyError:
             raise AXLAttributeError(
-                "Unknown AXL attribute for API endpoint: {key}".format(key=key)
+                f"Unknown AXL attribute for API endpoint: {key}"
             )
 
     def __getattr__(self, key):
