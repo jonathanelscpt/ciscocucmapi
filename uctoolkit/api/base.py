@@ -42,8 +42,7 @@ def _get_choices(obj):
     elif isinstance(obj, Element):
         return obj.name
     else:
-        raise TypeError(
-            f"Only Choice, Sequence and Element classes inspected, Type '{obj.__class__.__name__}' found.")
+        raise TypeError(f"Only Choice, Sequence and Element classes inspected, Type '{obj.__class__.__name__}' found.")
 
 
 def check_identifiers(wsdl_obj, **kwargs):
