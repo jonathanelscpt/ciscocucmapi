@@ -74,6 +74,6 @@ def ldap_sync(axl_connector, name=None, uuid=None):
         )
     except TypeError:
         name = extract_pkid_from_uuid(
-            axl_connector.ldap_directory.get(uuid=uuid, returned_tags={"name": ""})
+            axl_connector.ldap_directory.get(uuid=uuid, returnedTags={"name": ""})
         )
         return ldap_sync(axl_connector, name=name)
