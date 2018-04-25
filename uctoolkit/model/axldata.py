@@ -50,9 +50,7 @@ class AXLDataModel(MutableMapping):
         try:
             return self._axl_data[key]
         except KeyError:
-            raise AXLAttributeError(
-                f"Unknown AXL attribute for API endpoint: {key}"
-            )
+            raise AXLAttributeError(f"Unknown AXL attribute for API endpoint: {key}")
 
     def __setitem__(self, key, value):
         """Set item in AXL attribute dict"""
@@ -63,9 +61,7 @@ class AXLDataModel(MutableMapping):
         try:
             del self._axl_data[key]
         except KeyError:
-            raise AXLAttributeError(
-                f"Unknown AXL attribute for API endpoint: {key}"
-            )
+            raise AXLAttributeError(f"Unknown AXL attribute for API endpoint: {key}")
 
     def __getattr__(self, key):
         """Get attribute from AXL attribute dict"""
