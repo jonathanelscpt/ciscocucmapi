@@ -53,7 +53,7 @@ def get_signature_locals(f, loc):
     return {k: v for k, v in loc.items() if k in signature(f).parameters}
 
 
-def nullstring_dict(returned_tags):
+def nullstring_dict(returnedTags):
     """Convert list to nullstring dict"""
-    return {_: "" for _ in returned_tags}
+    return {_: "" for _ in returnedTags}
 
