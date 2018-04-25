@@ -21,9 +21,7 @@ def to_json_dict(json_data):
     elif isinstance(json_data, str):
         return json.loads(json_data, object_hook=OrderedDict)
     else:
-        raise TypeError(
-            f"'json_data' must be a dict or valid JSON string; received: {json_data!r}"
-        )
+        raise TypeError(f"'json_data' must be a dict or valid JSON string; received: {json_data!r}")
 
 
 def to_csv(data_model_list, destination_path):
@@ -41,8 +39,7 @@ def to_csv(data_model_list, destination_path):
             dict_writer.writeheader()
             dict_writer.writerows(data_model_list)
     except FileNotFoundError:
-        # just creating a placeholder for pre-3.6 support...
-        # No intention to boil the ocean yet, so just let if die a horrible death for now
+        # placeholder for pre-3.6 support...
         raise FileNotFoundError
 
 
@@ -66,17 +63,17 @@ def model_dict(api_endpoint, target_cls=dict, include_types=False):
     """
     if target_cls is OrderedDict:
         return OrderedDict((e[0], "" if not include_types else e[1].type.name)
-                           if not hasattr(e[1].type, 'elements') else (e[0], model_dict(
-                                e[1].type,
-                                target_cls=target_cls,
-                                include_types=include_types))
+                           if not hasattr(e[1].type, 'elements')
+                           else (e[0], model_dict(e[1].type,
+                                                  target_cls=target_cls,
+                                                  include_types=include_types))
                            for e in api_endpoint.elements)
     elif target_cls is dict:
         return {e[0]: ("" if not include_types else e[1].type.name)
-                if not hasattr(e[1].type, 'elements') else model_dict(
-                    e[1].type,
-                    target_cls=target_cls,
-                    include_types=include_types)
+                if not hasattr(e[1].type, 'elements')
+                else model_dict(e[1].type,
+                                target_cls=target_cls,
+                                include_types=include_types)
                 for e in api_endpoint.elements}
     else:
         raise TypeError("Invalid target class - dict or DefaultDict supported")
@@ -111,9 +108,6 @@ def sanitize_model_dict(obj):
     :param obj: (dict) AXL data model
     :return: sanitized AXL data model
     """
-    # flatten zeep's handling of AXL's XFkType into a k, v pair
-    # we need to support the two cases for an instantiated response and
-    # where an "X" api endpoint model was created using zeep's 'client.get_type' method
     if set(obj.keys()) == {"uuid", "_value_1"} or set(obj.keys()) == {"_value_1"}:
         return obj["_value_1"]
     else:
@@ -132,8 +126,7 @@ def extract_pkid_from_uuid(pkid_or_uuid):
     :param pkid_or_uuid: (str) pkid or uuid
     :return: (str) pkid with stripped encapsulation
     """
-    # double replace implemented for speed
-    return pkid_or_uuid.replace('{', '').replace('}', '')
+    return pkid_or_uuid.replace('{', '').replace('}', '')  # double replace implemented for speed
 
 
 def _filter_mandatory_attributes(zeep_axl_factory_object):
@@ -143,9 +136,7 @@ def _filter_mandatory_attributes(zeep_axl_factory_object):
     remote error responses from the AXL server.
 
     Note:
-    EXPERIMENTAL ONLY.
-
-    Inconsistencies noted for determinations on minOccurs and nillable.  Suggested not to use.
+    EXPERIMENTAL ONLY.  Inconsistencies noted for determinations on minOccurs and nillable.  Suggested not to use.
 
     :param zeep_axl_factory_object: zeep AXL object generated from a 'get_type' factory call
     :return: generator of mandatory axl elements
