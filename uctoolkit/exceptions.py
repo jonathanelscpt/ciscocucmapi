@@ -10,7 +10,7 @@ class UCToolkitException(Exception):
         self.message = message
 
     def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, self.message)
+        return f'{self.__class__.__name__}({self.message})'
 
 
 class AXLAttributeError(UCToolkitException):
