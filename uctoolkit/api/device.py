@@ -127,7 +127,9 @@ class NetworkAccessProfile(SimpleAXLAPI):
 class Phone(DeviceAXLAPI):
     _factory_descriptor = "phone"
     supported_methods = [
-        "model", "create", "add", "get", "update", "list", "remove", "options", "apply", "restart", "reset", "wipe"
+        "model", "create", "add", "get", "list", "update", "remove",
+        "options", "wipe", "lock",
+        "apply", "restart", "reset",
     ]
 
     def add(self, name, product, devicePoolName,
@@ -147,7 +149,10 @@ class Phone(DeviceAXLAPI):
         :return: None
         """
         # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
-        self._serialize_axl_object("wipe", **kwargs)
+        return self._serialize_axl_object("wipe", **kwargs)
+
+    def lock(self, **kwargs):
+        return self._serialize_axl_object("lock", **kwargs)
 
 
 class PhoneButtonTemplate(DeviceAXLAPI):

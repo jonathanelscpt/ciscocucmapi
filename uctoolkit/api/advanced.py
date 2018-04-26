@@ -8,7 +8,23 @@ from zeep.exceptions import Fault
 
 from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
+from ..helpers import model_dict
 from ..exceptions import AXLFault
+
+
+class IlsConfig(SimpleAXLAPI):
+    _factory_descriptor = "ils_config"
+    supported_methods = ["get", "update"]
+
+    def __init__(self, connector, object_factory):
+        super().__init__(connector, object_factory)
+        self._get_model_name = "NewIlsConfig"
+
+    def get(self, clusterId, returnedTags=None, **kwargs):
+        if not returnedTags:
+            get_model = self._get_wsdl_obj(self._get_model_name)
+            returnedTags = model_dict(get_model)
+        return super().get(clusterId=clusterId, returnedTags=returnedTags, **kwargs)
 
 
 class RemoteCluster(SimpleAXLAPI):

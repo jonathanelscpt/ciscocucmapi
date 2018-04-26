@@ -7,8 +7,31 @@ from zeep.helpers import serialize_object
 from zeep.exceptions import Fault
 
 from .base import DeviceAXLAPI, SimpleAXLAPI
-from .._internal_utils import flatten_signature_kwargs, get_signature_locals
+from .._internal_utils import flatten_signature_kwargs, get_signature_locals, nullstring_dict
+from ..helpers import model_dict
 from ..exceptions import AXLFault
+
+
+class ApplicationServer(SimpleAXLAPI):
+    _factory_descriptor = "application_server"
+
+    def add(self, name, appServerType,
+            ipAddress=None,
+            appUsers=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class AppServerInfo(SimpleAXLAPI):
+    _factory_descriptor = "application_server_info"
+    supported_methods = ["model", "create", "add", "get", "update", "remove"]
+
+    def add(self, appServerName, appServerContent,
+            content=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
 
 
 class AudioCodecPreferenceList(SimpleAXLAPI):
@@ -17,6 +40,11 @@ class AudioCodecPreferenceList(SimpleAXLAPI):
     def add(self, name, description, codecsInList, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
+
+
+class CallManager(DeviceAXLAPI):
+    _factory_descriptor = "callmanager"
+    supported_methods = ["get", "list", "update", "apply", "restart", "reset"]
 
 
 class CallManagerGroup(DeviceAXLAPI):
@@ -65,6 +93,19 @@ class DateTimeGroup(DeviceAXLAPI):
         return super().add(**add_kwargs)
 
 
+class LdapAuthentication(SimpleAXLAPI):
+    _factory_descriptor = "ldap_authentication"
+    supported_methods = ["get", "update"]
+
+    def __init__(self, connector, object_factory):
+        super().__init__(connector, object_factory)
+        self._get_model_name = "XLdapAuthentication"
+
+    def get(self):
+        axl_resp = self.connector.service.getLdapAuthentication()
+        return serialize_object(axl_resp)["return"][self._return_name]
+
+
 class LdapDirectory(SimpleAXLAPI):
     _factory_descriptor = "ldap_directory"
 
@@ -104,6 +145,11 @@ class LdapFilter(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
 
+class LdapSearch(SimpleAXLAPI):
+    _factory_descriptor = "ldap_search"
+    supported_methods = ["get", "list", "update"]
+
+
 # issue - not working!
 class LdapSyncCustomField(SimpleAXLAPI):
     _factory_descriptor = "ldap_custom_field"
@@ -111,6 +157,25 @@ class LdapSyncCustomField(SimpleAXLAPI):
     def add(self, ldapConfigurationName, customUserField, ldapUserField, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
+
+
+class LdapSystem(SimpleAXLAPI):
+    _factory_descriptor = "ldap_system"
+    supported_methods = ["get", "update"]
+
+    def __init__(self, connector, object_factory):
+        super().__init__(connector, object_factory)
+        self._get_model_name = "XLdapSystem"
+
+    def get(self):
+        axl_resp = self.connector.service.getLdapSystem()
+        return serialize_object(axl_resp)["return"][self._return_name]
+
+    def update(self,
+               syncEnabled=True,
+               ldapServer="Microsoft Active Directory",
+               userIdAttribute="sAMAccountName"):
+        return super().update(syncEnabled=syncEnabled, ldapServer=ldapServer, userIdAttribute=userIdAttribute)
 
 
 class LbmGroup(SimpleAXLAPI):
@@ -199,6 +264,61 @@ class Region(DeviceAXLAPI):
     def add(self, name, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
+
+
+class ServiceParameter(SimpleAXLAPI):
+    _factory_descriptor = "service_parameter"
+    supported_methods = ["get", "list", "update", "reset_all"]
+
+    def reset_all(self, processNodeName, service):
+        axl_resp = self.connector.service.doServiceParametersReset(processNodeName=processNodeName, service=service)
+        return serialize_object(axl_resp)["return"]
+
+
+class EnterpriseParameter(ServiceParameter):
+    _factory_descriptor = "enterprise_parameter"
+
+    def __init__(self, connector, object_factory):
+        super().__init__(connector, object_factory)
+        self._return_name = "serviceParameter"
+        self._get_method_name = "GetServiceParameterReq"
+        self._get_model_name = "RServiceParameter"
+        self._list_method_name = "ListServiceParameterReq"
+        self._list_model_name = "LServiceParameter"
+
+    def get(self, returnedTags=None, **kwargs):
+        if "uuid" not in kwargs and "processNodeName" not in kwargs and "service" not in kwargs:
+            kwargs["processNodeName"] = "EnterpriseWideData"
+            kwargs["service"] = "Enterprise Wide"
+        if isinstance(returnedTags, list):
+            returnedTags = nullstring_dict(returnedTags)
+        get_kwargs = flatten_signature_kwargs(self.get, locals())
+        axl_resp = self.connector.service.getServiceParameter(**get_kwargs)
+        return serialize_object(axl_resp)["return"][self._return_name]
+
+    def list(self, searchCriteria=None, returnedTags=None, skip=None, first=None):
+        # todo - warrants rework in base class
+        if not searchCriteria:
+            searchCriteria = {"processNodeName": "EnterpriseWideData", "service": "Enterprise Wide"}
+        if not returnedTags:
+            list_model = self._get_wsdl_obj(self._list_model_name)
+            returnedTags = model_dict(list_model)
+        elif isinstance(returnedTags, list):
+            returnedTags = nullstring_dict(returnedTags)
+        axl_resp = self.connector.service.listServiceParameter(searchCriteria=searchCriteria,
+                                                               returnedTags=returnedTags,
+                                                               skip=skip,
+                                                               first=first)
+        try:
+            axl_list = serialize_object(axl_resp)["return"][self._return_name]
+            return [self.object_factory(self.__class__.__name__, item) for item in axl_list]
+        except TypeError:
+            return []
+
+    def reset_all(self):
+        # todo - this violates LSP due to invalid method signature.  a case for class re-design
+        axl_resp = self.connector.service.doEnterpriseParametersReset()
+        return serialize_object(axl_resp)["return"]
 
 
 class Srst(DeviceAXLAPI):

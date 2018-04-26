@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """CUCM Dial Plan Configuration APIs."""
 
+from zeep.helpers import serialize_object
 from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 
@@ -19,10 +20,15 @@ def _check_route_group_port_assignment(members):
 
 class AarGroup(SimpleAXLAPI):
     _factory_descriptor = "aar_group"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "update_matrix"]
 
     def add(self, name, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
+
+    def update_matrix(self, **kwargs):
+        axl_resp = self.connector.service.updateAarGroupMatrix(**kwargs)
+        return serialize_object(axl_resp)["return"]
 
 
 class AdvertisedPatterns(SimpleAXLAPI):
@@ -32,6 +38,19 @@ class AdvertisedPatterns(SimpleAXLAPI):
             patternType="Enterprise Number",
             hostedRoutePSTNRule="No PSTN",
             pstnFailStrip=0,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class ApplicationDialRules(SimpleAXLAPI):
+    _factory_descriptor = "application_dial_rules"
+
+    def add(self, name,
+            numberBeginWith=None,
+            prefixPattern=None,
+            numberOfDigits=0,
+            digitsToBeRemoved=0,
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
@@ -253,6 +272,11 @@ class RoutePattern(SimpleAXLAPI):
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
+
+
+class RoutePlan(SimpleAXLAPI):
+    _factory_descriptor = "route_plan_report"
+    supported_methods = ["list"]
 
 
 class SipDialRules(SimpleAXLAPI):

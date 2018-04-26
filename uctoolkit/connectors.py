@@ -209,6 +209,7 @@ class UCMAXLConnector(UCSOAPConnector):
         # dial plan API wrappers
         self.advertised_patterns = AdvertisedPatterns(self, axl_factory)
         self.aar_group = AarGroup(self, axl_factory)
+        self.application_dial_rules = ApplicationDialRules(self, axl_factory)
         self.blocked_learned_patterns = BlockedLearnedPatterns(self, axl_factory)
         self.call_pickup_group = CallPickupGroup(self, axl_factory)
         self.call_park = CallPark(self, axl_factory)
@@ -231,6 +232,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.route_list = RouteList(self, axl_factory)
         self.route_partition = RoutePartition(self, axl_factory)
         self.route_pattern = RoutePattern(self, axl_factory)
+        self.route_plan_report = RoutePlan(self, axl_factory)
         self.sip_dial_rules = SipDialRules(self, axl_factory)
         self.sip_realm = SipRealm(self, axl_factory)
         self.sip_route_pattern = SipRoutePattern(self, axl_factory)
@@ -239,6 +241,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.translation_pattern = TransPattern(self, axl_factory)
 
         # system API wrappers
+        self.application_server = ApplicationServer(self, axl_factory)
         self.audio_codec_preference_list = AudioCodecPreferenceList(self, axl_factory)
         self.callmanager_group = CallManagerGroup(self, axl_factory)
         self.date_time_group = DateTimeGroup(self, axl_factory)
@@ -257,8 +260,16 @@ class UCMAXLConnector(UCSOAPConnector):
         self.presence_group = PresenceGroup(self, axl_factory)
         self.region = Region(self, axl_factory)
         self.srst = Srst(self, axl_factory)
+        self.service_parameter = ServiceParameter(self, axl_factory)
+        self.enterprise_parameter = EnterpriseParameter(self, axl_factory)
+        self.ldap_system = LdapSystem(self, axl_factory)
+        self.ldap_authentication = LdapAuthentication(self, axl_factory)
+        self.ldap_search = LdapSearch(self, axl_factory)
+        self.callmanager = CallManager(self, axl_factory)
 
         # media API wrappers
+        self.announcement = Announcement(self, axl_factory)
+        self.annunciator = Annunciator(self, axl_factory)
         self.conference_bridge = ConferenceBridge(self, axl_factory)
         self.mrg = MediaResourceGroup(self, axl_factory)
         self.mrgl = MediaResourceList(self, axl_factory)
@@ -267,6 +278,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.voh_server = VohServer(self, axl_factory)
 
         # advanced API wrappers
+        self.ils_config = IlsConfig(self, axl_factory)
         self.remote_cluster = RemoteCluster(self, axl_factory)
         self.voicemail_pilot = VoiceMailPilot(self, axl_factory)
         self.voicemail_profile = VoiceMailProfile(self, axl_factory)
@@ -278,6 +290,12 @@ class UCMAXLConnector(UCSOAPConnector):
         self.billing_server = BillingServer(self, axl_factory)
         self.snmp_community_string = SNMPCommunityString(self, axl_factory)
         self.snmp_user = SNMPUser(self, axl_factory)
+        self.snmp_mib2_system_group = SNMPMIB2List(self, axl_factory)
+        self.syslog_configuration = SyslogConfiguration(self, axl_factory)
+
+    def get_ccm_version(self, processNodeName=None):
+        axl_resp = self.service.getCCMVersion(processNodeName=processNodeName)
+        return serialize_object(axl_resp)["return"]["componentVersion"]["version"]
 
 
 class UCMControlCenterConnector(UCSOAPConnector):

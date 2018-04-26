@@ -5,6 +5,21 @@ from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 
 
+class Announcement(SimpleAXLAPI):
+    _factory_descriptor = "announcement"
+
+    def add(self, name,
+            announcementFile=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class Annunciator(SimpleAXLAPI):
+    _factory_descriptor = "annunciator"
+    supported_methods = ["get", "list", "update"]
+
+
 class ConferenceBridge(DeviceAXLAPI):
     _factory_descriptor = "conference_bridge"
 

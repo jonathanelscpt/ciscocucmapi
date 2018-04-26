@@ -143,12 +143,21 @@ class BaseAXLAPI(object):
 
 class SimpleAXLAPI(BaseAXLAPI):
     """Simple AXL API with common method support"""
-
     supported_methods = ["model", "create", "add", "get", "update", "list", "remove"]  # doesn't include 'options'
 
+    def __init__(self, connector, object_factory):
+        super().__init__(connector, object_factory)
+        if "add" in self.supported_methods:
+            self._add_model_name = "".join(["X", self.__class__.__name__])
+        if "get" in self.supported_methods:
+            self._get_model_name = "".join(["R", self.__class__.__name__])
+            self._get_method_name = "".join(["Get", self.__class__.__name__, "Req"])
+        if "list" in self.supported_methods:
+            self._list_method_name = "".join(["List", self.__class__.__name__, "Req"])
+            self._list_model_name = "".join(["L", self.__class__.__name__])
+
     def _fetch_add_model(self):
-        add_model_name = "".join(["X", self.__class__.__name__])
-        return self._get_wsdl_obj(add_model_name)
+        return self._get_wsdl_obj(self._add_model_name)
 
     @BaseAXLAPI.assert_supported
     def model(self, sanitized=True, target_cls=OrderedDict, include_types=False):
@@ -186,10 +195,8 @@ class SimpleAXLAPI(BaseAXLAPI):
         if isinstance(returnedTags, list):
             returnedTags = nullstring_dict(returnedTags)
         # define zeep objects for method generically
-        get_method_name = "".join(["Get", self.__class__.__name__, "Req"])
-        get_model_name = "".join(["R", self.__class__.__name__])
-        get_method = self._get_wsdl_obj(get_method_name)
-        check_identifiers(get_method, **kwargs)
+        get_method = self._get_wsdl_obj(self._get_method_name)
+        # check_identifiers(get_method, **kwargs)
         get_kwargs = flatten_signature_kwargs(self.get, locals())
         return self._serialize_axl_object("get", **get_kwargs)
 
@@ -212,16 +219,13 @@ class SimpleAXLAPI(BaseAXLAPI):
         :param first: (int) return first number of results
         :return: list of Data Models for API Endpoint
         """
-        list_method_name = "".join(["List", self.__class__.__name__, "Req"])
-        list_model_name = "".join(["L", self.__class__.__name__])
-        list_method = self._get_wsdl_obj(list_method_name)
-        list_model = self._get_wsdl_obj(list_model_name)
-
         if not searchCriteria:
             # this is presumptive and may not work in all cases.
+            list_method = self._get_wsdl_obj(self._list_method_name)
             supported_criteria = [element[0] for element in list_method.elements[0][1].type.elements]
             searchCriteria = {supported_criteria[0]: "%"}
         if not returnedTags:
+            list_model = self._get_wsdl_obj(self._list_model_name)
             returnedTags = model_dict(list_model)
         elif isinstance(returnedTags, list):
             returnedTags = nullstring_dict(returnedTags)
@@ -261,7 +265,6 @@ class SimpleAXLAPI(BaseAXLAPI):
 
 class DeviceAXLAPI(SimpleAXLAPI):
     """AXL API support additional device-related methods"""
-
     supported_methods = [
         "model", "create", "add", "get", "list", "update", "remove",
         "apply", "restart", "reset"
