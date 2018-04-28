@@ -169,6 +169,9 @@ class UCMAXLConnector(UCSOAPConnector):
         # sql API wrapper
         self.sql = ThinAXLAPI(self, axl_factory)
 
+        # device
+        self.device = Device(self, axl_factory)
+
         # device API wrappers
         self.common_device_config = CommonDeviceConfig(self, axl_factory)
         self.common_phone_profile = CommonPhoneConfig(self, axl_factory)
@@ -201,12 +204,15 @@ class UCMAXLConnector(UCSOAPConnector):
         self.feature_group_template = FeatureGroupTemplate(self, axl_factory)
         self.user = User(self, axl_factory)
         self.uc_service = UcService(self, axl_factory)
+        self.sip_realm = SipRealm(self, axl_factory)
+        self.self_provisioning = SelfProvisioning(self, axl_factory)
         self.service_profile = ServiceProfile(self, axl_factory)
         self.user_group = UserGroup(self, axl_factory)
         self.user_profile = UserProfileProvision(self, axl_factory)
         # self.quick_user_phone_add = _UserPhoneAssociationAPI(self, axl_factory)
 
         # dial plan API wrappers
+        self.caller_filter_list = CallerFilterList(self, axl_factory)
         self.advertised_patterns = AdvertisedPatterns(self, axl_factory)
         self.aar_group = AarGroup(self, axl_factory)
         self.application_dial_rules = ApplicationDialRules(self, axl_factory)
@@ -234,11 +240,12 @@ class UCMAXLConnector(UCSOAPConnector):
         self.route_pattern = RoutePattern(self, axl_factory)
         self.route_plan_report = RoutePlan(self, axl_factory)
         self.sip_dial_rules = SipDialRules(self, axl_factory)
-        self.sip_realm = SipRealm(self, axl_factory)
         self.sip_route_pattern = SipRoutePattern(self, axl_factory)
         self.time_period = TimePeriod(self, axl_factory)
         self.time_schedule = TimeSchedule(self, axl_factory)
         self.translation_pattern = TransPattern(self, axl_factory)
+        self.route_partitions_for_learned_patterns = RoutePartitionsForLearnedPatterns(self, axl_factory)
+        self.elin_group = ElinGroup(self, axl_factory)
 
         # system API wrappers
         self.application_server = ApplicationServer(self, axl_factory)
@@ -266,6 +273,10 @@ class UCMAXLConnector(UCSOAPConnector):
         self.ldap_authentication = LdapAuthentication(self, axl_factory)
         self.ldap_search = LdapSearch(self, axl_factory)
         self.callmanager = CallManager(self, axl_factory)
+        self.process_node = ProcessNode(self, axl_factory)
+        self.dhcp_server = DhcpServer(self, axl_factory)
+        self.dhcp_subnet = DhcpSubnet(self, axl_factory)
+        self.enterprise_phone_config = EnterprisePhoneConfig(self, axl_factory)
 
         # media API wrappers
         self.announcement = Announcement(self, axl_factory)
@@ -278,13 +289,16 @@ class UCMAXLConnector(UCSOAPConnector):
         self.voh_server = VohServer(self, axl_factory)
 
         # advanced API wrappers
+        self.called_party_tracing = CalledPartyTracing(self, axl_factory)
         self.ils_config = IlsConfig(self, axl_factory)
+        self.mwi_number = MessageWaiting(self, axl_factory)
         self.remote_cluster = RemoteCluster(self, axl_factory)
         self.voicemail_pilot = VoiceMailPilot(self, axl_factory)
         self.voicemail_profile = VoiceMailProfile(self, axl_factory)
         self.vpn_gateway = VpnGateway(self, axl_factory)
         self.vpn_group = VpnGroup(self, axl_factory)
         self.vpn_profile = VpnProfile(self, axl_factory)
+        self.secure_config = SecureConfig(self, axl_factory)
 
         # serviceability API wrappers
         self.billing_server = BillingServer(self, axl_factory)
@@ -292,6 +306,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.snmp_user = SNMPUser(self, axl_factory)
         self.snmp_mib2_system_group = SNMPMIB2List(self, axl_factory)
         self.syslog_configuration = SyslogConfiguration(self, axl_factory)
+        self.process_node_service = ProcessNodeService(self, axl_factory)
 
     def get_ccm_version(self, processNodeName=None):
         axl_resp = self.service.getCCMVersion(processNodeName=processNodeName)

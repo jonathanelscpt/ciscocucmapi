@@ -72,6 +72,18 @@ class BlockedLearnedPatterns(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
 
+class CallerFilterList(SimpleAXLAPI):
+    _factory_descriptor = "caller_filter_list"
+
+    def add(self, name,
+            isAllowedType=False,
+            endUse=None,
+            members=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class CallPickupGroup(SimpleAXLAPI):
     _factory_descriptor = "call_pickup_group"
 
@@ -137,6 +149,14 @@ class DirectedCallPark(DeviceAXLAPI):
     supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "reset"]
 
     def add(self, pattern, retrievalPrefix, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class ElinGroup(SimpleAXLAPI):
+    _factory_descriptor = "elin_group"
+
+    def add(self, name, elinNumbers, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -260,6 +280,26 @@ class RoutePartition(DeviceAXLAPI):
     def add(self, name, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
+
+
+class RoutePartitionsForLearnedPatterns(SimpleAXLAPI):
+    _factory_descriptor = "route_partitions_for_learned_patterns"
+    supported_methods = ["update"]
+
+    def update(self,
+               partitionForEnterpriseANo="Global Learned Enterprise Numbers",
+               partitionForE164ANo="Global Learned E164 Numbers",
+               partitionForEnterprisePatterns="Global Learned E164 Patterns",
+               partitionForE164Pattern="Global Learned Enterprise Patterns",
+               markLearnedEntAltNumbers=False,
+               markLearnedE164AltNumbers=False,
+               markFixedLengthEntPatterns=False,
+               markVariableLengthEntPatterns=False,
+               markFixedLengthE164Patterns=False,
+               markVariableLengthE164Patterns=False,
+               **kwargs):
+        update_kwargs = flatten_signature_kwargs(self.update, locals())
+        return super().update(**update_kwargs)
 
 
 class RoutePattern(SimpleAXLAPI):

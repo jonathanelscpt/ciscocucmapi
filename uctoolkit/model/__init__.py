@@ -8,7 +8,7 @@ from .axldata import AXLDataModel, ThinAXLDataModel
 
 axl_data_models = defaultdict(
     lambda: AXLDataModel,
-    ThinAXL=ThinAXLDataModel,
+    ThinAXLAPI=ThinAXLDataModel,
 )
 
 

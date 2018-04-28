@@ -94,6 +94,25 @@ class BaseAXLAPI(object):
 
         return wrapper
 
+
+class SimpleAXLAPI(BaseAXLAPI):
+    """Simple AXL API with common method support"""
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove"]  # doesn't include 'options'
+
+    def __init__(self, connector, object_factory):
+        super().__init__(connector, object_factory)
+        if "add" in self.supported_methods:
+            self._add_model_name = "".join(["X", self.__class__.__name__])
+        if "get" in self.supported_methods:
+            self._get_model_name = "".join(["R", self.__class__.__name__])
+            self._get_method_name = "".join(["Get", self.__class__.__name__, "Req"])
+        if "list" in self.supported_methods:
+            self._list_method_name = "".join(["List", self.__class__.__name__, "Req"])
+            self._list_model_name = "".join(["L", self.__class__.__name__])
+
+    def _fetch_add_model(self):
+        return self._get_wsdl_obj(self._add_model_name)
+
     def _get_wsdl_obj(self, obj_name):
         """Get an empty python-zeep complex type
 
@@ -140,25 +159,6 @@ class BaseAXLAPI(object):
         axl_resp = self._axl_methodcaller(action, **kwargs)
         return serialize_object(axl_resp)["return"]
 
-
-class SimpleAXLAPI(BaseAXLAPI):
-    """Simple AXL API with common method support"""
-    supported_methods = ["model", "create", "add", "get", "update", "list", "remove"]  # doesn't include 'options'
-
-    def __init__(self, connector, object_factory):
-        super().__init__(connector, object_factory)
-        if "add" in self.supported_methods:
-            self._add_model_name = "".join(["X", self.__class__.__name__])
-        if "get" in self.supported_methods:
-            self._get_model_name = "".join(["R", self.__class__.__name__])
-            self._get_method_name = "".join(["Get", self.__class__.__name__, "Req"])
-        if "list" in self.supported_methods:
-            self._list_method_name = "".join(["List", self.__class__.__name__, "Req"])
-            self._list_model_name = "".join(["L", self.__class__.__name__])
-
-    def _fetch_add_model(self):
-        return self._get_wsdl_obj(self._add_model_name)
-
     @BaseAXLAPI.assert_supported
     def model(self, sanitized=True, target_cls=OrderedDict, include_types=False):
         """Get a empty serialized 'add' model for the API endpoint
@@ -196,7 +196,6 @@ class SimpleAXLAPI(BaseAXLAPI):
             returnedTags = nullstring_dict(returnedTags)
         # define zeep objects for method generically
         get_method = self._get_wsdl_obj(self._get_method_name)
-        # check_identifiers(get_method, **kwargs)
         get_kwargs = flatten_signature_kwargs(self.get, locals())
         return self._serialize_axl_object("get", **get_kwargs)
 
@@ -244,7 +243,6 @@ class SimpleAXLAPI(BaseAXLAPI):
     @BaseAXLAPI.assert_supported
     def remove(self, **kwargs):
         """Remove method for API endpoint"""
-        # check_identifiers(self._wsdl_objects["name_and_guid_model"], **kwargs)
         return self._serialize_uuid_resp("remove", **kwargs)
 
     @BaseAXLAPI.assert_supported
@@ -340,3 +338,25 @@ class ThinAXLAPI(BaseAXLAPI):
             return serialize_object(axl_resp)["return"]["rowsUpdated"]
         except Fault as fault:
             raise IllegalSQLStatement(message=fault.message)
+
+
+class Device(BaseAXLAPI):
+    _factory_descriptor = "device"
+    supported_methods = ["login", "logout", "reset"]
+
+    @BaseAXLAPI.assert_supported
+    def login(self, deviceName, profileName, userId,
+              loginDuration=0):
+        axl_resp = self.connector.service.doDeviceLogin(deviceName, profileName, userId, loginDuration)
+        return serialize_object(axl_resp)["return"]
+
+    @BaseAXLAPI.assert_supported
+    def logout(self, deviceName):
+        axl_resp = self.connector.service.doDeviceLogout(deviceName)
+        return serialize_object(axl_resp)["return"]
+
+    @BaseAXLAPI.assert_supported
+    def reset(self, deviceName, **kwargs):
+        reset_kwargs = flatten_signature_kwargs(self.reset, locals())
+        axl_resp = self.connector.service.doDeviceLogin(**reset_kwargs)
+        return serialize_object(axl_resp)["return"]

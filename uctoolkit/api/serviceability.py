@@ -19,6 +19,11 @@ class BillingServer(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
 
+class ProcessNodeService(SimpleAXLAPI):
+    _factory_descriptor = "process_node_service"
+    supported_methods = ["get", "update", "list"]
+
+
 class SNMPCommunityString(SimpleAXLAPI):
     _factory_descriptor = "snmp_community_string"
     supported_methods = ["model", "create", "add", "get", "update", "remove"]

@@ -56,6 +56,18 @@ class CallManagerGroup(DeviceAXLAPI):
         return super().add(**add_kwargs)
 
 
+class DateTimeGroup(DeviceAXLAPI):
+    _factory_descriptor = "date_time_group"
+    supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "reset"]
+
+    def add(self, name, timeZone,
+            separator="-",
+            dateformat="M-D-Y",
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class DeviceMobilityGroup(SimpleAXLAPI):
     _factory_descriptor = "device_mobility_group"
 
@@ -81,13 +93,53 @@ class DevicePool(DeviceAXLAPI):
         return super().add(**add_kwargs)
 
 
-class DateTimeGroup(DeviceAXLAPI):
-    _factory_descriptor = "date_time_group"
-    supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "reset"]
+class DhcpServer(SimpleAXLAPI):
+    _factory_descriptor = "dhcp_server"
 
-    def add(self, name, timeZone,
-            separator="-",
-            dateformat="M-D-Y",
+    def add(self, processNodeName,
+            primaryTftpServerIpAddress=None,
+            secondaryTftpServerIpAddress=None,
+            primaryDnsIpAddress=None,
+            secondaryDnsIpAddress=None,
+            domainName=None,
+            arpCacheTimeout=0,
+            ipAddressLeaseTime=0,
+            renewalTime=0,
+            rebindingTime=0,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class EnterprisePhoneConfig(SimpleAXLAPI):
+    _factory_descriptor = "enterprise_phone_config"
+    supported_methods = ["get", "update"]
+
+    def __init__(self, connector, object_factory):
+        super().__init__(connector, object_factory)
+        self._get_model_name = "XEnterprisePhoneConfig"
+
+    def get(self):
+        axl_resp = self.connector.service.getEnterprisePhoneConfig()
+        return serialize_object(axl_resp)["return"][self._return_name]
+
+
+class DhcpSubnet(SimpleAXLAPI):
+    _factory_descriptor = "dhcp_subnet"
+
+    def add(self, dhcpServerName,
+            primaryStartIpAddress, primaryEndIpAddress,
+            subnetIpAddress, subnetMask,
+            primaryRouterIpAddress,  # making this mandatory because... seriously.
+            primaryTftpServerIpAddress=None,
+            secondaryTftpServerIpAddress=None,
+            primaryDnsIpAddress=None,
+            secondaryDnsIpAddress=None,
+            domainName=None,
+            arpCacheTimeout=0,
+            ipAddressLeaseTime=0,
+            renewalTime=0,
+            rebindingTime=0,
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
@@ -108,6 +160,10 @@ class LdapAuthentication(SimpleAXLAPI):
 
 class LdapDirectory(SimpleAXLAPI):
     _factory_descriptor = "ldap_directory"
+    supported_methods = [
+        "model", "create", "add", "get", "update", "list", "remove",
+        "sync", "get_sync_status",
+    ]
 
     def add(self,
             name, ldapDn, ldapPassword, userSearchBase, servers,
@@ -257,6 +313,15 @@ class PresenceGroup(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
 
+class ProcessNode(SimpleAXLAPI):
+    _factory_descriptor = "process_node"
+
+    def add(self, name,
+            processNodeRole="CUCM Voice/Video"):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class Region(DeviceAXLAPI):
     _factory_descriptor = "region"
     supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "restart"]
@@ -299,7 +364,10 @@ class EnterpriseParameter(ServiceParameter):
     def list(self, searchCriteria=None, returnedTags=None, skip=None, first=None):
         # todo - warrants rework in base class
         if not searchCriteria:
-            searchCriteria = {"processNodeName": "EnterpriseWideData", "service": "Enterprise Wide"}
+            searchCriteria = {
+                "processNodeName": "EnterpriseWideData",
+                "service": "Enterprise Wide"
+            }
         if not returnedTags:
             list_model = self._get_wsdl_obj(self._list_model_name)
             returnedTags = model_dict(list_model)
@@ -327,6 +395,6 @@ class Srst(DeviceAXLAPI):
     def add(self, name, ipAddress, SipNetwork=None, **kwargs):
         # there are corner cases, but this is a good for optimized usability
         if not SipNetwork:
-            SipNetwork=ipAddress
+            SipNetwork = ipAddress
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)

@@ -12,6 +12,15 @@ from ..helpers import model_dict
 from ..exceptions import AXLFault
 
 
+class CalledPartyTracing(SimpleAXLAPI):
+    _factory_descriptor = "called_party_tracing"
+    supported_methods = ["add", "list", "remove"]
+
+    def add(self, directorynumber, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class IlsConfig(SimpleAXLAPI):
     _factory_descriptor = "ils_config"
     supported_methods = ["get", "update"]
@@ -27,8 +36,21 @@ class IlsConfig(SimpleAXLAPI):
         return super().get(clusterId=clusterId, returnedTags=returnedTags, **kwargs)
 
 
+class MessageWaiting(SimpleAXLAPI):
+    _factory_descriptor = "mwi_number"
+
+    def add(self, pattern,
+            routePartitionName=None,
+            callingSearchSpaceName=None,
+            messageWaitingIndicator=False,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class RemoteCluster(SimpleAXLAPI):
     _factory_descriptor = "remote_cluster"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "do_update"]
 
     def add(self, clusterId, fullyQualifiedName,
             emcc=None,
@@ -55,6 +77,23 @@ class RemoteCluster(SimpleAXLAPI):
             )
         except Fault as fault:
             raise AXLFault(fault.message)
+
+
+class SecureConfig(SimpleAXLAPI):
+    _factory_descriptor = "secure_config"
+    supported_methods = ["get", "update"]
+
+    def get(self, name="NativeEmergencyCallHandling",
+            returnedTags=None,
+            **kwargs):
+        get_kwargs = flatten_signature_kwargs(self.get, locals())
+        return super().get(**get_kwargs)
+
+    def update(self, name="NativeEmergencyCallHandling",
+               value="Enabled",
+               **kwargs):
+        update_kwargs = flatten_signature_kwargs(self.get, locals())
+        return super().get(**update_kwargs)
 
 
 class VoiceMailPilot(SimpleAXLAPI):
