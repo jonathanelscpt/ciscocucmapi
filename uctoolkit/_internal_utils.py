@@ -10,11 +10,11 @@ def element_list_to_ordered_dict(elements):
     return [OrderedDict((element.tag, element.text) for element in row) for row in elements]
 
 
-def _flatten(l):
+def flatten(l):
     """Flattens nested Iterable of arbitrary depth"""
     for el in l:
         if isinstance(el, Iterable) and not isinstance(el, (str, bytes)):
-            yield from _flatten(el)
+            yield from flatten(el)
         else:
             yield el
 
@@ -30,18 +30,20 @@ def downcase_string(s):
     return s[:1].lower() + s[1:] if s else ''
 
 
-def _get_signature_kwargs_key(f):
+def get_signature_kwargs_key(f):
     """Get the key name for kwargs if a method signature"""
     keys = [k for k, v in signature(f).parameters.items() if v.kind == v.VAR_KEYWORD]
-    # return keys[0] if len(keys) == 1 else None
-    return keys.pop() if len(keys) == 1 else None
+    try:
+        return keys.pop()
+    except IndexError:  # empty list
+        return None
 
 
-def flatten_signature_kwargs(f, loc):
+def flatten_signature_kwargs(func, loc):
     """flatten a signature dict by one level to move kwargs keys to locals dict"""
-    kwargs_name = _get_signature_kwargs_key(f)
+    kwargs_name = get_signature_kwargs_key(func)
     # remove unwanted metadata for class methods
-    attributes = get_signature_locals(f, loc)
+    attributes = get_signature_locals(func, loc)
     if kwargs_name:
         attributes.pop(kwargs_name)
         attributes.update(loc[kwargs_name])
