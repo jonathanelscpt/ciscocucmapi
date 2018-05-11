@@ -21,7 +21,7 @@ class AXLFault(UCToolkitException):
     """Bubble error received from AXL API in zeep Fault"""
 
 
-class IllegalSQLStatement(AXLFault):
+class IllegalSQLStatement(UCToolkitException):
     """Illegal SQL Statement response from CUCM"""
 
 
