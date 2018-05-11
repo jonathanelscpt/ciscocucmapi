@@ -61,7 +61,7 @@ dead_device = axl.phone.get(name="SEPDEADDEADDEAD",
                             )
 beefy_device = axl.phone.get(name="SEPBEEFBEEFBEEF", 
                             returnedTags=["name", "devicePoolName", "callingSearchSpaceName"]
-                            )
+                             )
 
 # listing phones by name
 nyc_bot_attrs = {
@@ -70,8 +70,8 @@ nyc_bot_attrs = {
     "callingSearchSpaceName": "US_%"
 }
 nyc_bot_devices = axl.phone.list(searchCriteria=nyc_bot_attrs,
-                             returnedTags=["name", "description", "lines"]
-                             )
+                                 returnedTags=["name", "description", "lines"]
+                                 )
 # implicit "return all" available for `searchCriteria` and `returnedTags` - use sparingly for large data sets!
 all_devices = axl.phone.list()
 
@@ -99,7 +99,7 @@ numplan.csv(destination_path="/path/to/datadump/numplan.csv")  # pathlib also su
 ```
 
 
-## Connector Environment Variables
+### Connector Environment Variables
  
  The following env vars are supported for easy of use:
  
@@ -109,7 +109,20 @@ numplan.csv(destination_path="/path/to/datadump/numplan.csv")  # pathlib also su
  - `AXL_FQDN`
 
 
-## API Endpoint Support
+### AXL WSDL
+
+The package includes the AXL wsdl for ease of use.  The schema will be updated regularly to match the latest CUCM
+releases.  By default, unless an AXL version is specified, the `current` WSDL will be used.
+
+Due to the strictness of `python-zeep`'s WSDL and .xsd parsing, numerous AXL defects have been encountered during
+development and testing.  As a result, the packaged WSDL and .xsd files *may* include patches to mitigate defects
+where applicable.  Known AXL defects which have resulted in patches are catalogued in `AXL_DEFECTS.md`.  
+
+If you require a more up-to-date WSDL, or are uncomfortable with using a patched schema, all `UCSOAPConnector`
+accept a direct path to a local WSDL file as input.
+
+
+### API Endpoint Support
 
 Not all API Endpoints are supported, as API and data models are required to mitigate inconsistencies in the 
 AXL API.  If you'd to extend API support, please create a pull request, or raise a GitHub issue and I'll add
@@ -120,7 +133,7 @@ has been developed primarily against UCM 11.5.  If any API definitions interfere
 AXL for prior versions, please raise a GitHub issue and I will address this.
 
  
-## Supported Languages and AXL Versions
+### Supported Languages and AXL Versions
 
  - Currently only Python 3.6 is supported.   Python 2.7 not planned for support in the short-term.
  - All AXL versions *should* be supported, however only 11.5 has been currently tested.  All
@@ -135,11 +148,13 @@ AXL for prior versions, please raise a GitHub issue and I will address this.
 If this library has helped you, or if you would like to support future development, 
 donations are most welcome:
 
- - BTC: xxxxxxxxxxxxxxx
- - ETH: xxxxxxxxxxxxxxx
+ - **BTC**: 3EFVaakujecqhEmNkah5Q5gkpNbyy251os
+ - **ETH**: 0xb44b637e99b32b9f12ba9430ff823cabb3ca7db5
+ - **BCH**: 38YJXxgchDgSjzd8b91LkmcbQSy1q6ruYx
+ - **LTC**: MTJKDiS8Jv9qG9iYGWHyhTrAL6oynFwQw1
  
  
-# Support
+## Support
  
 I'm open to discussing ad-hoc commercial support or custom DevOps implementations.
 Please contact me at [jonathanelscpt@gmail.com](mailto:jonathanelscpt@gmail.com) for more information. 
