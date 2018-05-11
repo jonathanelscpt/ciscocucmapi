@@ -2,15 +2,15 @@
 
 The uctoolkit package is inspired by the most excellent [ciscosparkapi](https://github.com/CiscoDevNet/ciscosparkapi)
 Python API wrapper for Cisco Spark.  The library wraps a 
-[python-zeep](https://github.com/mvantellingen/python-zeep) client to create and manage 
-AXL connections and provide CRUD operations for common API endpoints.
+[python-zeep](https://github.com/mvantellingen/python-zeep) client to manage 
+AXL connections and CRUD operations for common API endpoints.
 
 
 ## Features
 
  - Simplified Pythonic wrapping of Cisco UC SOAP APIs
- - `python-zeep`-based client under the hood - much faster than `suds`
- - Complete abstraction from AXL SOAP API - no xml!
+ - `python-zeep`-based client under the hood - much faster than `suds`.  WSDL caching is enabled by default.
+ - Complete abstraction of AXL SOAP API - no xml!
  - Native Python tooling includes:
    - Native returned AXL data objects modelled with a `dict`-like interface and characteristics
    - xml order is honoured due to `OrderedDict` implementation
@@ -60,7 +60,7 @@ dead_device = axl.phone.get(name="SEPDEADDEADDEAD",
                             returnedTags={"name": "", "devicePoolName": "", "callingSearchSpaceName": ""}
                             )
 beefy_device = axl.phone.get(name="SEPBEEFBEEFBEEF", 
-                            returnedTags=["name", "devicePoolName", "callingSearchSpaceName"]
+                             returnedTags=["name", "devicePoolName", "callingSearchSpaceName"]
                              )
 
 # listing phones by name
@@ -149,7 +149,7 @@ If this library has helped you, or if you would like to support future developme
 donations are most welcome:
 
 | Cryptocurrency  | Address |
-| :---:  | :---  |
+| :---:  | :---:  |
 | **BTC** | 3EFVaakujecqhEmNkah5Q5gkpNbyy251os |
 | **ETH** | 0xb44b637e99b32b9f12ba9430ff823cabb3ca7db5 |
 | **BCH** | 38YJXxgchDgSjzd8b91LkmcbQSy1q6ruYx |
