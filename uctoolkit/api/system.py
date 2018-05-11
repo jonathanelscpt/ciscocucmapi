@@ -177,20 +177,14 @@ class LdapDirectory(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
     def sync(self, name=None, uuid=None, sync=True):
-        try:
-            kwargs = get_signature_locals(self.get_sync_status, locals())
-            axl_resp = self.connector.service.doLdapSync(**kwargs)
-            return serialize_object(axl_resp)["return"]
-        except Fault as fault:
-            raise AXLFault(fault.message)
+        kwargs = get_signature_locals(self.get_sync_status, locals())
+        axl_resp = self.connector.service.doLdapSync(**kwargs)
+        return serialize_object(axl_resp)["return"]
 
     def get_sync_status(self, name=None, uuid=None):
-        try:
-            kwargs = get_signature_locals(self.get_sync_status, locals())
-            axl_resp = self.connector.service.getLdapSyncStatus(**kwargs)
-            return serialize_object(axl_resp)["return"]
-        except Fault as fault:
-            raise AXLFault(fault.message)
+        kwargs = get_signature_locals(self.get_sync_status, locals())
+        axl_resp = self.connector.service.getLdapSyncStatus(**kwargs)
+        return serialize_object(axl_resp)["return"]
 
 
 class LdapFilter(SimpleAXLAPI):
