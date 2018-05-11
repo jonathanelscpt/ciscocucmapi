@@ -11,8 +11,7 @@ WSDL = 'file://C://path//to//AXLAPI.wsdl'
 
 def main():
     axl = UCMAXLConnector(username=USERNAME, password=PASSWORD, fqdn=FQDN, wsdl=WSDL)
-    bot_device_name = "BOTUSER015"
-    botuser15 = axl.phone.get(name=bot_device_name)
+    botuser15 = axl.phone.get(name="BOTUSER015")
     print(botuser15.callingSearchSpaceName)
 
 
