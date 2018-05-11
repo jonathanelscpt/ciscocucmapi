@@ -68,13 +68,14 @@ def get_model_dict(obj, include_types=False):
         else:
             # list of list of elements represented as list with single ordered dict
             if hasattr(e[1].type.elements[0][1].type, 'elements'):
-                model_dict[e[0]] = OrderedDict([(e[1].type.elements[0][0],
-                                                 [get_model_dict(e[1].type.elements[0][1].type,
-                                                                 include_types=include_types)]
-                                                 )
-                                                ])
+                model_dict[e[0]] = OrderedDict([
+                    (e[1].type.elements[0][0],
+                     [get_model_dict(e[1].type.elements[0][1].type,
+                                     include_types=include_types)])
+                ])
             else:
-                model_dict[e[0]] = get_model_dict(e[1].type, include_types=include_types)
+                model_dict[e[0]] = get_model_dict(e[1].type,
+                                                  include_types=include_types)
     return model_dict
 
 
@@ -100,15 +101,16 @@ def filter_dict_to_target_model(obj, target_model):
             raise TypeError
 
         for k, v in target_model.items():
-            if isinstance(v, list):
-                if all([isinstance(i, dict) for i in v]) and len(v) == 1 and obj[k]:
-                    filtered_obj[k] = [filter_dict_to_target_model(item, v[0]) for item in obj[k]]
+            if k in obj:
+                if isinstance(v, list):
+                    if all([isinstance(i, dict) for i in v]) and len(v) == 1 and obj[k]:
+                        filtered_obj[k] = [filter_dict_to_target_model(item, v[0]) for item in obj[k]]
+                    else:
+                        filtered_obj[k] = obj[k]
+                elif isinstance(v, dict) and obj[k]:
+                    filtered_obj[k] = filter_dict_to_target_model(obj[k], v)
                 else:
                     filtered_obj[k] = obj[k]
-            elif isinstance(v, dict) and obj[k]:
-                filtered_obj[k] = filter_dict_to_target_model(obj[k], v)
-            else:
-                filtered_obj[k] = obj[k]
         return filtered_obj
     except (ValueError, AttributeError, TypeError):
         raise ParseError("Unable to parse data object dictionary against target model")
