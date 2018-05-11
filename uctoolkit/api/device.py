@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """CUCM AXL Device APIs."""
 
+from zeep.exceptions import Fault
 from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 
@@ -107,7 +108,9 @@ class Line(DeviceAXLAPI):
     def __init__(self, connector, object_factory):
         super().__init__(connector, object_factory)
 
-    def add(self, name, routePartitionName, **kwargs):
+    def add(self, pattern, routePartitionName,
+            usage="Device",
+            **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -132,14 +135,33 @@ class Phone(DeviceAXLAPI):
         "apply", "restart", "reset",
     ]
 
+    @staticmethod
+    def _check_confidential_access(confidentialAccess):
+        """Workaround for AXL defect not accepting None for 'confidentialAccessMode'"""
+        if not confidentialAccess['confidentialAccessMode']:
+            confidentialAccess['confidentialAccessMode'] = ''
+        return confidentialAccess
+
     def add(self, name, product, devicePoolName,
             locationName="Hub_None",
             protocol="SIP",
+            commonPhoneConfigName="Standard Common Phone Profile",
             **kwargs):
         if "class" not in kwargs:  # workaround for restricted 'class' attribute
             kwargs["class"] = "Phone"
         add_kwargs = flatten_signature_kwargs(self.add, locals())
+        try:
+            add_kwargs['confidentialAccess'] = self._check_confidential_access(add_kwargs['confidentialAccess'])
+        except KeyError:
+            pass
         return super().add(**add_kwargs)
+
+    def update(self, **kwargs):
+        try:
+            kwargs['confidentialAccess'] = self._check_confidential_access(kwargs['confidentialAccess'])
+        except KeyError:
+            pass
+        return super().update(**kwargs)
 
     def wipe(self, **kwargs):
         """Allows Cisco's newer Android-based devices, like the Cisco DX650,
