@@ -136,11 +136,8 @@ class SimpleAXLAPI(BaseAXLAPI):
         :param kwargs: input kwargs for called method
         :return: axl response zeep object
         """
-        try:
-            axl_method = methodcaller("".join([action, self.__class__.__name__]), **kwargs)
-            return axl_method(self.connector.service)
-        except Fault as fault:
-            raise AXLFault(fault.message)
+        axl_method = methodcaller("".join([action, self.__class__.__name__]), **kwargs)
+        return axl_method(self.connector.service)
 
     def _serialize_axl_object(self, action, **kwargs):
         """Builds and AXL methodcaller using given action verb and the object type.
@@ -168,19 +165,22 @@ class SimpleAXLAPI(BaseAXLAPI):
         return serialize_object(axl_resp)["return"]
 
     @BaseAXLAPI.assert_supported
-    def model(self, sanitized=True, include_types=False):
+    def model(self, target_model="add", sanitized=True, include_types=False):
         """Get a empty serialized 'add' model for the API endpoint
 
         Useful for inspecting the endpoint's schema and future template generation.
 
+        :param target_model: target model for api - 'add', 'get', 'update' etc.
         :param sanitized: collapse zeep's interpretation of the xsd nested dicts
         with '_value_1' and 'uuid' keys into a simple k,v pair with v as a (str)
-        :param target_cls: dict or OrderedDict
         :param include_types: (bool) include zeep model type inspection
         :return: empty data model dictionary
         """
-        model = get_model_dict(self._fetch_add_model(), include_types=include_types)
-        return sanitize_model_dict(model) if sanitized else model
+        if target_model == "add":
+            model = get_model_dict(self._fetch_add_model(), include_types=include_types)
+            return sanitize_model_dict(model) if sanitized else model
+        else:
+            raise NotImplementedError
 
     @BaseAXLAPI.assert_supported
     def create(self, **kwargs):
@@ -256,19 +256,16 @@ class SimpleAXLAPI(BaseAXLAPI):
     @BaseAXLAPI.assert_supported
     def options(self, uuid, returnedChoices=None):
         """Return options for selected API endpoints"""
-        try:
-            kwargs = {
-                "uuid": uuid,
-                "returnedChoices": returnedChoices
-            }
-            options_method = methodcaller("".join(["get", self.__class__.__name__, "Options"]), **kwargs)
-            axl_resp = options_method(self.connector.service)
-            return self.object_factory(
-                "".join([self.__class__.__name__, "Options"]),
-                serialize_object(axl_resp)["return"][self._return_name]
-            )
-        except Fault as fault:
-            raise AXLFault(fault.message)
+        kwargs = {
+            "uuid": uuid,
+            "returnedChoices": returnedChoices
+        }
+        options_method = methodcaller("".join(["get", self.__class__.__name__, "Options"]), **kwargs)
+        axl_resp = options_method(self.connector.service)
+        return self.object_factory(
+            "".join([self.__class__.__name__, "Options"]),
+            serialize_object(axl_resp)["return"][self._return_name]
+        )
 
 
 class DeviceAXLAPI(SimpleAXLAPI):
