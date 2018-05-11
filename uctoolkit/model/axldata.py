@@ -75,8 +75,12 @@ class AXLDataModel(MutableMapping):
 
         Removes nested references to '_value_1', where python-zeep has interpreted the
         AXL schema's inclusion of uuid attributes.
+
+        :return: sanitized dictionary
         """
-        return sanitize_model_dict(self._axl_data)
+        # return sanitize_model_dict(self._axl_data)
+        super().__setattr__('_axl_data', sanitize_model_dict(self._axl_data))
+        return self
 
     def filter(self, target_model):
         """Filter model data against a target API model schema
@@ -86,7 +90,9 @@ class AXLDataModel(MutableMapping):
         :param target_model: empty API model called from API's model() method
         :return: filtered dictionary
         """
-        return filter_dict_to_target_model(self._axl_data, target_model)
+        # return filter_dict_to_target_model(self._axl_data, target_model)
+        super().__setattr__('_axl_data', filter_dict_to_target_model(self._axl_data, target_model))
+        return self
 
 
 class ThinAXLDataModel(AXLDataModel):
