@@ -8,7 +8,7 @@ from zeep.exceptions import Fault
 
 from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs, get_signature_locals, nullstring_dict
-from ..helpers import model_dict
+from ..helpers import get_model_dict
 from ..exceptions import AXLFault
 
 
@@ -370,7 +370,7 @@ class EnterpriseParameter(ServiceParameter):
             }
         if not returnedTags:
             list_model = self._get_wsdl_obj(self._list_model_name)
-            returnedTags = model_dict(list_model)
+            returnedTags = get_model_dict(list_model)
         elif isinstance(returnedTags, list):
             returnedTags = nullstring_dict(returnedTags)
         axl_resp = self.connector.service.listServiceParameter(searchCriteria=searchCriteria,

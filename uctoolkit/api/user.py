@@ -21,6 +21,34 @@ class AppUser(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
 
+class ApplicationUserCapfProfile(SimpleAXLAPI):
+    _factory_descriptor = "application_user_capf_profile"
+
+    def add(self, applicationUser, instanceId,
+            certificateOperation="No Pending Operation",
+            authenticationMode="By Null String",
+            keySize=2014,
+            keyOrder="RSA Only",
+            ecKeySize=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class EndUserCapfProfile(SimpleAXLAPI):
+    _factory_descriptor = "end_user_capf_profile"
+
+    def add(self, endUserId, instanceId,
+            certificateOperation="No Pending Operation",
+            authenticationMode="By Null String",
+            keySize=2014,
+            keyOrder="RSA Only",
+            ecKeySize=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class FeatureGroupTemplate(SimpleAXLAPI):
     _factory_descriptor = "feature_group_template"
 

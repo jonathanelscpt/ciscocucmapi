@@ -23,3 +23,7 @@ class AXLFault(UCToolkitException):
 
 class IllegalSQLStatement(AXLFault):
     """Illegal SQL Statement response from CUCM"""
+
+
+class ParseError(UCToolkitException):
+    """Unable to parse AXL object"""

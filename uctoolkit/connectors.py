@@ -186,6 +186,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.phone_button_template = PhoneButtonTemplate(self, axl_factory)
         self.phone_security_profile = PhoneSecurityProfile(self, axl_factory)
         self.recording_profile = RecordingProfile(self, axl_factory)
+        self.sdp_transparency_profile = SdpTransparencyProfile(self, axl_factory)
         self.sip_trunk = SipTrunk(self, axl_factory)
         self.sip_trunk_security_profile = SipTrunkSecurityProfile(self, axl_factory)
         self.sip_profile = SipProfile(self, axl_factory)
@@ -201,6 +202,8 @@ class UCMAXLConnector(UCSOAPConnector):
 
         # user API wrappers
         self.application_user = AppUser(self, axl_factory)
+        self.application_user_capf_profile = ApplicationUserCapfProfile(self, axl_factory)
+        self.end_user_capf_profile = EndUserCapfProfile(self, axl_factory)
         self.feature_group_template = FeatureGroupTemplate(self, axl_factory)
         self.user = User(self, axl_factory)
         self.uc_service = UcService(self, axl_factory)
@@ -211,7 +214,7 @@ class UCMAXLConnector(UCSOAPConnector):
         self.user_profile = UserProfileProvision(self, axl_factory)
         # self.quick_user_phone_add = _UserPhoneAssociationAPI(self, axl_factory)
 
-        # dial plan API wrappers
+        # dialplan API wrappers
         self.caller_filter_list = CallerFilterList(self, axl_factory)
         self.advertised_patterns = AdvertisedPatterns(self, axl_factory)
         self.aar_group = AarGroup(self, axl_factory)
@@ -225,9 +228,12 @@ class UCMAXLConnector(UCSOAPConnector):
         self.cmc = CmcInfo(self, axl_factory)
         self.css = Css(self, axl_factory)
         self.directed_call_park = DirectedCallPark(self, axl_factory)
+        self.directory_lookup_rules = DirectoryLookupDialRules(self, axl_factory)
         self.mobility_enterprise_feature_access_number = EnterpriseFeatureAccessConfiguration(self, axl_factory)
         self.fac = FacInfo(self, axl_factory)
         self.handoff_mobility = Mobility(self, axl_factory)
+        self.handoff_configuration = HandoffConfiguration(self, axl_factory)
+        self.http_profile = HttpProfile(self, axl_factory)
         self.meetme = MeetMe(self, axl_factory)
         self.mobility_profile = MobilityProfile(self, axl_factory)
         self.hunt_list = HuntList(self, axl_factory)
@@ -290,6 +296,7 @@ class UCMAXLConnector(UCSOAPConnector):
 
         # advanced API wrappers
         self.called_party_tracing = CalledPartyTracing(self, axl_factory)
+        self.directory_number_alias_sync = DirNumberAliasLookupandSync(self, axl_factory)
         self.ils_config = IlsConfig(self, axl_factory)
         self.mwi_number = MessageWaiting(self, axl_factory)
         self.remote_cluster = RemoteCluster(self, axl_factory)

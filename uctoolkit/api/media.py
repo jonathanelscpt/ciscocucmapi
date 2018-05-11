@@ -46,6 +46,11 @@ class MediaResourceList(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
 
+class MohServer(SimpleAXLAPI):
+    _factory_descriptor = "moh_server"
+    supported_methods = ["get", "list", "update"]
+
+
 class Mtp(DeviceAXLAPI):
     _factory_descriptor = "mtp"
 

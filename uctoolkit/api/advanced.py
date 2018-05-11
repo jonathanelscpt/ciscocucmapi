@@ -8,7 +8,7 @@ from zeep.exceptions import Fault
 
 from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
-from ..helpers import model_dict
+from ..helpers import get_model_dict
 from ..exceptions import AXLFault
 
 
@@ -17,6 +17,20 @@ class CalledPartyTracing(SimpleAXLAPI):
     supported_methods = ["add", "list", "remove"]
 
     def add(self, directorynumber, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class DirNumberAliasLookupandSync(SimpleAXLAPI):
+    _factory_descriptor = "directory_number_alias_sync"
+
+    def add(self, ldapConfigName, ldapManagerDisgName, ldapPassword, ldapUserSearch, servers,
+            ldapDirectoryServerUsage="DirSync",
+            enableCachingofRecords=False,
+            sipAliasSuffix=None,
+            keepAliveSearch=None,
+            keepAliveTime=5,
+            **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -32,7 +46,7 @@ class IlsConfig(SimpleAXLAPI):
     def get(self, clusterId, returnedTags=None, **kwargs):
         if not returnedTags:
             get_model = self._get_wsdl_obj(self._get_model_name)
-            returnedTags = model_dict(get_model)
+            returnedTags = get_model_dict(get_model)
         return super().get(clusterId=clusterId, returnedTags=returnedTags, **kwargs)
 
 

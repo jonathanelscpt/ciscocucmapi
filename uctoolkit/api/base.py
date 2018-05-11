@@ -23,7 +23,7 @@ from .._internal_utils import (
     nullstring_dict
 )
 from ..helpers import (
-    model_dict,
+    get_model_dict,
     sanitize_model_dict
 )
 
@@ -46,18 +46,26 @@ def _get_choices(obj):
 
 
 def check_identifiers(wsdl_obj, **kwargs):
+    """Check identifiers by inspecting choices in zeep model object
+
+    :param wsdl_obj: zeep AXL model object
+    :param kwargs: supplied identifiers to test
+    :return: None
+    """
     identifiers = _get_choices(wsdl_obj.elements_nested[0][1][0])
     if not check_valid_attribute_req_dict(identifiers, kwargs):
         raise TypeError(f"Supplied identifiers not supported for API call: {identifiers}")
 
 
 def classproperty(func):
+    """Decorator function to denote class properties"""
     if not isinstance(func, (classmethod, staticmethod)):
         func = classmethod(func)
     return ClassPropertyDescriptor(func)
 
 
 class ClassPropertyDescriptor(object):
+    """Decorator class for class properties"""
     # setter wont work, but we don't want it at the class level in any case
     def __init__(self, fget):
         self.fget = fget
@@ -114,7 +122,7 @@ class SimpleAXLAPI(BaseAXLAPI):
         return self._get_wsdl_obj(self._add_model_name)
 
     def _get_wsdl_obj(self, obj_name):
-        """Get an empty python-zeep complex type
+        """Get empty python-zeep complex type
 
         :param obj_name: name of AXL type
         :return: empty zeep complex type obj
@@ -160,7 +168,7 @@ class SimpleAXLAPI(BaseAXLAPI):
         return serialize_object(axl_resp)["return"]
 
     @BaseAXLAPI.assert_supported
-    def model(self, sanitized=True, target_cls=OrderedDict, include_types=False):
+    def model(self, sanitized=True, include_types=False):
         """Get a empty serialized 'add' model for the API endpoint
 
         Useful for inspecting the endpoint's schema and future template generation.
@@ -171,7 +179,7 @@ class SimpleAXLAPI(BaseAXLAPI):
         :param include_types: (bool) include zeep model type inspection
         :return: empty data model dictionary
         """
-        model = model_dict(self._fetch_add_model(), target_cls=target_cls, include_types=include_types)
+        model = get_model_dict(self._fetch_add_model(), include_types=include_types)
         return sanitize_model_dict(model) if sanitized else model
 
     @BaseAXLAPI.assert_supported
@@ -225,7 +233,7 @@ class SimpleAXLAPI(BaseAXLAPI):
             searchCriteria = {supported_criteria[0]: "%"}
         if not returnedTags:
             list_model = self._get_wsdl_obj(self._list_model_name)
-            returnedTags = model_dict(list_model)
+            returnedTags = get_model_dict(list_model)
         elif isinstance(returnedTags, list):
             returnedTags = nullstring_dict(returnedTags)
         axl_resp = self._axl_methodcaller("list",
@@ -247,6 +255,7 @@ class SimpleAXLAPI(BaseAXLAPI):
 
     @BaseAXLAPI.assert_supported
     def options(self, uuid, returnedChoices=None):
+        """Return options for selected API endpoints"""
         try:
             kwargs = {
                 "uuid": uuid,
@@ -298,6 +307,7 @@ class DeviceAXLAPI(SimpleAXLAPI):
 
 
 class ThinAXLAPI(BaseAXLAPI):
+    """API extension for Thin AXL"""
     _factory_descriptor = "sql"
     supported_methods = ["query", "update"]
 
@@ -341,6 +351,7 @@ class ThinAXLAPI(BaseAXLAPI):
 
 
 class Device(BaseAXLAPI):
+    """API Extension for restartable CUCM Devices"""
     _factory_descriptor = "device"
     supported_methods = ["login", "logout", "reset"]
 

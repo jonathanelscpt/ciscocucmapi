@@ -153,6 +153,21 @@ class DirectedCallPark(DeviceAXLAPI):
         return super().add(**add_kwargs)
 
 
+class DirectoryLookupDialRules(SimpleAXLAPI):
+    _factory_descriptor = "directory_lookup_rules"
+    supported_methods = ["model", "create", "add", "get", "update", "list", "remove"]
+
+    def add(self, name,
+            priority=0,
+            numberBeginWith=None,
+            numberOfDigits=0,
+            digitsToBeRemoved=0,
+            prefixPattern=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class ElinGroup(SimpleAXLAPI):
     _factory_descriptor = "elin_group"
 
@@ -176,6 +191,29 @@ class FacInfo(SimpleAXLAPI):
     _factory_descriptor = "fac"
 
     def add(self, name, code, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class HandoffConfiguration(SimpleAXLAPI):
+    _factory_descriptor = "handoff_configuration"
+    supported_methods = ["add", "get", "remove", "update"]
+
+    def add(self, pattern,
+            routePartitionName=None,
+            **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class HttpProfile(SimpleAXLAPI):
+    _factory_descriptor = "http_profile"
+    supported_methods = ["add", "get", "remove", "update"]
+
+    def add(self, name, userName, password, webServiceRootUri,
+            requestTimeout=60000,
+            retryCount=4,
+            **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 

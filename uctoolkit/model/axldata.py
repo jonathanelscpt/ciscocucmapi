@@ -5,7 +5,7 @@
 from collections.abc import MutableMapping
 
 from ..exceptions import AXLAttributeError
-from ..helpers import sanitize_model_dict, to_csv
+from ..helpers import sanitize_model_dict, to_csv, filter_dict_to_target_model
 
 
 class AXLDataModel(MutableMapping):
@@ -71,12 +71,22 @@ class AXLDataModel(MutableMapping):
         self.__setitem__(key, value)
 
     def sanitize(self):
-        """Return a sanitized dict representation of the data model
+        """Sanitize data model
 
         Removes nested references to '_value_1', where python-zeep has interpreted the
         AXL schema's inclusion of uuid attributes.
         """
         return sanitize_model_dict(self._axl_data)
+
+    def filter(self, target_model):
+        """Filter model data against a target API model schema
+
+        Useful for assured processing of list/add or get/add transaction paradigms.
+
+        :param target_model: empty API model called from API's model() method
+        :return: filtered dictionary
+        """
+        return filter_dict_to_target_model(self._axl_data, target_model)
 
 
 class ThinAXLDataModel(AXLDataModel):

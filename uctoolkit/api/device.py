@@ -224,6 +224,16 @@ class RemoteDestinationProfile(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
 
+class SdpTransparencyProfile(SimpleAXLAPI):
+    _factory_descriptor = "sdp_transparency_profile"
+
+    def add(self, name, attributeSet, **kwargs):
+        if "class" not in kwargs:
+            kwargs["class"] = "Trunk"
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
 class SipTrunk(DeviceAXLAPI):
     _factory_descriptor = "sip_trunk"
 

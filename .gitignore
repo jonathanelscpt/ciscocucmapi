@@ -101,9 +101,6 @@ ENV/
 .mypy_cache/
 
 
-# AXL schemas
-schema/
-
 # IntelliJ files
 .idea/
 

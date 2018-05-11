@@ -8,6 +8,8 @@ from pathlib import Path
 
 from zeep.helpers import serialize_object
 
+from .exceptions import ParseError
+
 
 def to_json_dict(json_data):
     """Given a dictionary or JSON string; return a dictionary.
@@ -43,40 +45,73 @@ def to_csv(data_model_list, destination_path):
         raise FileNotFoundError
 
 
-def model_dict(api_endpoint, target_cls=dict, include_types=False):
+def get_model_dict(obj, include_types=False):
     """Get an empty model dict or OrderedDict for an api endpoint from a complex zeep type
-
-    "target_cls' an output data structrure preference (default is dict, for speed) as xml element ordering
-    is not important for AXL requests.  Alternatively, an OrderedDict is useful for debugging and for
-    dumping to JSON objects for local template generation.
 
     'include_types' is useful for quickly determining the API endpoints expected attribute type
     (e.g. "hostName": "String128") without delving into the .xsd or API documentation.
-    Note that some output (e.g. "ldapPortNumber": "anySimpleType") may actually be of a sub-type
+
+    Note:
+
+    some output (e.g. "ldapPortNumber": "anySimpleType") may actually be of a sub-type
     (i.e. "XInteger" in the case of "ldapPortNumber"), but this util does not yet provide that level of granularity
     in its schema inspection.
 
-    :param api_endpoint: zeep data structure
-    :param target_cls: (bool) requested model data structure - dict or OrderedDict
+    :param obj: zeep AXL data structure
     :param include_types: (bool) replace null string with string name of AXL type for each attr
     :return: (dict or OrderedDict) of soap api endpoint
     """
-    if target_cls is OrderedDict:
-        return OrderedDict((e[0], "" if not include_types else e[1].type.name)
-                           if not hasattr(e[1].type, 'elements')
-                           else (e[0], model_dict(e[1].type,
-                                                  target_cls=target_cls,
-                                                  include_types=include_types))
-                           for e in api_endpoint.elements)
-    elif target_cls is dict:
-        return {e[0]: ("" if not include_types else e[1].type.name)
-                if not hasattr(e[1].type, 'elements')
-                else model_dict(e[1].type,
-                                target_cls=target_cls,
-                                include_types=include_types)
-                for e in api_endpoint.elements}
-    else:
-        raise TypeError("Invalid target class - dict or DefaultDict supported")
+    model_dict = OrderedDict()
+    for e in obj.elements:
+        if not hasattr(e[1].type, 'elements'):
+            model_dict[e[0]] = "" if not include_types else e[1].type.name
+        else:
+            # list of list of elements represented as list with single ordered dict
+            if hasattr(e[1].type.elements[0][1].type, 'elements'):
+                model_dict[e[0]] = OrderedDict([(e[1].type.elements[0][0],
+                                                 [get_model_dict(e[1].type.elements[0][1].type,
+                                                                 include_types=include_types)]
+                                                 )
+                                                ])
+            else:
+                model_dict[e[0]] = get_model_dict(e[1].type, include_types=include_types)
+    return model_dict
+
+
+def filter_dict_to_target_model(obj, target_model):
+    """Filters a serialized response to match the structure of a target model dictionary.
+
+    This is useful for filtering a 'get' or 'list' response to match the required schema of a 'add' request.
+        e.g. filtering a serialized 'RPhone' for re-purposing in a subsequent 'XPhone' request.
+
+    :param obj: serialized zeep response
+    :param target_model: model dict for
+    :return: filtered dict only containing k-v pairs matching the target model
+    """
+    try:
+        # base case for empty model with uuid attr
+        if (set(obj.keys()) == {"uuid", "_value_1"} or set(obj.keys()) == {"_value_1"}) and \
+                (set(target_model.keys()) == {"uuid", "_value_1"} or set(target_model.keys()) == {"_value_1"}):
+            return obj
+
+        if isinstance(obj, dict):
+            filtered_obj = OrderedDict()
+        else:
+            raise TypeError
+
+        for k, v in target_model.items():
+            if isinstance(v, list):
+                if all([isinstance(i, dict) for i in v]) and len(v) == 1 and obj[k]:
+                    filtered_obj[k] = [filter_dict_to_target_model(item, v[0]) for item in obj[k]]
+                else:
+                    filtered_obj[k] = obj[k]
+            elif isinstance(v, dict) and obj[k]:
+                filtered_obj[k] = filter_dict_to_target_model(obj[k], v)
+            else:
+                filtered_obj[k] = obj[k]
+        return filtered_obj
+    except (ValueError, AttributeError, TypeError):
+        raise ParseError("Unable to parse data object dictionary against target model")
 
 
 def sanitize_model_dict(obj):
@@ -114,6 +149,8 @@ def sanitize_model_dict(obj):
         for k, v in obj.items():
             if isinstance(v, dict):
                 obj[k] = sanitize_model_dict(v)
+            elif isinstance(v, list):
+                obj[k] = [sanitize_model_dict(item) for item in v]
     return obj
 
 
@@ -136,7 +173,8 @@ def _filter_mandatory_attributes(zeep_axl_factory_object):
     remote error responses from the AXL server.
 
     Note:
-    EXPERIMENTAL ONLY.  Inconsistencies noted for determinations on minOccurs and nillable.  Suggested not to use.
+    EXPERIMENTAL ONLY.
+    Inconsistencies noted for determinations on 'minOccurs' and 'nillable'.  Suggested NOT to be used.
 
     :param zeep_axl_factory_object: zeep AXL object generated from a 'get_type' factory call
     :return: generator of mandatory axl elements
