@@ -148,10 +148,12 @@ AXL for prior versions, please raise a GitHub issue and I will address this.
 If this library has helped you, or if you would like to support future development, 
 donations are most welcome:
 
- - **BTC**: 3EFVaakujecqhEmNkah5Q5gkpNbyy251os
- - **ETH**: 0xb44b637e99b32b9f12ba9430ff823cabb3ca7db5
- - **BCH**: 38YJXxgchDgSjzd8b91LkmcbQSy1q6ruYx
- - **LTC**: MTJKDiS8Jv9qG9iYGWHyhTrAL6oynFwQw1
+| Cryptocurrency  | Address |
+| :---:  | :---  |
+| **BTC** | 3EFVaakujecqhEmNkah5Q5gkpNbyy251os |
+| **ETH** | 0xb44b637e99b32b9f12ba9430ff823cabb3ca7db5 |
+| **BCH** | 38YJXxgchDgSjzd8b91LkmcbQSy1q6ruYx |
+| **LTC** | MTJKDiS8Jv9qG9iYGWHyhTrAL6oynFwQw1 |
  
  
 ## Support
