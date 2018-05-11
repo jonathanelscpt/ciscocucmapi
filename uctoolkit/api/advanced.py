@@ -78,19 +78,16 @@ class RemoteCluster(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
     def do_update(self, clusterId, server):
-        try:
-            kwargs = {
-                "clusterId": clusterId,
-                "server": server
-            }
-            options_method = methodcaller("".join(["doUpdate", self.__class__.__name__]), **kwargs)
-            axl_resp = options_method(self.connector.service)
-            return self.object_factory(
-                "".join([self.__class__.__name__]),
-                serialize_object(axl_resp)["return"]
-            )
-        except Fault as fault:
-            raise AXLFault(fault.message)
+        kwargs = {
+            "clusterId": clusterId,
+            "server": server
+        }
+        options_method = methodcaller("".join(["doUpdate", self.__class__.__name__]), **kwargs)
+        axl_resp = options_method(self.connector.service)
+        return self.object_factory(
+            "".join([self.__class__.__name__]),
+            serialize_object(axl_resp)["return"]
+        )
 
 
 class SecureConfig(SimpleAXLAPI):
