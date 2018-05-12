@@ -1,14 +1,13 @@
-# Cisco UC Toolkit
+# Cisco CUCM API
 
-The uctoolkit package is inspired by the most excellent [ciscosparkapi](https://github.com/CiscoDevNet/ciscosparkapi)
-Python API wrapper for Cisco Spark.  The library wraps a 
-[python-zeep](https://github.com/mvantellingen/python-zeep) client to manage 
-AXL connections and CRUD operations for common API endpoints.
+The ciscocucmapi package is inspired by the most excellent [ciscosparkapi](https://github.com/CiscoDevNet/ciscosparkapi)
+Python API wrapper for Cisco Spark.  The library wraps a [python-zeep](https://github.com/mvantellingen/python-zeep) 
+client to manage CUCM SOAP connections (specifically for AXL) and CRUD operations for common API endpoints.
 
 
 ## Features
 
- - Simplified Pythonic wrapping of Cisco UC SOAP APIs
+ - Simplified Pythonic wrappings of Cisco UC SOAP APIs
  - `python-zeep`-based client under the hood - much faster than `suds`.  WSDL caching is enabled by default.
  - Complete abstraction of AXL SOAP API - no xml!
  - Native Python tooling includes:
@@ -21,21 +20,21 @@ AXL connections and CRUD operations for common API endpoints.
   
 ## Installation
 
-Installing and upgrading `uctoolkit` is done with `pip`:
+Installing and upgrading `ciscocucmapi` is done with `pip`:
 
 **Installing via PIP**
 
-    $ pip install uctoolkit
+    $ pip install ciscocucmapi
 
 **Upgrading via PIP**
 
-    $ pip install uctoolkit --upgrade
+    $ pip install ciscocucmapi --upgrade
     
 
 ## Quick Start
 
 ```python
-from uctoolkit import UCMAXLConnector
+from ciscocucmapi import UCMAXLConnector
 import json
 
 
