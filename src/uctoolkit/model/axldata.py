@@ -19,12 +19,15 @@ class AXLDataModel(MutableMapping):
         # for k, v in axl_data.items():
         #     if isinstance(v, MutableMapping):
         #         axl_data[k] = AXLDataModel(v)
-
-        if not isinstance(axl_data, dict):
+        if isinstance(axl_data, MutableMapping):
             raise TypeError(mutable_mapping_msg)
+        elif not isinstance(axl_data, dict):
+            raise TypeError("AXL model data must be a dictionary")
+
         for k, v in axl_data.items():
             if isinstance(v, MutableMapping):
                 raise TypeError(mutable_mapping_msg)
+
         super().__setattr__('_axl_data', axl_data)
 
     @property
