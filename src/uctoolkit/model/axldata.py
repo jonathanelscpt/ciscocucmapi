@@ -7,6 +7,10 @@ from ..exceptions import AXLAttributeError
 from ..helpers import sanitize_model_dict, to_csv, filter_dict_to_target_model
 
 
+mutable_mapping_msg = "Unable to support MutableMapping due to python-zeep xml rendering limitation.  " \
+                      "Please use dict or OrderedDict instead."
+
+
 class AXLDataModel(MutableMapping):
     """Model an AXL data object as a native Python object."""
 
@@ -15,13 +19,13 @@ class AXLDataModel(MutableMapping):
         # for k, v in axl_data.items():
         #     if isinstance(v, MutableMapping):
         #         axl_data[k] = AXLDataModel(v)
-        if isinstance(axl_data, dict):
-            super().__setattr__('_axl_data', axl_data)
-        elif isinstance(axl_data, MutableMapping):
-            raise TypeError("Unable to support MutableMapping due to python-zeep xml rendering limitation.  "
-                            "Please use dict or OrderedDict instead.")
-        else:
-            raise TypeError("AXL data must be dict or OrderedDict")
+
+        if not isinstance(axl_data, dict):
+            raise TypeError(mutable_mapping_msg)
+        for k, v in axl_data.items():
+            if isinstance(v, MutableMapping):
+                raise TypeError(mutable_mapping_msg)
+        super().__setattr__('_axl_data', axl_data)
 
     @property
     def axl_data(self):
@@ -67,8 +71,7 @@ class AXLDataModel(MutableMapping):
         # else:
         #     self._axl_data[key] = value
         if isinstance(value, MutableMapping):
-            raise TypeError("Unable to support MutableMapping due to python-zeep xml rendering limitation.  "
-                            "Please use dict or OrderedDict instead.")
+            raise TypeError(mutable_mapping_msg)
         self._axl_data[key] = value
 
     def __delitem__(self, key):
