@@ -15,7 +15,13 @@ class AXLDataModel(MutableMapping):
         # for k, v in axl_data.items():
         #     if isinstance(v, MutableMapping):
         #         axl_data[k] = AXLDataModel(v)
-        super().__setattr__('_axl_data', axl_data)
+        if isinstance(axl_data, dict):
+            super().__setattr__('_axl_data', axl_data)
+        elif isinstance(axl_data, MutableMapping):
+            raise TypeError("Unable to support MutableMapping due to python-zeep xml rendering limitation.  "
+                            "Please use dict or OrderedDict instead.")
+        else:
+            raise TypeError("AXL data must be dict or OrderedDict")
 
     @property
     def axl_data(self):
@@ -60,6 +66,9 @@ class AXLDataModel(MutableMapping):
         #     self._axl_data[key] = AXLDataModel(value)
         # else:
         #     self._axl_data[key] = value
+        if isinstance(value, MutableMapping):
+            raise TypeError("Unable to support MutableMapping due to python-zeep xml rendering limitation.  "
+                            "Please use dict or OrderedDict instead.")
         self._axl_data[key] = value
 
     def __delitem__(self, key):
