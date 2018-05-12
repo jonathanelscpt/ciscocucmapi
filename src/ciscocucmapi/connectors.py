@@ -29,7 +29,6 @@ def get_connection_kwargs(env_dict, kwargs):
     :param env_dict: dict mapping connection argument names to environment variable names
     :param kwargs: __init__ input args
     :return: kwargs with updated connection parameter values
-    :raises UCToolkitConnectionException: if no connection parameters not provided
     """
     connection_kwargs = {k: os.environ.get(v) for k, v in env_dict.items()}
     connection_kwargs.update(kwargs)

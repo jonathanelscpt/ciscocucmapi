@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Package helper functions and classes."""
+"""Package helper functions and classes"""
 
 import json
 import csv

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Useful SQL query utils for UC System Administration  tasks where full AXL object
-instantiation and method calling is too verbose or slow"""
+"""Useful SQL query utils for specific UC System Administration tasks"""
 
 from .helpers import extract_pkid_from_uuid
 
