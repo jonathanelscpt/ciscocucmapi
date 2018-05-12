@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Cisco UC AXL Generic Data Model"""
 
-
 from collections.abc import MutableMapping
 
 from ..exceptions import AXLAttributeError
@@ -13,6 +12,9 @@ class AXLDataModel(MutableMapping):
 
     def __init__(self, axl_data):
         super().__init__()
+        # for k, v in axl_data.items():
+        #     if isinstance(v, MutableMapping):
+        #         axl_data[k] = AXLDataModel(v)
         super().__setattr__('_axl_data', axl_data)
 
     @property
@@ -31,7 +33,7 @@ class AXLDataModel(MutableMapping):
     def __eq__(self, other):
         """AXL objects equality using on uuid"""
         return (isinstance(other, self.__class__)
-                and self._axl_data)
+                and self._axl_data.__eq__(other))
 
     def __ne__(self, other):
         """AXL objects non-equality using uuid"""
@@ -54,6 +56,10 @@ class AXLDataModel(MutableMapping):
 
     def __setitem__(self, key, value):
         """Set item in AXL attribute dict"""
+        # if isinstance(value, MutableMapping):
+        #     self._axl_data[key] = AXLDataModel(value)
+        # else:
+        #     self._axl_data[key] = value
         self._axl_data[key] = value
 
     def __delitem__(self, key):
