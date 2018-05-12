@@ -101,7 +101,7 @@ ENV/
 .mypy_cache/
 
 
-# IntelliJ files
+# PyCharm project files
 .idea/
 
 # output
