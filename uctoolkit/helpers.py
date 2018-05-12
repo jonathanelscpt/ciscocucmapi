@@ -4,6 +4,7 @@
 import json
 import csv
 from collections import OrderedDict
+from collections.abc import MutableMapping
 from pathlib import Path
 
 from zeep.helpers import serialize_object
@@ -95,7 +96,8 @@ def filter_dict_to_target_model(obj, target_model):
                 (set(target_model.keys()) == {"uuid", "_value_1"} or set(target_model.keys()) == {"_value_1"}):
             return obj
 
-        if isinstance(obj, dict):
+        # if isinstance(obj, dict):
+        if isinstance(obj, MutableMapping):
             filtered_obj = OrderedDict()
         else:
             raise TypeError
