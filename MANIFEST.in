@@ -1,7 +1,8 @@
-graft schema
+graft src
 graft examples
 graft tests
 graft docs
+graft schema
 
 include LICENSE
 include README.md
