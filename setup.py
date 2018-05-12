@@ -34,14 +34,14 @@ install_requires = [
 
 
 setup(
-    name="UCToolkit",
+    name="ciscocucmapi",
     version="0.0.1",
     license="MIT",
-    description="Python Toolkit for Cisco UC APIs",
+    description="Python Wrappers for Cisco CUCM SOAP APIs",
     long_description=read('README.md'),
     author="Jonathan Els",
     author_email="jonathanelscpt@gmail.com",
-    url="https://github.com/jonathanelscpt/UCToolkit",
+    url="https://github.com/jonathanelscpt/ciscocucmapi",
     python_requires=">=3.6.*",
     packages=find_packages('src'),
     package_dir={
