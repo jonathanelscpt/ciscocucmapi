@@ -70,4 +70,3 @@ setup(
     extras_require={},
     entry_points={},
 )
-
