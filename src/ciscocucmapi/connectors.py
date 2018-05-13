@@ -10,6 +10,7 @@ from lxml import etree
 from zeep import Client
 from zeep.cache import SqliteCache
 from zeep.transports import Transport
+from zeep.helpers import serialize_object
 # from zeep.asyncio import AsyncTransport
 from requests import Session
 from requests.auth import HTTPBasicAuth
@@ -76,7 +77,6 @@ class UCSOAPConnector(object):
         :param binding_name: QName of the binding
         :param address: address of the endpoint
         :param tls_verify: /path/to/certificate.pem or False.  Certificate must be a CA_BUNDLE. Supports .pem and .crt
-        :param is_async: create async client
         :param timeout: timeout in seconds.  Overrides zeep 300 default to timeout after 30sec
         """
         self._username = username
