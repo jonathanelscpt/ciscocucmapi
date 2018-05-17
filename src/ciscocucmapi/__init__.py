@@ -9,27 +9,21 @@ to facilitate DevOps Cisco UC application provisioning.
 :license: MIT, see LICENSE for more details.
 """
 
-from ciscocucmapi.connectors import (
+import logging
+
+from .connectors import (
     UCMAXLConnector
 )
 
-# Set default logging handler to avoid "No handler found" warnings.
-import logging
-try:  # Python 2.7+
-    from logging import NullHandler
-except ImportError:
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
 
-# Initialize Package Logging
+# Initialize Package Logging - set default logging handler to avoid "No handler found" warnings.
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-__all__ = (
-    UCMAXLConnector,
-    # UCMControlCenterConnector,
-    # UCMRisPortConnector,
-    # UCMPerfMonConnector,
-    # UCMLogCollectionConnector
-)
+__all__ = [
+    'UCMAXLConnector',
+    # 'UCMControlCenterConnector',
+    # 'UCMRisPortConnector',
+    # 'UCMPerfMonConnector',
+    # 'UCMLogCollectionConnector'
+]
