@@ -23,6 +23,8 @@ install_requires = [
     'zeep>=2.5.0',
     'lxml>=4.2.1'
 ]
+
+tests_require = []
 # tests_require = [
 #     'pytest-httpbin==0.0.7',
 #     'pytest-cov',
@@ -58,6 +60,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Communications :: Telephony',
         'Topic :: Communications :: Conferencing',
         'Topic :: System :: Systems Administration'
@@ -66,7 +69,7 @@ setup(
         "cisco", "cucm", "uc", "collaboration", "callmanager", "axl",
     ],
     install_requires=install_requires,
-    # tests_require=tests_require,
+    tests_require=tests_require,
     extras_require={},
     entry_points={},
 )
