@@ -17,8 +17,16 @@ from requests.auth import HTTPBasicAuth
 from zeep.plugins import HistoryPlugin
 
 from .model import axl_factory
-from .definitions import WSDL_URLS
 from .api import *
+from .definitions import (
+    AXL_BINDING_NAME,
+    AXL_ADDRESS,
+    RISPORT_BINDING_NAME,
+    RISPORT_ADDRESS,
+    PERFMON_BINDING_NAME,
+    PERFMON_ADDRESS,
+    WSDL_URLS
+)
 
 
 def get_connection_kwargs(env_dict, kwargs):
@@ -157,12 +165,12 @@ class UCMAXLConnector(UCSOAPConnector):
 
     def __init__(self, **kwargs):
         connection_kwargs = get_connection_kwargs(self._ENV, kwargs)
-        connection_kwargs["binding_name"] = "{http://www.cisco.com/AXLAPIService/}AXLAPIBinding"
-        connection_kwargs["address"] = "https://{fqdn}:8443/axl/".format(**connection_kwargs)
+        connection_kwargs["binding_name"] = AXL_BINDING_NAME
+        connection_kwargs["address"] = AXL_ADDRESS.format(**connection_kwargs)
         del connection_kwargs["fqdn"]  # remove fqdn as not used in super() call
         super().__init__(**connection_kwargs)
 
-        # for api in API_ENDPOINTS.values():
+        # for api in AXL_API_ENDPOINTS.values():
         #     setattr(self, api.factory_descriptor, api(self, axl_factory))
 
         # sql API wrapper
@@ -355,8 +363,8 @@ class UCMRisPortConnector(UCSOAPConnector):
 
     def __init__(self, username, password, fqdn, tls_verify=False):
         _wsdl = WSDL_URLS["RisPort70"].format(fqdn)
-        _binding_name = "{http://schemas.cisco.com/ast/soap}RisBinding"
-        _address = f"https://{fqdn}:8443/realtimeservice2/services/RISService70"
+        _binding_name = RISPORT_BINDING_NAME
+        _address = RISPORT_ADDRESS.format(fqdn)
         super().__init__(username=username,
                          password=password,
                          wsdl=_wsdl,
@@ -396,8 +404,8 @@ class UCMPerfMonConnector(UCSOAPConnector):
 
     def __init__(self, username, password, fqdn, tls_verify=False):
         _wsdl = WSDL_URLS["PerfMon"].format(fqdn)
-        _binding_name = "{http://schemas.cisco.com/ast/soap}PerfmonBinding"
-        _address = f"https://{fqdn}:8443/perfmonservice2/services/PerfmonService"
+        _binding_name = PERFMON_BINDING_NAME
+        _address = PERFMON_ADDRESS.format(fqdn)
         super().__init__(username=username,
                          password=password,
                          wsdl=_wsdl,
