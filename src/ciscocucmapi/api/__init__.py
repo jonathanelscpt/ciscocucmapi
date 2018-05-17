@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .base import ThinAXLAPI, Device
+from .base import *
 from .device import *
 from .user import *
 from .dialplan import *

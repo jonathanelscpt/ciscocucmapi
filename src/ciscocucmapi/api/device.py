@@ -6,6 +6,15 @@ from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 
 
+__all__ = [
+    "CommonDeviceConfig", "CommonPhoneConfig", "CtiRoutePoint", "DefaultDeviceProfile", "DeviceProfile",
+    "FeatureControlPolicy", "IpPhoneServices", "Line", "NetworkAccessProfile", "Phone", "PhoneButtonTemplate",
+    "PhoneSecurityProfile", "RecordingProfile", "RemoteDestination", "RemoteDestinationProfile",
+    "SdpTransparencyProfile", "SipTrunk", "SipProfile", "SipTrunkSecurityProfile", "SoftKeyTemplate", "SoftKeySet",
+    "UniversalDeviceTemplate", "UniversalLineTemplate", "WifiHotspot", "WLANProfile", "WlanProfileGroup"
+]
+
+
 class CommonDeviceConfig(DeviceAXLAPI):
     _factory_descriptor = "common_device_config"
     supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "reset"]

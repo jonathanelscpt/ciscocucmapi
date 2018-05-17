@@ -4,12 +4,16 @@
 from operator import methodcaller
 
 from zeep.helpers import serialize_object
-from zeep.exceptions import Fault
 
 from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 from ..helpers import get_model_dict
-from ..exceptions import AXLFault
+
+__all__ = [
+    "CalledPartyTracing", "DirNumberAliasLookupandSync", "IlsConfig",
+    "MessageWaiting", "RemoteCluster", "SecureConfig", "VoiceMailPilot", "VoiceMailProfile",
+    "VpnGateway", "VpnGroup", "VpnProfile"
+]
 
 
 class CalledPartyTracing(SimpleAXLAPI):

@@ -27,6 +27,10 @@ from ..helpers import (
     sanitize_model_dict
 )
 
+__all__ = [
+    "ThinAXLAPI", "Device"
+]
+
 
 def _get_choices(obj):
     """Create tuple of available choices as defined in xsd

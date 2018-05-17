@@ -5,6 +5,12 @@ from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 
 
+__all__ = [
+    "Announcement", "Annunciator", "ConferenceBridge", "MediaResourceGroup", "MediaResourceList", "MohServer", "Mtp",
+    "Transcoder", "VohServer"
+]
+
+
 class Announcement(SimpleAXLAPI):
     _factory_descriptor = "announcement"
 

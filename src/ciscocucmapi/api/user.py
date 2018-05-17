@@ -8,6 +8,12 @@ from zeep.helpers import serialize_object
 from .base import SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
 
+__all__ = [
+    "AppUser", "ApplicationUserCapfProfile", "EndUserCapfProfile", "FeatureGroupTemplate", "SelfProvisioning",
+    "FeatureGroupTemplate", "SelfProvisioning", "ServiceProfile", "SipRealm", "UcService", "User", "UserGroup",
+    "UserProfileProvision"
+]
+
 
 class AppUser(SimpleAXLAPI):
     _factory_descriptor = "application_user"

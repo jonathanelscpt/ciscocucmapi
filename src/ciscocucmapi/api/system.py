@@ -12,6 +12,15 @@ from ..helpers import get_model_dict
 from ..exceptions import AXLFault
 
 
+__all__ = [
+    "ApplicationServer", "AppServerInfo", "AudioCodecPreferenceList", "CallManager", "CallManagerGroup",
+    "DateTimeGroup", "DeviceMobility", "DeviceMobilityGroup", "DevicePool", "DhcpServer", "EnterprisePhoneConfig",
+    "DhcpSubnet", "LdapAuthentication", "LdapDirectory", "LdapFilter", "LdapSearch", "LdapSyncCustomField",
+    "LdapSystem", "LbmGroup", "LbmHubGroup", "Location", "PresenceRedundancyGroup", "PhoneNtp", "PhysicalLocation",
+    "PresenceGroup", "ProcessNode", "Region", "ServiceParameter", "EnterpriseParameter", "Srst"
+]
+
+
 class ApplicationServer(SimpleAXLAPI):
     _factory_descriptor = "application_server"
 
@@ -68,18 +77,18 @@ class DateTimeGroup(DeviceAXLAPI):
         return super().add(**add_kwargs)
 
 
-class DeviceMobilityGroup(SimpleAXLAPI):
-    _factory_descriptor = "device_mobility_group"
-
-    def add(self, name, **kwargs):
-        add_kwargs = flatten_signature_kwargs(self.add, locals())
-        return super().add(**add_kwargs)
-
-
 class DeviceMobility(SimpleAXLAPI):
     _factory_descriptor = "device_mobility_info"
 
     def add(self, name, subNet, subNetMaskSz, members, **kwargs):
+        add_kwargs = flatten_signature_kwargs(self.add, locals())
+        return super().add(**add_kwargs)
+
+
+class DeviceMobilityGroup(SimpleAXLAPI):
+    _factory_descriptor = "device_mobility_group"
+
+    def add(self, name, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
