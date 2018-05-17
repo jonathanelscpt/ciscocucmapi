@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 """AXL definitions"""
 
+import inspect
 
-# API_ENDPOINTS = {api.__name__: api for api in _api_all}
+import ciscocucmapi.api
+
+
+__all__ = [
+    "AXL_API_ENDPOINTS", "AXL_BINDING_NAME", "AXL_ADDRESS", "RISPORT_BINDING_NAME", "RISPORT_ADDRESS",
+    "PERFMON_BINDING_NAME", "PERFMON_ADDRESS", "WSDL_URLS"
+]
 
 WSDL_URLS = {
     "RisPort70": "https://{fqdn}:8443/realtimeservice2/services/RISService70?wsdl",
@@ -14,6 +21,13 @@ WSDL_URLS = {
     "DimeGetFileService": "https://{fqdn}:8443/logcollectionservice/services/DimeGetFileService?wsdl"
 }
 
+AXL_API_ENDPOINTS = {m[0]: m[1] for m in inspect.getmembers(ciscocucmapi.api, inspect.isclass)}
+
+AXL_BINDING_NAME = "{http://www.cisco.com/AXLAPIService/}AXLAPIBinding"
+AXL_ADDRESS = "https://{fqdn}:8443/axl/"
+
+RISPORT_BINDING_NAME = "{http://schemas.cisco.com/ast/soap}RisBinding"
+RISPORT_ADDRESS = "https://{fqdn}:8443/realtimeservice2/services/RISService70"
 RISPORT = {
     "type": (
         "Name",
@@ -47,3 +61,6 @@ RISPORT = {
     },
     "all_models": 255
 }
+
+PERFMON_BINDING_NAME = "{http://schemas.cisco.com/ast/soap}PerfmonBinding"
+PERFMON_ADDRESS = "https://{fqdn}:8443/perfmonservice2/services/PerfmonService"
