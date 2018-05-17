@@ -147,15 +147,20 @@ def sanitize_model_dict(obj):
     :param obj: (dict) AXL data model
     :return: sanitized AXL data model
     """
-    if set(obj.keys()) == {"uuid", "_value_1"} or set(obj.keys()) == {"_value_1"}:
-        return obj["_value_1"]
+    if isinstance(obj, dict):
+        if set(obj.keys()) == {"uuid", "_value_1"} or set(obj.keys()) == {"_value_1"}:
+            return obj["_value_1"]
+        else:
+            for k, v in obj.items():
+                if isinstance(v, dict):
+                    obj[k] = sanitize_model_dict(v)
+                elif isinstance(v, list):
+                    obj[k] = [sanitize_model_dict(item) for item in v]
+        return obj
+    elif isinstance(obj, str):
+        return obj
     else:
-        for k, v in obj.items():
-            if isinstance(v, dict):
-                obj[k] = sanitize_model_dict(v)
-            elif isinstance(v, list):
-                obj[k] = [sanitize_model_dict(item) for item in v]
-    return obj
+        raise ParseError("Invalid obj type found during attempted parsing.  Unable to sanitize object")
 
 
 def extract_pkid_from_uuid(pkid_or_uuid):
