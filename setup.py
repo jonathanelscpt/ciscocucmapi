@@ -24,7 +24,9 @@ install_requires = [
     'lxml>=4.2.1'
 ]
 
-tests_require = []
+tests_require = [
+    'pytest>=2.8.0'
+]
 # tests_require = [
 #     'pytest-httpbin==0.0.7',
 #     'pytest-cov',

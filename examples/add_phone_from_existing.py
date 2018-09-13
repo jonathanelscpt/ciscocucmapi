@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from uctoolkit import UCMAXLConnector
+from ciscocucmapi import UCMAXLConnector
 from zeep.exceptions import Fault
 
 

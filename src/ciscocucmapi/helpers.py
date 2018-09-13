@@ -62,22 +62,25 @@ def get_model_dict(obj, include_types=False):
     :param include_types: (bool) replace null string with string name of AXL type for each attr
     :return: (dict or OrderedDict) of soap api endpoint
     """
-    model_dict = OrderedDict()
-    for e in obj.elements:
-        if not hasattr(e[1].type, 'elements'):
-            model_dict[e[0]] = "" if not include_types else e[1].type.name
-        else:
-            # list of list of elements represented as list with single ordered dict
-            if hasattr(e[1].type.elements[0][1].type, 'elements'):
-                model_dict[e[0]] = OrderedDict([
-                    (e[1].type.elements[0][0],
-                     [get_model_dict(e[1].type.elements[0][1].type,
-                                     include_types=include_types)])
-                ])
+    try:
+        model_dict = OrderedDict()
+        for e in obj.elements:
+            if not hasattr(e[1].type, 'elements'):
+                model_dict[e[0]] = "" if not include_types else e[1].type.name
             else:
-                model_dict[e[0]] = get_model_dict(e[1].type,
-                                                  include_types=include_types)
-    return model_dict
+                # list of list of elements represented as list with single ordered dict
+                if hasattr(e[1].type.elements[0][1].type, 'elements'):
+                    model_dict[e[0]] = OrderedDict([
+                        (e[1].type.elements[0][0],
+                         [get_model_dict(e[1].type.elements[0][1].type,
+                                         include_types=include_types)])
+                    ])
+                else:
+                    model_dict[e[0]] = get_model_dict(e[1].type,
+                                                      include_types=include_types)
+        return model_dict
+    except AttributeError:
+        raise ValueError("obj must be zeep data type")
 
 
 def filter_dict_to_target_model(obj, target_model):
@@ -172,7 +175,10 @@ def extract_pkid_from_uuid(pkid_or_uuid):
     :param pkid_or_uuid: (str) pkid or uuid
     :return: (str) pkid with stripped encapsulation
     """
-    return pkid_or_uuid.replace('{', '').replace('}', '')  # double replace implemented for speed
+    try:
+        return pkid_or_uuid.replace('{', '').replace('}', '').lower()  # double replace implemented for speed
+    except AttributeError as error:
+        raise TypeError(error)
 
 
 def _filter_mandatory_attributes(zeep_axl_factory_object):

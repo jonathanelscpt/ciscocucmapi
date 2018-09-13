@@ -2,14 +2,25 @@
 """AXL definitions"""
 
 import inspect
+import os
+import pathlib
 
 import ciscocucmapi.api
 
 
 __all__ = [
-    "AXL_API_ENDPOINTS", "AXL_BINDING_NAME", "AXL_ADDRESS", "RISPORT_BINDING_NAME", "RISPORT_ADDRESS",
-    "PERFMON_BINDING_NAME", "PERFMON_ADDRESS", "WSDL_URLS"
+    "PACKAGE_ROOT_PATH",
+    "WSDL_URLS", "WSDL_PATH",
+    "AXL_API_ENDPOINTS", "AXL_BINDING_NAME", "AXL_ADDRESS",
+    "RISPORT_BINDING_NAME", "RISPORT_ADDRESS",
+    "PERFMON_BINDING_NAME", "PERFMON_ADDRESS",
 ]
+
+_ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+PACKAGE_ROOT_PATH = pathlib.Path(_ROOT_DIR)
+WSDL_PATH = PACKAGE_ROOT_PATH.parents[1] / "schema"
+
 
 WSDL_URLS = {
     "RisPort70": "https://{fqdn}:8443/realtimeservice2/services/RISService70?wsdl",
@@ -22,7 +33,6 @@ WSDL_URLS = {
 }
 
 AXL_API_ENDPOINTS = {m[0]: m[1] for m in inspect.getmembers(ciscocucmapi.api, inspect.isclass)}
-
 AXL_BINDING_NAME = "{http://www.cisco.com/AXLAPIService/}AXLAPIBinding"
 AXL_ADDRESS = "https://{fqdn}:8443/axl/"
 
