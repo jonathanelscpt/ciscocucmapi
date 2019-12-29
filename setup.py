@@ -17,22 +17,6 @@ def read(*names, **kwargs):
     ).read()
 
 
-install_requires = [
-    'requests>=2.18.4',
-    'urllib3>=1.22',
-    'zeep>=2.5.0',
-    'lxml>=4.2.1'
-]
-# tests_require = [
-#     'pytest-httpbin==0.0.7',
-#     'pytest-cov',
-#     'pytest-mock',
-#     'pytest-xdist',
-#     'PySocks>=1.5.6, !=1.5.7',
-#     'pytest>=2.8.0'
-# ]
-
-
 setup(
     name="ciscocucmapi",
     version="0.0.1",
@@ -65,8 +49,19 @@ setup(
     keywords=[
         "cisco", "cucm", "uc", "collaboration", "callmanager", "axl",
     ],
-    install_requires=install_requires,
-    # tests_require=tests_require,
+    install_requires=[
+        'requests>=2.18.4',
+        'zeep>=2.5.0'
+    ],
+    tests_require=[
+        # 'pytest-httpbin==0.0.7',
+        # 'pytest-cov',
+        # 'pytest-mock',
+        # 'pytest-xdist',
+        # 'PySocks>=1.5.6, !=1.5.7',
+        # 'pytest>=2.8.0'
+    ]
+    ,
     extras_require={},
     entry_points={},
 )

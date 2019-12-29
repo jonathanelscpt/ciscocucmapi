@@ -86,8 +86,7 @@ class RemoteCluster(SimpleAXLAPI):
         axl_resp = options_method(self.connector.service)
         return self.object_factory(
             "".join([self.__class__.__name__]),
-            serialize_object(axl_resp)["return"]
-        )
+            serialize_object(axl_resp)["return"])
 
 
 class SecureConfig(SimpleAXLAPI):

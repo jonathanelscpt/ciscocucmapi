@@ -386,4 +386,3 @@ class WlanProfileGroup(SimpleAXLAPI):
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
-

@@ -2,8 +2,6 @@
 """AXL definitions"""
 
 
-# API_ENDPOINTS = {api.__name__: api for api in _api_all}
-
 WSDL_URLS = {
     "RisPort70": "https://{fqdn}:8443/realtimeservice2/services/RISService70?wsdl",
     "CDRonDemand": "https://{fqdn}:8443/realtimeservice2/services/CDRonDemandService?wsdl",

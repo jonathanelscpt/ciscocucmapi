@@ -15,10 +15,7 @@ from ..exceptions import AXLFault
 class ApplicationServer(SimpleAXLAPI):
     _factory_descriptor = "application_server"
 
-    def add(self, name, appServerType,
-            ipAddress=None,
-            appUsers=None,
-            **kwargs):
+    def add(self, name, appServerType, ipAddress=None, appUsers=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -27,9 +24,7 @@ class AppServerInfo(SimpleAXLAPI):
     _factory_descriptor = "application_server_info"
     supported_methods = ["model", "create", "add", "get", "update", "remove"]
 
-    def add(self, appServerName, appServerContent,
-            content=None,
-            **kwargs):
+    def add(self, appServerName, appServerContent, content=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -60,10 +55,7 @@ class DateTimeGroup(DeviceAXLAPI):
     _factory_descriptor = "date_time_group"
     supported_methods = ["model", "create", "add", "get", "list", "update", "remove", "apply", "reset"]
 
-    def add(self, name, timeZone,
-            separator="-",
-            dateformat="M-D-Y",
-            **kwargs):
+    def add(self, name, timeZone, separator="-", dateformat="M-D-Y", **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -96,17 +88,9 @@ class DevicePool(DeviceAXLAPI):
 class DhcpServer(SimpleAXLAPI):
     _factory_descriptor = "dhcp_server"
 
-    def add(self, processNodeName,
-            primaryTftpServerIpAddress=None,
-            secondaryTftpServerIpAddress=None,
-            primaryDnsIpAddress=None,
-            secondaryDnsIpAddress=None,
-            domainName=None,
-            arpCacheTimeout=0,
-            ipAddressLeaseTime=0,
-            renewalTime=0,
-            rebindingTime=0,
-            **kwargs):
+    def add(self, processNodeName, primaryTftpServerIpAddress=None, secondaryTftpServerIpAddress=None,
+            primaryDnsIpAddress=None, secondaryDnsIpAddress=None, domainName=None, arpCacheTimeout=0,
+            ipAddressLeaseTime=0, renewalTime=0, rebindingTime=0, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -127,20 +111,11 @@ class EnterprisePhoneConfig(SimpleAXLAPI):
 class DhcpSubnet(SimpleAXLAPI):
     _factory_descriptor = "dhcp_subnet"
 
-    def add(self, dhcpServerName,
-            primaryStartIpAddress, primaryEndIpAddress,
-            subnetIpAddress, subnetMask,
-            primaryRouterIpAddress,  # making this mandatory because... seriously.
-            primaryTftpServerIpAddress=None,
-            secondaryTftpServerIpAddress=None,
-            primaryDnsIpAddress=None,
-            secondaryDnsIpAddress=None,
-            domainName=None,
-            arpCacheTimeout=0,
-            ipAddressLeaseTime=0,
-            renewalTime=0,
-            rebindingTime=0,
-            **kwargs):
+    def add(self, dhcpServerName, primaryStartIpAddress, primaryEndIpAddress, subnetIpAddress, subnetMask,
+            primaryRouterIpAddress,  # making this mandatory for sanity-sake
+            primaryTftpServerIpAddress=None, secondaryTftpServerIpAddress=None, primaryDnsIpAddress=None,
+            secondaryDnsIpAddress=None, domainName=None, arpCacheTimeout=0, ipAddressLeaseTime=0, renewalTime=0,
+            rebindingTime=0, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -165,12 +140,8 @@ class LdapDirectory(SimpleAXLAPI):
         "sync", "get_sync_status",
     ]
 
-    def add(self,
-            name, ldapDn, ldapPassword, userSearchBase, servers,
-            intervalValue=7,
-            scheduleUnit="DAY",
-            nextExecTime=None,
-            **kwargs):
+    def add(self, name, ldapDn, ldapPassword, userSearchBase, servers, intervalValue=7, scheduleUnit="DAY",
+            nextExecTime=None, **kwargs):
         if not nextExecTime:
             nextExecTime = (datetime.now() + timedelta(days=intervalValue+1)).strftime("%y-%m-%d 00:00")
         add_kwargs = flatten_signature_kwargs(self.add, locals())
@@ -221,19 +192,14 @@ class LdapSystem(SimpleAXLAPI):
         axl_resp = self.connector.service.getLdapSystem()
         return serialize_object(axl_resp)["return"][self._return_name]
 
-    def update(self,
-               syncEnabled=True,
-               ldapServer="Microsoft Active Directory",
-               userIdAttribute="sAMAccountName"):
+    def update(self, syncEnabled=True, ldapServer="Microsoft Active Directory", userIdAttribute="sAMAccountName"):
         return super().update(syncEnabled=syncEnabled, ldapServer=ldapServer, userIdAttribute=userIdAttribute)
 
 
 class LbmGroup(SimpleAXLAPI):
     _factory_descriptor = "lbm_group"
 
-    def add(self, name, ProcessnodeActive,
-            ProcessnodeStandby=None,
-            **kwargs):
+    def add(self, name, ProcessnodeActive, ProcessnodeStandby=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -275,10 +241,7 @@ class Location(SimpleAXLAPI):
 class PresenceRedundancyGroup(SimpleAXLAPI):
     _factory_descriptor = "presence_redundancy_group"
 
-    def add(self, name, server1,
-            server2=None,
-            haEnabled=False,
-            **kwargs):
+    def add(self, name, server1, server2=None, haEnabled=False, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 

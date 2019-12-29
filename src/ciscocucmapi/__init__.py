@@ -28,8 +28,4 @@ logger.addHandler(logging.NullHandler())
 
 __all__ = (
     UCMAXLConnector,
-    # UCMControlCenterConnector,
-    # UCMRisPortConnector,
-    # UCMPerfMonConnector,
-    # UCMLogCollectionConnector
 )

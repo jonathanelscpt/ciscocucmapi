@@ -5,12 +5,10 @@ import os
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 from lxml import etree
-# import asyncio
 
 from zeep import Client
 from zeep.cache import SqliteCache
 from zeep.transports import Transport
-# from zeep.asyncio import AsyncTransport
 from requests import Session
 from requests.auth import HTTPBasicAuth
 from zeep.plugins import HistoryPlugin
@@ -58,16 +56,8 @@ class AXLHistoryPlugin(HistoryPlugin):
 class UCSOAPConnector(object):
     """Parent class for all Cisco UC SOAP Connectors"""
 
-    def __init__(self, username=None,
-                 password=None,
-                 wsdl=None,
-                 binding_name=None,
-                 address=None,
-                 tls_verify=False,
-                 timeout=30,
-                 # is_async=False,
-                 history=True,
-                 history_maxlen=1):
+    def __init__(self, username=None, password=None, wsdl=None, binding_name=None, address=None, tls_verify=False,
+                 timeout=30, history=True, history_maxlen=1):
         """Instantiate UC SOAP Client Connector
 
         :param username: SOAP client connector username
@@ -82,7 +72,6 @@ class UCSOAPConnector(object):
         self._username = username
         self._wsdl = wsdl
         self._timeout = timeout
-        # self.is_async = is_async
 
         self._session = Session()
         self._session.auth = HTTPBasicAuth(username, password)
@@ -96,29 +85,17 @@ class UCSOAPConnector(object):
             self._history = AXLHistoryPlugin(maxlen=history_maxlen)
             self._plugins.append(self._history)
 
-        # todo - extend necessary support for async
-        # if self.is_async:
-        #     loop = asyncio.get_event_loop()
-        #     transport = AsyncTransport(loop,
-        #                                cache=SqliteCache(),
-        #                                session=self._session,
-        #                                timeout=self._timeout
-        #                                )
-        # else:
         transport = Transport(cache=SqliteCache(),
                               session=self._session,
-                              timeout=self._timeout
-                              )
+                              timeout=self._timeout)
 
-        # self._client = Client(wsdl=wsdl, transport=transport)
         self._client = Client(wsdl=wsdl, transport=transport, plugins=self._plugins)
         if binding_name and address:
             self._service = self._client.create_service(binding_name, address)
         elif binding_name or address:
             raise TypeError(
                 message="Incomplete parameters for ServiceProxy Object creation.  "
-                        "Requires 'binding_name' and 'address'"
-            )
+                        "Requires 'binding_name' and 'address'")
         self.model_factory = self._client.type_factory('ns0')
 
     @property
@@ -161,9 +138,6 @@ class UCMAXLConnector(UCSOAPConnector):
         connection_kwargs["address"] = "https://{fqdn}:8443/axl/".format(**connection_kwargs)
         del connection_kwargs["fqdn"]  # remove fqdn as not used in super() call
         super().__init__(**connection_kwargs)
-
-        # for api in API_ENDPOINTS.values():
-        #     setattr(self, api.factory_descriptor, api(self, axl_factory))
 
         # sql API wrapper
         self.sql = ThinAXLAPI(self, axl_factory)
@@ -211,7 +185,6 @@ class UCMAXLConnector(UCSOAPConnector):
         self.service_profile = ServiceProfile(self, axl_factory)
         self.user_group = UserGroup(self, axl_factory)
         self.user_profile = UserProfileProvision(self, axl_factory)
-        # self.quick_user_phone_add = _UserPhoneAssociationAPI(self, axl_factory)
 
         # dialplan API wrappers
         self.caller_filter_list = CallerFilterList(self, axl_factory)
@@ -317,182 +290,3 @@ class UCMAXLConnector(UCSOAPConnector):
     def get_ccm_version(self, processNodeName=None):
         axl_resp = self.service.getCCMVersion(processNodeName=processNodeName)
         return serialize_object(axl_resp)["return"]["componentVersion"]["version"]
-
-
-class UCMControlCenterConnector(UCSOAPConnector):
-    """UCM ControlCenter API Connector"""
-
-    def __init__(self, username, password, fqdn, tls_verify=True):
-        _wsdl = WSDL_URLS["ControlCenterServicesExtended"].format(fqdn)
-        super().__init__(username=username,
-                         password=password,
-                         wsdl=_wsdl,
-                         tls_verify=tls_verify)
-
-    def get_service_status(self, services=None):
-        # check this comment on factory creation:
-        # https://github.com/mvantellingen/python-zeep/issues/145#issuecomment-261509531
-
-        # if not services:
-        #     return self.service.soapGetServiceStatus()
-        # else:
-        #     return self.service.soapGetServiceStatus(services)
-        raise NotImplementedError()
-
-    def do_service_deployment(self):
-        # todo
-        # return self.service.soapDoServiceDeployment()
-        raise NotImplementedError()
-
-    def get_product_information_list(self):
-        # todo
-        # return self.service.getProductInformationList()
-        raise NotImplementedError()
-
-
-class UCMRisPortConnector(UCSOAPConnector):
-    """UCM RisPort API Connector"""
-
-    def __init__(self, username, password, fqdn, tls_verify=False):
-        _wsdl = WSDL_URLS["RisPort70"].format(fqdn)
-        _binding_name = "{http://schemas.cisco.com/ast/soap}RisBinding"
-        _address = f"https://{fqdn}:8443/realtimeservice2/services/RISService70"
-        super().__init__(username=username,
-                         password=password,
-                         wsdl=_wsdl,
-                         binding_name=_binding_name,
-                         address=_address,
-                         tls_verify=tls_verify)
-
-    def select_cm_device(self, state_info=None, **cm_selection_criteria):
-        # device_class = "Any",
-        # status = "Any",
-        # max_devices = 1000,
-        # model = 255,
-        # selection_type = None,
-        # node_name = None
-        #
-        _max_devices = 1000  # assume CUCM 9.1 and above only
-        _all_models = 255  # returns all models
-
-        # return self.service.selectCmDevice(state_info, {"CmSelectionCriteria": cm_selection_criteria})
-        raise NotImplementedError()
-
-    def select_cm_device_ext(self):
-        # return self.service.SelectCmDeviceExt
-        raise NotImplementedError()
-
-    def select_cti_item(self):
-        # return self.service.selectCtiItem
-        raise NotImplementedError()
-
-    def select_cm_device_sip(self):
-        # return self.service.SelectCmDeviceSIP
-        raise NotImplementedError()
-
-
-class UCMPerfMonConnector(UCSOAPConnector):
-    """UCM PerfMon API Connector"""
-
-    def __init__(self, username, password, fqdn, tls_verify=False):
-        _wsdl = WSDL_URLS["PerfMon"].format(fqdn)
-        _binding_name = "{http://schemas.cisco.com/ast/soap}PerfmonBinding"
-        _address = f"https://{fqdn}:8443/perfmonservice2/services/PerfmonService"
-        super().__init__(username=username,
-                         password=password,
-                         wsdl=_wsdl,
-                         binding_name=_binding_name,
-                         address=_address,
-                         tls_verify=tls_verify)
-
-    def open_session(self):
-        # todo
-        # return self.service.perfmonOpenSession()
-        raise NotImplementedError()
-
-    def add_counter(self, session_handle, counters):
-        """
-        :param session_handle: A session Handle returned from perfmonOpenSession()
-        :param counters: An array of counters or a single string for a single counter
-        :return: True for Success and False for Failure
-        """
-        # todo - fix unreferenced counter_data var
-        if isinstance(counters, list):
-            counter_data = [
-                {
-                    'Counter': []
-                }
-            ]
-
-            for counter in counters:
-                new_counter = {
-                    'Name': counter
-                }
-                counter_data['Counter'].append(new_counter)
-
-        elif counters is not None:
-            counter_data = [
-                {
-                    'Counter': [
-                        {
-                            'Name': counters
-                        }
-                    ]
-                }
-            ]
-
-        try:
-            self.service.perfmonAddCounter(SessionHandle=session_handle, ArrayOfCounter=counter_data)
-            result = True
-        # todo - fix except - bubble to the top with custom exception?
-        except:
-            result = False
-
-        # return result
-        raise NotImplementedError()
-
-    def remove_counter(self):
-        # todo
-        # return self.service.perfmonRemoveCounter()
-        raise NotImplementedError()
-
-    def collect_session_data(self, session_handle):
-        # todo
-        # return self.service.perfmonCollectSessionData(SessionHandle=session_handle)
-        raise NotImplementedError()
-
-    def close_session(self):
-        # todo
-        # return self.service.perfmonCloseSession()
-        raise NotImplementedError()
-
-    def list_instance(self):
-        # todo
-        # return self.service.perfmonListInstance()
-        raise NotImplementedError()
-
-    def query_counter_description(self):
-        # todo
-        # return self.service.perfmonQueryCounterDescription()
-        raise NotImplementedError()
-
-    def list_counter(self):
-        # todo
-        # return self.service.perfmonListCounter()
-        raise NotImplementedError()
-
-    def collect_counter_data(self):
-        # todo
-        # return self.service.perfmonCollectCounterData()
-        raise NotImplementedError()
-
-
-class UCMLogCollectionConnector(UCSOAPConnector):
-    """UCM Log Collection API Connector"""
-
-    def __init__(self, username, password, fqdn, tls_verify=False):
-        _wsdl = WSDL_URLS["LogCollection"].format(fqdn)
-        super().__init__(username=username,
-                         password=password,
-                         wsdl=_wsdl,
-                         tls_verify=tls_verify)

@@ -12,11 +12,7 @@ from .._internal_utils import flatten_signature_kwargs
 class AppUser(SimpleAXLAPI):
     _factory_descriptor = "application_user"
 
-    def add(self, userid,
-            associatedDevices=None,
-            associatedGroups=None,
-            ctiControlledDeviceProfiles=None,
-            **kwargs):
+    def add(self, userid, associatedDevices=None, associatedGroups=None, ctiControlledDeviceProfiles=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -24,13 +20,8 @@ class AppUser(SimpleAXLAPI):
 class ApplicationUserCapfProfile(SimpleAXLAPI):
     _factory_descriptor = "application_user_capf_profile"
 
-    def add(self, applicationUser, instanceId,
-            certificateOperation="No Pending Operation",
-            authenticationMode="By Null String",
-            keySize=2014,
-            keyOrder="RSA Only",
-            ecKeySize=None,
-            **kwargs):
+    def add(self, applicationUser, instanceId, certificateOperation="No Pending Operation",
+            authenticationMode="By Null String", keySize=2014, keyOrder="RSA Only", ecKeySize=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -38,13 +29,8 @@ class ApplicationUserCapfProfile(SimpleAXLAPI):
 class EndUserCapfProfile(SimpleAXLAPI):
     _factory_descriptor = "end_user_capf_profile"
 
-    def add(self, endUserId, instanceId,
-            certificateOperation="No Pending Operation",
-            authenticationMode="By Null String",
-            keySize=2014,
-            keyOrder="RSA Only",
-            ecKeySize=None,
-            **kwargs):
+    def add(self, endUserId, instanceId, certificateOperation="No Pending Operation",
+            authenticationMode="By Null String", keySize=2014, keyOrder="RSA Only", ecKeySize=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -52,15 +38,8 @@ class EndUserCapfProfile(SimpleAXLAPI):
 class FeatureGroupTemplate(SimpleAXLAPI):
     _factory_descriptor = "feature_group_template"
 
-    def add(self, name,
-            serviceProfile=None,
-            userProfile=None,
-            homeCluster=True,
-            imAndUcPresenceEnable=True,
-            meetingInformation=True,
-            allowCTIControl=True,
-            BLFPresenceGp="Standard Presence group",
-            **kwargs):
+    def add(self, name, serviceProfile=None, userProfile=None, homeCluster=True, imAndUcPresenceEnable=True,
+            meetingInformation=True, allowCTIControl=True, BLFPresenceGp="Standard Presence group", **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -69,13 +48,8 @@ class SelfProvisioning(SimpleAXLAPI):
     _factory_descriptor = "self_provisioning"
     supported_methods = ["update"]
 
-    def update(self,
-               requireAuthentication=False,
-               allowAuthentication=False,
-               authenticationCode=None,
-               ctiRoutePoint=None,
-               applicationUser=None,
-               **kwargs):
+    def update(self, requireAuthentication=False, allowAuthentication=False, authenticationCode=None,
+               ctiRoutePoint=None, applicationUser=None, **kwargs):
         update_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().update(**update_kwargs)
 
@@ -132,16 +106,11 @@ class User(SimpleAXLAPI):
     _factory_descriptor = "user"
     supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "change_dnd_status"]
 
-    def add(self, userid, lastName,
-            presenceGroupName="Standard Presence group",
-            **kwargs):
+    def add(self, userid, lastName, presenceGroupName="Standard Presence group", **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
-    def change_dnd_status(self,
-                          userID=None,
-                          uuid=None,
-                          dndStatus=False):
+    def change_dnd_status(self, userID=None, uuid=None, dndStatus=False):
         """Change Do Not Disturb status for user
 
         :param userID: (str) userid
@@ -165,35 +134,10 @@ class UserGroup(SimpleAXLAPI):
         return super().add(**add_kwargs)
 
 
-# class UserPhoneAssociation(AbstractAXLAPI):
-#     _factory_descriptor = "quick_user_phone_add"
-#
-#     def add(self, userId, lastName, extension,
-#             firstName=None,
-#             routePartitionName=None,
-#             name=None, productType=None,
-#             **kwargs):
-#         return super().add(**flatten_signature_args(self.add, locals()))
-#
-#     def get(self, returnedTags=None, **kwargs):
-#         raise AXLMethodDoesNotExist()
-#
-#     def update(self, **kwargs):
-#         raise AXLMethodDoesNotExist()
-#
-#     def list(self, searchCriteria=None, returnedTags=None, skip=None, first=None):
-#         raise AXLMethodDoesNotExist()
-#
-#     def remove(self, **kwargs):
-#         raise AXLMethodDoesNotExist()
-
-
 class UserProfileProvision(SimpleAXLAPI):
     _factory_descriptor = "user_profile"
 
-    def add(self, name,
-            profile=None, deskPhones=None, mobileDevices=None, defaultUserProfile=None,
-            universalLineTemplate=None, allowProvision=False,
-            **kwargs):
+    def add(self, name, profile=None, deskPhones=None, mobileDevices=None, defaultUserProfile=None,
+            universalLineTemplate=None, allowProvision=False, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)

@@ -151,8 +151,7 @@ class SimpleAXLAPI(BaseAXLAPI):
         axl_resp = self._axl_methodcaller(action, **kwargs)
         return self.object_factory(
             self.__class__.__name__,
-            serialize_object(axl_resp)["return"][self._return_name]
-        )
+            serialize_object(axl_resp)["return"][self._return_name])
 
     def _serialize_uuid_resp(self, action, **kwargs):
         """Serialize commons responses that return a uuid string only
@@ -236,12 +235,8 @@ class SimpleAXLAPI(BaseAXLAPI):
             returnedTags = get_model_dict(list_model)
         elif isinstance(returnedTags, list):
             returnedTags = nullstring_dict(returnedTags)
-        axl_resp = self._axl_methodcaller("list",
-                                          searchCriteria=searchCriteria,
-                                          returnedTags=returnedTags,
-                                          skip=skip,
-                                          first=first
-                                          )
+        axl_resp = self._axl_methodcaller("list", searchCriteria=searchCriteria, returnedTags=returnedTags,
+                                          skip=skip, first=first)
         try:
             axl_list = serialize_object(axl_resp)["return"][self._return_name]
             return [self.object_factory(self.__class__.__name__, item) for item in axl_list]
@@ -319,13 +314,11 @@ class ThinAXLAPI(BaseAXLAPI):
             axl_resp = self.connector.service.executeSQLQuery(sql=sql_statement)
             try:
                 serialized_resp = element_list_to_ordered_dict(
-                    serialize_object(axl_resp)["return"]["rows"]
-                )
+                    serialize_object(axl_resp)["return"]["rows"])
             except KeyError:
                 # single tuple response
                 serialized_resp = element_list_to_ordered_dict(
-                    serialize_object(axl_resp)["return"]["row"]
-                )
+                    serialize_object(axl_resp)["return"]["row"])
             except TypeError:
                 # no SQL tuples
                 serialized_resp = serialize_object(axl_resp)["return"]

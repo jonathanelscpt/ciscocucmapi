@@ -10,10 +10,7 @@ from .._internal_utils import flatten_signature_kwargs
 class BillingServer(SimpleAXLAPI):
     _factory_descriptor = "billing_server"
 
-    def add(self, hostName, userId, password,
-            directory="/",
-            resendOnFailure=True,
-            billingServerProtocol="SFTP",
+    def add(self, hostName, userId, password, directory="/", resendOnFailure=True, billingServerProtocol="SFTP",
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
@@ -32,9 +29,7 @@ class SNMPCommunityString(SimpleAXLAPI):
         super().__init__(connector, object_factory)
         self._return_name = self.__class__.__name__
 
-    def add(self, communityName, ArrayOfHosts,
-            accessPrivilege=None,
-            **kwargs):
+    def add(self, communityName, ArrayOfHosts, accessPrivilege=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -44,8 +39,7 @@ class SNMPCommunityString(SimpleAXLAPI):
         axl_resp = self.connector.service.getSNMPCommunityString(communityName=communityName)
         return self.object_factory(
             self.__class__.__name__,
-            serialize_object(axl_resp)["return"][self._return_name]
-        )
+            serialize_object(axl_resp)["return"][self._return_name] )
 
 
 class SNMPMIB2List(SimpleAXLAPI):
@@ -62,8 +56,7 @@ class SNMPMIB2List(SimpleAXLAPI):
         axl_resp = self.connector.service.getSNMPMIB2List(sysContact=sysContact)
         return self.object_factory(
             self.__class__.__name__,
-            serialize_object(axl_resp)["return"][self._return_name]
-        )
+            serialize_object(axl_resp)["return"][self._return_name])
 
 
 class SNMPUser(SimpleAXLAPI):
@@ -74,15 +67,8 @@ class SNMPUser(SimpleAXLAPI):
         super().__init__(connector, object_factory)
         self._return_name = self.__class__.__name__
 
-    def add(self, userName, ArrayOfHosts,
-            accessPrivilege=None,
-            authRequired=True,
-            authPassword=None,
-            authProtocol="SHA",
-            privacyRequired=True,
-            privacyPassword=None,
-            privacyProtocol="AES128",
-            **kwargs):
+    def add(self, userName, ArrayOfHosts, accessPrivilege=None, authRequired=True, authPassword=None,
+            authProtocol="SHA", privacyRequired=True, privacyPassword=None, privacyProtocol="AES128", **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -100,17 +86,10 @@ class SyslogConfiguration(SimpleAXLAPI):
     _factory_descriptor = "syslog_configuration"
     supported_methods = ["get", "update"]
 
-    def get(self, serverName,
-            serviceGroup="CM Services",
-            service="Cisco CallManager",
-            **kwargs):
+    def get(self, serverName, serviceGroup="CM Services", service="Cisco CallManager", **kwargs):
         get_kwargs = flatten_signature_kwargs(self.get, locals())
         return super().get(**get_kwargs)
 
-    def update(self, serverName,
-               serviceGroup="CM Services",
-               service="Cisco CallManager",
-               alarmConfigs=None,
-               ):
+    def update(self, serverName, serviceGroup="CM Services", service="Cisco CallManager", alarmConfigs=None):
         update_kwargs = flatten_signature_kwargs(self.update, locals())
         return super().update(**update_kwargs)

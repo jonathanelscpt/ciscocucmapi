@@ -56,11 +56,9 @@ with open("/path/to/templates/phone.json", "w") as _:
 
 # getting existing phones with null-string dicts or lists of `returnedTags`
 dead_device = axl.phone.get(name="SEPDEADDEADDEAD", 
-                            returnedTags={"name": "", "devicePoolName": "", "callingSearchSpaceName": ""}
-                            )
+                            returnedTags={"name": "", "devicePoolName": "", "callingSearchSpaceName": ""})
 beefy_device = axl.phone.get(name="SEPBEEFBEEFBEEF", 
-                             returnedTags=["name", "devicePoolName", "callingSearchSpaceName"]
-                             )
+                             returnedTags=["name", "devicePoolName", "callingSearchSpaceName"])
 
 # listing phones by name
 nyc_bot_attrs = {
@@ -69,8 +67,7 @@ nyc_bot_attrs = {
     "callingSearchSpaceName": "US_%"
 }
 nyc_bot_devices = axl.phone.list(searchCriteria=nyc_bot_attrs,
-                                 returnedTags=["name", "description", "lines"]
-                                 )
+                                 returnedTags=["name", "description", "lines"])
 # implicit "return all" available for `searchCriteria` and `returnedTags` - use sparingly for large data sets!
 all_devices = axl.phone.list()
 
@@ -85,8 +82,7 @@ botuser15.locationName = "Hub_None"
 axl.phone.update(name=botuser15.name,
                  newName=botuser15.newName,
                  callingSearchSpaceName=botuser15.callingSearchSpaceName,
-                 locationName=botuser15.locationName
-                 )
+                 locationName=botuser15.locationName)
 
 # deleting a phone
 axl.phone.remove(uuid=botuser15.uuid) 
@@ -100,7 +96,7 @@ numplan.csv(destination_path="/path/to/datadump/numplan.csv")  # pathlib also su
 
 ### Connector Environment Variables
  
- The following env vars are supported for easy of use:
+ The following env vars are supported for ease of use:
  
  - `AXL_USERNAME`
  - `AXL_PASSWORD`
@@ -151,8 +147,6 @@ donations are most welcome:
 | :---:  | :---:  |
 | **BTC** | 3EFVaakujecqhEmNkah5Q5gkpNbyy251os |
 | **ETH** | 0xb44b637e99b32b9f12ba9430ff823cabb3ca7db5 |
-| **BCH** | 38YJXxgchDgSjzd8b91LkmcbQSy1q6ruYx |
-| **LTC** | MTJKDiS8Jv9qG9iYGWHyhTrAL6oynFwQw1 |
  
  
 ## Support

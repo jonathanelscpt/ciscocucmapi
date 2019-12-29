@@ -34,11 +34,7 @@ class AarGroup(SimpleAXLAPI):
 class AdvertisedPatterns(SimpleAXLAPI):
     _factory_descriptor = "advertised_patterns"
 
-    def add(self, pattern,
-            patternType="Enterprise Number",
-            hostedRoutePSTNRule="No PSTN",
-            pstnFailStrip=0,
-            **kwargs):
+    def add(self, pattern, patternType="Enterprise Number", hostedRoutePSTNRule="No PSTN", pstnFailStrip=0, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -46,12 +42,7 @@ class AdvertisedPatterns(SimpleAXLAPI):
 class ApplicationDialRules(SimpleAXLAPI):
     _factory_descriptor = "application_dial_rules"
 
-    def add(self, name,
-            numberBeginWith=None,
-            prefixPattern=None,
-            numberOfDigits=0,
-            digitsToBeRemoved=0,
-            **kwargs):
+    def add(self, name, numberBeginWith=None, prefixPattern=None, numberOfDigits=0, digitsToBeRemoved=0, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -59,12 +50,7 @@ class ApplicationDialRules(SimpleAXLAPI):
 class BlockedLearnedPatterns(SimpleAXLAPI):
     _factory_descriptor = "blocked_learned_patterns"
 
-    def add(self,
-            pattern=None,
-            prefix=None,
-            clusterId=None,
-            patternType=None,
-            **kwargs):
+    def add(self, pattern=None, prefix=None, clusterId=None, patternType=None, **kwargs):
         if not (pattern or prefix or clusterId):
             criteria = ("pattern", "prefix", "clusterId")
             raise ValueError(f"At least one of the following criteria must be specified: {criteria}")
@@ -75,11 +61,7 @@ class BlockedLearnedPatterns(SimpleAXLAPI):
 class CallerFilterList(SimpleAXLAPI):
     _factory_descriptor = "caller_filter_list"
 
-    def add(self, name,
-            isAllowedType=False,
-            endUse=None,
-            members=None,
-            **kwargs):
+    def add(self, name, isAllowedType=False, endUse=None, members=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -127,11 +109,7 @@ class CmcInfo(SimpleAXLAPI):
 class ConferenceNow(SimpleAXLAPI):
     _factory_descriptor = "conference_now"
 
-    def add(self, conferenceNowNumber,
-            routePartitionName=None,
-            maxWaitTimeForHost=15,
-            MohAudioSourceId=None,
-            **kwargs):
+    def add(self, conferenceNowNumber, routePartitionName=None, maxWaitTimeForHost=15, MohAudioSourceId=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -157,12 +135,7 @@ class DirectoryLookupDialRules(SimpleAXLAPI):
     _factory_descriptor = "directory_lookup_rules"
     supported_methods = ["model", "create", "add", "get", "update", "list", "remove"]
 
-    def add(self, name,
-            priority=0,
-            numberBeginWith=None,
-            numberOfDigits=0,
-            digitsToBeRemoved=0,
-            prefixPattern=None,
+    def add(self, name, priority=0, numberBeginWith=None, numberOfDigits=0, digitsToBeRemoved=0, prefixPattern=None,
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
@@ -179,10 +152,7 @@ class ElinGroup(SimpleAXLAPI):
 class EnterpriseFeatureAccessConfiguration(SimpleAXLAPI):
     _factory_descriptor = "mobility_enterprise_feature_access_number"
 
-    def add(self, patter,
-            routePartitionName=None,
-            isDefaultEafNumber=False,
-            **kwargs):
+    def add(self, pattern, routePartitionName=None, isDefaultEafNumber=False, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -199,9 +169,7 @@ class HandoffConfiguration(SimpleAXLAPI):
     _factory_descriptor = "handoff_configuration"
     supported_methods = ["add", "get", "remove", "update"]
 
-    def add(self, pattern,
-            routePartitionName=None,
-            **kwargs):
+    def add(self, pattern, routePartitionName=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -210,10 +178,7 @@ class HttpProfile(SimpleAXLAPI):
     _factory_descriptor = "http_profile"
     supported_methods = ["add", "get", "remove", "update"]
 
-    def add(self, name, userName, password, webServiceRootUri,
-            requestTimeout=60000,
-            retryCount=4,
-            **kwargs):
+    def add(self, name, userName, password, webServiceRootUri, requestTimeout=60000, retryCount=4, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -222,9 +187,7 @@ class HuntList(DeviceAXLAPI):
     _factory_descriptor = "hunt_list"
     supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "reset"]
 
-    def add(self, name,callManagerGroupName,
-            routeListEnabled=True,
-            **kwargs):
+    def add(self, name,callManagerGroupName, routeListEnabled=True, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -256,10 +219,7 @@ class LocalRouteGroup(SimpleAXLAPI):
 class MeetMe(SimpleAXLAPI):
     _factory_descriptor = "meetme"
 
-    def add(self, pattern,
-            routePartitionName=None,
-            minimumSecurityLevel="Non Secure",
-            **kwargs):
+    def add(self, pattern, routePartitionName=None, minimumSecurityLevel="Non Secure", **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -268,9 +228,7 @@ class Mobility(SimpleAXLAPI):
     _factory_descriptor = "handoff_mobility"
     supported_methods = ["model", "create", "add", "get", "update"]
 
-    def add(self, handoffNumber,
-            handoffPartitionName=None,
-            **kwargs):
+    def add(self, handoffNumber, handoffPartitionName=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -278,12 +236,8 @@ class Mobility(SimpleAXLAPI):
 class MobilityProfile(SimpleAXLAPI):
     _factory_descriptor = "mobility_profile"
 
-    def add(self, name,
-            mobileClientCallingOption="Dial via Office Reverse",
-            dvofServiceAccessNumber=None,
-            dirn=None,
-            dvorCallerId=None,
-            **kwargs):
+    def add(self, name, mobileClientCallingOption="Dial via Office Reverse", dvofServiceAccessNumber=None, dirn=None,
+            dvorCallerId=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -291,9 +245,7 @@ class MobilityProfile(SimpleAXLAPI):
 class RouteGroup(SimpleAXLAPI):
     _factory_descriptor = "route_group"
 
-    def add(self, name, members,
-            distributionAlgorithm="Circular",
-            **kwargs):
+    def add(self, name, members, distributionAlgorithm="Circular", **kwargs):
         _check_route_group_port_assignment(members)
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
@@ -303,9 +255,7 @@ class RouteList(DeviceAXLAPI):
     _factory_descriptor = "route_list"
     supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "reset"]
 
-    def add(self, name, callManagerGroupName,
-            runOnEveryNode=True,
-            routeListEnabled=True,
+    def add(self, name, callManagerGroupName, runOnEveryNode=True, routeListEnabled=True,
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
@@ -324,8 +274,7 @@ class RoutePartitionsForLearnedPatterns(SimpleAXLAPI):
     _factory_descriptor = "route_partitions_for_learned_patterns"
     supported_methods = ["update"]
 
-    def update(self,
-               partitionForEnterpriseANo="Global Learned Enterprise Numbers",
+    def update(self, partitionForEnterpriseANo="Global Learned Enterprise Numbers",
                partitionForE164ANo="Global Learned E164 Numbers",
                partitionForEnterprisePatterns="Global Learned E164 Patterns",
                partitionForE164Pattern="Global Learned Enterprise Patterns",
@@ -343,11 +292,8 @@ class RoutePartitionsForLearnedPatterns(SimpleAXLAPI):
 class RoutePattern(SimpleAXLAPI):
     _factory_descriptor = "route_pattern"
 
-    def add(self, pattern, routePartitionName, destination,
-            blockEnable=False,
-            provideOutsideDialtone=True,
-            networkLocation="OffNet",
-            **kwargs):
+    def add(self, pattern, routePartitionName, destination, blockEnable=False, provideOutsideDialtone=True,
+            networkLocation="OffNet", **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -360,11 +306,7 @@ class RoutePlan(SimpleAXLAPI):
 class SipDialRules(SimpleAXLAPI):
     _factory_descriptor = "sip_dial_rules"
 
-    def add(self, name,
-            patterns=None,
-            plars=None,
-            dialPattern="7940_7960_OTHER",
-            **kwargs):
+    def add(self, name, patterns=None, plars=None, dialPattern="7940_7960_OTHER", **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -372,9 +314,7 @@ class SipDialRules(SimpleAXLAPI):
 class SipRoutePattern(SimpleAXLAPI):
     _factory_descriptor = "sip_route_pattern"
 
-    def add(self, pattern, routePartitionName, sipTrunkName,
-            usage="Domain Routing",
-            **kwargs):
+    def add(self, pattern, routePartitionName, sipTrunkName, usage="Domain Routing", **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -399,10 +339,7 @@ class TransPattern(SimpleAXLAPI):
     _factory_descriptor = "translation_pattern"
     supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "options"]
 
-    def add(self, pattern, routePartitionName,
-            usage="Translation",
-            provideOutsideDialtone=True,
-            patternUrgency=True,
+    def add(self, pattern, routePartitionName, usage="Translation", provideOutsideDialtone=True, patternUrgency=True,
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
