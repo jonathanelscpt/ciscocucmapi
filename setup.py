@@ -54,7 +54,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Communications :: Telephony',
         'Topic :: Communications :: Conferencing',
-        'Topic :: System :: Systems Administration'
+        'Topic :: System :: Systems Administration',
         'Topic :: Utilities',
     ],
     project_urls={
