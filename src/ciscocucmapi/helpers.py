@@ -1,7 +1,7 @@
 """Package helper functions and classes"""
 
-import json
 import csv
+import json
 from collections import OrderedDict
 from collections.abc import MutableMapping
 from pathlib import Path

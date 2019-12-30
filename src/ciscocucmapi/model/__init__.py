@@ -2,8 +2,8 @@
 
 from collections import defaultdict
 
-from .axldata import AXLDataModel, ThinAXLDataModel
-
+from .axldata import AXLDataModel
+from .axldata import ThinAXLDataModel
 
 axl_data_models = defaultdict(
     lambda: AXLDataModel,

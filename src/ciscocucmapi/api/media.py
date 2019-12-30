@@ -1,7 +1,8 @@
 """CUCM Media Configuration APIs."""
 
-from .base import DeviceAXLAPI, SimpleAXLAPI
 from .._internal_utils import flatten_signature_kwargs
+from .base import DeviceAXLAPI
+from .base import SimpleAXLAPI
 
 
 class Announcement(SimpleAXLAPI):

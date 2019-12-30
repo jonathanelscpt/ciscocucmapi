@@ -1,8 +1,10 @@
 """CUCM Dial Plan Configuration APIs."""
 
 from zeep.helpers import serialize_object
-from .base import DeviceAXLAPI, SimpleAXLAPI
+
 from .._internal_utils import flatten_signature_kwargs
+from .base import DeviceAXLAPI
+from .base import SimpleAXLAPI
 
 
 def _check_route_group_port_assignment(members):
@@ -346,4 +348,3 @@ class TransPattern(SimpleAXLAPI):
     def get(self, dialPlanName=None, routeFilterName=None, returnedTags=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().get(**add_kwargs)
-

@@ -1,20 +1,20 @@
 """python-zeep client wrappers for Cisco UC SOAP APIs"""
 
 import os
-import urllib3
-from urllib3.exceptions import InsecureRequestWarning
-from lxml import etree
 
-from zeep import Client
-from zeep.cache import SqliteCache
-from zeep.transports import Transport
+import urllib3
+from lxml import etree
 from requests import Session
 from requests.auth import HTTPBasicAuth
+from urllib3.exceptions import InsecureRequestWarning
+from zeep import Client
+from zeep.cache import SqliteCache
 from zeep.plugins import HistoryPlugin
+from zeep.transports import Transport
 
-from .model import axl_factory
-from .definitions import WSDL_URLS
 from .api import *
+from .definitions import WSDL_URLS
+from .model import axl_factory
 
 
 def get_connection_kwargs(env_dict, kwargs):

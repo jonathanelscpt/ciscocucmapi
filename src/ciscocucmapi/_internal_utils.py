@@ -1,7 +1,8 @@
 """Package helper functions and classes."""
 
+from collections import Iterable
+from collections import OrderedDict
 from inspect import signature
-from collections import OrderedDict, Iterable
 
 
 def element_list_to_ordered_dict(elements):
@@ -57,4 +58,3 @@ def get_signature_locals(f, loc):
 def nullstring_dict(returnedTags):
     """Convert list to nullstring dict"""
     return {_: "" for _ in returnedTags}
-

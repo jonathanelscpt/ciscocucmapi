@@ -1,8 +1,9 @@
-from .base import ThinAXLAPI, Device
+from .advanced import *
+from .base import Device
+from .base import ThinAXLAPI
 from .device import *
-from .user import *
 from .dialplan import *
-from .system import *
 from .media import *
 from .serviceability import *
-from .advanced import *
+from .system import *
+from .user import *
