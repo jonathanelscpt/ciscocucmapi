@@ -188,7 +188,7 @@ class HuntList(DeviceAXLAPI):
     _factory_descriptor = "hunt_list"
     supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "apply", "reset"]
 
-    def add(self, name,callManagerGroupName, routeListEnabled=True, **kwargs):
+    def add(self, name, callManagerGroupName, routeListEnabled=True, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 

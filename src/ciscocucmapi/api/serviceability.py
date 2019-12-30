@@ -38,7 +38,7 @@ class SNMPCommunityString(SimpleAXLAPI):
         axl_resp = self.connector.service.getSNMPCommunityString(communityName=communityName)
         return self.object_factory(
             self.__class__.__name__,
-            serialize_object(axl_resp)["return"][self._return_name] )
+            serialize_object(axl_resp)["return"][self._return_name])
 
 
 class SNMPMIB2List(SimpleAXLAPI):

@@ -45,8 +45,7 @@ class AXLDataModel(MutableMapping):
 
     def __eq__(self, other):
         """AXL objects equality using on uuid"""
-        return (isinstance(other, self.__class__)
-                and self._axl_data.__eq__(other))
+        return isinstance(other, self.__class__) and self._axl_data.__eq__(other)
 
     def __ne__(self, other):
         """AXL objects non-equality using uuid"""

@@ -1,7 +1,6 @@
 """Base AXL APIs"""
 
 import functools
-from collections import OrderedDict
 from operator import methodcaller
 
 from zeep.exceptions import Fault
@@ -15,7 +14,6 @@ from .._internal_utils import downcase_string
 from .._internal_utils import element_list_to_ordered_dict
 from .._internal_utils import flatten_signature_kwargs
 from .._internal_utils import nullstring_dict
-from ..exceptions import AXLFault
 from ..exceptions import IllegalSQLStatement
 from ..helpers import get_model_dict
 from ..helpers import sanitize_model_dict

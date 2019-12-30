@@ -71,8 +71,7 @@ setup(
         'zeep>=2.5.0'
     ],
     extras_require={
-        # eg:
-        #   'rst': ['docutils>=0.11'],
+          'rst': ['docutils>=0.11'],
         #   ':python_version=="2.6"': ['argparse'],
     },
     entry_points={

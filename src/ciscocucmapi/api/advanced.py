@@ -2,11 +2,9 @@
 
 from operator import methodcaller
 
-from zeep.exceptions import Fault
 from zeep.helpers import serialize_object
 
 from .._internal_utils import flatten_signature_kwargs
-from ..exceptions import AXLFault
 from ..helpers import get_model_dict
 from .base import DeviceAXLAPI
 from .base import SimpleAXLAPI
@@ -25,12 +23,8 @@ class DirNumberAliasLookupandSync(SimpleAXLAPI):
     _factory_descriptor = "directory_number_alias_sync"
 
     def add(self, ldapConfigName, ldapManagerDisgName, ldapPassword, ldapUserSearch, servers,
-            ldapDirectoryServerUsage="DirSync",
-            enableCachingofRecords=False,
-            sipAliasSuffix=None,
-            keepAliveSearch=None,
-            keepAliveTime=5,
-            **kwargs):
+            ldapDirectoryServerUsage="DirSync", enableCachingofRecords=False, sipAliasSuffix=None,
+            keepAliveSearch=None, keepAliveTime=5, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -53,10 +47,7 @@ class IlsConfig(SimpleAXLAPI):
 class MessageWaiting(SimpleAXLAPI):
     _factory_descriptor = "mwi_number"
 
-    def add(self, pattern,
-            routePartitionName=None,
-            callingSearchSpaceName=None,
-            messageWaitingIndicator=False,
+    def add(self, pattern, routePartitionName=None, callingSearchSpaceName=None, messageWaitingIndicator=False,
             **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
@@ -66,14 +57,8 @@ class RemoteCluster(SimpleAXLAPI):
     _factory_descriptor = "remote_cluster"
     supported_methods = ["model", "create", "add", "get", "update", "list", "remove", "do_update"]
 
-    def add(self, clusterId, fullyQualifiedName,
-            emcc=None,
-            pstnAccess=None,
-            rsvpAgent=None,
-            tftp=None,
-            lbm=None,
-            uds=None,
-            **kwargs):
+    def add(self, clusterId, fullyQualifiedName, emcc=None, pstnAccess=None, rsvpAgent=None, tftp=None, lbm=None,
+            uds=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -93,15 +78,11 @@ class SecureConfig(SimpleAXLAPI):
     _factory_descriptor = "secure_config"
     supported_methods = ["get", "update"]
 
-    def get(self, name="NativeEmergencyCallHandling",
-            returnedTags=None,
-            **kwargs):
+    def get(self, name="NativeEmergencyCallHandling", returnedTags=None, **kwargs):
         get_kwargs = flatten_signature_kwargs(self.get, locals())
         return super().get(**get_kwargs)
 
-    def update(self, name="NativeEmergencyCallHandling",
-               value="Enabled",
-               **kwargs):
+    def update(self, name="NativeEmergencyCallHandling", value="Enabled", **kwargs):
         update_kwargs = flatten_signature_kwargs(self.get, locals())
         return super().get(**update_kwargs)
 
@@ -125,9 +106,7 @@ class VoiceMailProfile(DeviceAXLAPI):
 class VpnGateway(SimpleAXLAPI):
     _factory_descriptor = "vpn_gateway"
 
-    def add(self, name, url, certificates,
-            vpnGateways=None,
-            **kwargs):
+    def add(self, name, url, certificates, vpnGateways=None, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 
@@ -145,13 +124,7 @@ class VpnGroup(SimpleAXLAPI):
 class VpnProfile(SimpleAXLAPI):
     _factory_descriptor = "vpn_profile"
 
-    def add(self, name,
-            autoNetworkDetection=False,
-            mtu=1920,
-            failToConnect=30,
-            enableHostIdCheck=True,
-            clientAuthentication="User and Password",
-            pwdPersistant=False,
-            **kwargs):
+    def add(self, name, autoNetworkDetection=False, mtu=1920, failToConnect=30, enableHostIdCheck=True,
+            clientAuthentication="User and Password", pwdPersistant=False, **kwargs):
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)

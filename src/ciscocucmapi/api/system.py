@@ -3,13 +3,11 @@
 from datetime import datetime
 from datetime import timedelta
 
-from zeep.exceptions import Fault
 from zeep.helpers import serialize_object
 
 from .._internal_utils import flatten_signature_kwargs
 from .._internal_utils import get_signature_locals
 from .._internal_utils import nullstring_dict
-from ..exceptions import AXLFault
 from ..helpers import get_model_dict
 from .base import DeviceAXLAPI
 from .base import SimpleAXLAPI
@@ -146,7 +144,7 @@ class LdapDirectory(SimpleAXLAPI):
     def add(self, name, ldapDn, ldapPassword, userSearchBase, servers, intervalValue=7, scheduleUnit="DAY",
             nextExecTime=None, **kwargs):
         if not nextExecTime:
-            nextExecTime = (datetime.now() + timedelta(days=intervalValue+1)).strftime("%y-%m-%d 00:00")
+            nextExecTime = (datetime.now() + timedelta(days=intervalValue + 1)).strftime("%y-%m-%d 00:00")
         add_kwargs = flatten_signature_kwargs(self.add, locals())
         return super().add(**add_kwargs)
 

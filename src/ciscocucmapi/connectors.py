@@ -13,7 +13,6 @@ from zeep.plugins import HistoryPlugin
 from zeep.transports import Transport
 
 from .api import *
-from .definitions import WSDL_URLS
 from .model import axl_factory
 
 
