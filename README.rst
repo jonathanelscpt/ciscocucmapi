@@ -240,8 +240,7 @@ Note, to combine the coverage data from all the tox environments run:
 Donate
 ======
 
-If this library has helped you, or if you would like to support future development,
-donations are most welcome:
+If this library has helped you, or if you would like to support future development, donations are most welcome:
 
 ==============  ==========================================
 Cryptocurrency  Address
