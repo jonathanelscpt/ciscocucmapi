@@ -205,7 +205,7 @@ AXL for prior versions, please raise a GitHub issue and I will address this.
 Supported Languages and AXL Versions
 ====================================
 
-- Currently only Python 3.6 is supported.   Python 2.7 not planned for support in the short-term.
+- Currently only Python 3.6+ is supported.   There are no plans to support Python 2.7.
 - All AXL versions *should* be supported, however only 11.5 has been currently tested.  All AXL data models include
   static metadata on mandatory params for :code:`add` calls.  It  is not expected that these should change across AXL
   schema versions.  Please raise a defect if you encounter any issues.
