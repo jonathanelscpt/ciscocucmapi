@@ -183,7 +183,8 @@ releases.  By default, unless an AXL version is specified, the :code:`current` W
 
 Due to the strictness of :code:`python-zeep`'s WSDL and .xsd parsing, numerous AXL defects have been encountered during
 development and testing.  As a result, the packaged WSDL and .xsd files *may* include patches to mitigate defects
-where applicable.  Known AXL defects which have resulted in patches are catalogued in AXL_DEFECTS.md.
+where applicable.  Known AXL defects which have resulted in patches are catalogued in
+:doc:`AXL_DEFECTS.rst`.
 
 If you require a more up-to-date WSDL, or are uncomfortable with using a patched schema, all :code:`UCSOAPConnector`
 accept a direct path to a local WSDL file as input.
