@@ -22,10 +22,12 @@ except ImportError:
         def emit(self, record):
             pass
 
+
+__version__ = '0.0.0'
+
+
 # Initialize Package Logging
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-__all__ = (
-    UCMAXLConnector,
-)
+__all__ = (UCMAXLConnector,)
