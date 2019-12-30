@@ -59,7 +59,7 @@ Python Wrappers for Cisco CUCM SOAP APIs
 Features
 ========
 
-The ciscocucmapi package is inspired by the most excellent `ciscosparkapi <https://github.com/CiscoDevNet/ciscosparkapi>`__
+The ciscocucmapi package is inspired by the most excellent `webexteamssdk <https://github.com/CiscoDevNet/webexteamssdk>`__
 Python API wrapper for Cisco Spark.  The library wraps a `python-zeep <https://github.com/mvantellingen/python-zeep>`__
 client to manage CUCM SOAP connections (specifically for AXL) and CRUD operations for common API endpoints.
 
@@ -130,7 +130,7 @@ Quick Start
 
     # listing phones by name
     nyc_bot_attrs = {
-        "name": "SEP%",
+        "name": "BOT%",
         "devicePoolName": "US_NYC%",
         "callingSearchSpaceName": "US_%"
     }
