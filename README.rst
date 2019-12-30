@@ -93,9 +93,7 @@ You can also install the in-development version with::
 Documentation
 =============
 
-
 https://ciscocucmapi.readthedocs.io/
-
 
 
 Quick Start
@@ -125,7 +123,8 @@ Quick Start
 
     # getting existing phones with null-string dicts or lists of `returnedTags`
     dead_device = axl.phone.get(name="SEPDEADDEADDEAD",
-                                returnedTags={"name": "", "devicePoolName": "", "callingSearchSpaceName": ""})
+                                returnedTags={"name": "", "devicePoolName": "",
+                                              "callingSearchSpaceName": ""})
     beefy_device = axl.phone.get(name="SEPBEEFBEEFBEEF",
                                  returnedTags=["name", "devicePoolName", "callingSearchSpaceName"])
 
@@ -137,7 +136,8 @@ Quick Start
     }
     nyc_bot_devices = axl.phone.list(searchCriteria=nyc_bot_attrs,
                                      returnedTags=["name", "description", "lines"])
-    # implicit "return all" available for `searchCriteria` and `returnedTags` - use sparingly for large data sets!
+    # implicit "return all" available for `searchCriteria` and `returnedTags`
+    # use sparingly for large data sets!
     all_devices = axl.phone.list()
 
     # property-like getters and setters
@@ -167,7 +167,6 @@ Quick Start
 Connector Environment Variables
 ===============================
 
-
  The following env vars are supported for ease of use:
 
  - :code:`AXL_USERNAME`
@@ -178,7 +177,6 @@ Connector Environment Variables
 
 AXL WSDL
 ========
-
 
 The package includes the AXL wsdl for ease of use.  The schema will be updated regularly to match the latest CUCM
 releases.  By default, unless an AXL version is specified, the :code:`current` WSDL will be used.
@@ -194,7 +192,6 @@ accept a direct path to a local WSDL file as input.
 API Endpoint Support
 ====================
 
-
 Not all API Endpoints are supported, as API and data models are required to mitigate inconsistencies in the
 AXL API.  If you'd like to extend API support, please create a pull request, or raise a GitHub issue and I'll add
 an enhancement.
@@ -207,12 +204,11 @@ AXL for prior versions, please raise a GitHub issue and I will address this.
 Supported Languages and AXL Versions
 ====================================
 
-
- - Currently only Python 3.6 is supported.   Python 2.7 not planned for support in the short-term.
- - All AXL versions *should* be supported, however only 11.5 has been currently tested.  All AXL data models include
-static metadata on mandatory params for :code:`add` calls.  It  is not expected that these should change across AXL
-schema versions.  Please raise a defect if you encounter any issues.
- - Other API methods should contain reliable schema-driven metadata and attributes.
+- Currently only Python 3.6 is supported.   Python 2.7 not planned for support in the short-term.
+- All AXL versions *should* be supported, however only 11.5 has been currently tested.  All AXL data models include
+  static metadata on mandatory params for :code:`add` calls.  It  is not expected that these should change across AXL
+  schema versions.  Please raise a defect if you encounter any issues.
+- Other API methods should contain reliable schema-driven metadata and attributes.
 
 
 Development
@@ -256,7 +252,6 @@ Cryptocurrency  Address
 
 Support
 =======
-
 
 I'm open to discussing ad-hoc commercial support or custom DevOps implementations. Please contact me at
 jonathanelscpt@gmail.com for more information. Note that asking questions or reporting bugs via this e-mail address
