@@ -245,8 +245,8 @@ donations are most welcome:
 ==============  ==========================================
 Cryptocurrency  Address
 ==============  ==========================================
- **BTC**        3EFVaakujecqhEmNkah5Q5gkpNbyy251os
- **ETH**        0xb44b637e99b32b9f12ba9430ff823cabb3ca7db5
+ **BTC**        38c7QWggrB2HLUJZFmhAC2zh4t8C57c1ec
+ **ETH**        0x01eD3b58a07c6d005281Db76e6c1AE2bfF2226AD
 ==============  ==========================================
 
 
