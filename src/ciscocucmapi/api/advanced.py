@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CUCM AXL Advanced APIs."""
 
 from operator import methodcaller

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CUCM System Configuration APIs."""
 
 from datetime import datetime, timedelta

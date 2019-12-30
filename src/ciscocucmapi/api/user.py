@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CUCM AXL User APIs."""
 
 from collections import defaultdict

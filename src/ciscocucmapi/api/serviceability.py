@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CUCM Serviceability APIs provided via AXL"""
 
 from zeep.helpers import serialize_object

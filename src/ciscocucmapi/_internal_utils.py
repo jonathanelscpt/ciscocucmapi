@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Package helper functions and classes."""
 
 from inspect import signature

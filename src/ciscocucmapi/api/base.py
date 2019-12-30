@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Base AXL APIs"""
 
 from operator import methodcaller

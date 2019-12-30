@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """python-zeep client wrappers for Cisco UC SOAP APIs"""
 
 import os

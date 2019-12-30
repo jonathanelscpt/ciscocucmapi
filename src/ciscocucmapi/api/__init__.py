@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from .base import ThinAXLAPI, Device
 from .device import *
 from .user import *

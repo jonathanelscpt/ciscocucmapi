@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CUCM Media Configuration APIs."""
 
 from .base import DeviceAXLAPI, SimpleAXLAPI

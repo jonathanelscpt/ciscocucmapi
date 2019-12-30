@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CUCM AXL Device APIs."""
 
 from zeep.exceptions import Fault

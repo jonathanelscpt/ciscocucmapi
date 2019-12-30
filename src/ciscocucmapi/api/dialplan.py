@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """CUCM Dial Plan Configuration APIs."""
 
 from zeep.helpers import serialize_object

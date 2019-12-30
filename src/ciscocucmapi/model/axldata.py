@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Cisco UC AXL Generic Data Model"""
 
 from collections.abc import MutableMapping

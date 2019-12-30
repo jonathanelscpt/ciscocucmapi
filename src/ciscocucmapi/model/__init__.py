@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """AXL Data Model Classes"""
 
 from collections import defaultdict
