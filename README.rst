@@ -23,7 +23,7 @@ Cisco CUCM API
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/jonathanelscpt/ciscocucmapi
 
-.. |codecov| image:: https://codecov.io/github/jonathanelscpt/ciscocucmapi/coverage.svg?branch=master
+.. |codecov| image:: https://codecov.io/gh/jonathanelscpt/ciscocucmapi/branch/master/graphs/badge.svg?branch=master
     :alt: Coverage Status
     :target: https://codecov.io/github/jonathanelscpt/ciscocucmapi
 
