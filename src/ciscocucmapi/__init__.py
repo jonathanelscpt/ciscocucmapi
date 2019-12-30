@@ -21,7 +21,7 @@ except ImportError:
             pass
 
 
-__version__ = '0.0.0'
+__version__ = '0.0.1'
 
 
 # Initialize Package Logging
