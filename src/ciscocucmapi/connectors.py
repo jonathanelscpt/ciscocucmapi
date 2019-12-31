@@ -91,9 +91,8 @@ class UCSOAPConnector(object):
         if binding_name and address:
             self._service = self._client.create_service(binding_name, address)
         elif binding_name or address:
-            raise TypeError(
-                message="Incomplete parameters for ServiceProxy Object creation.  "
-                        "Requires 'binding_name' and 'address'")
+            raise ValueError("Incomplete parameters for ServiceProxy Object creation.  "
+                             "Requires 'binding_name' and 'address'")
         self.model_factory = self._client.type_factory('ns0')
 
     @property
