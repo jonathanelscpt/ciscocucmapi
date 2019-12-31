@@ -108,12 +108,12 @@ Quick Start
     axl = UCMAXLConnector()  # env vars for connection params
 
     # adding phones
-    bot_device_attributes = {
+    ipphone_attributes = {
         "name": "SEPDEADDEADDEAD",
         "product": "Cisco 8821",
         "devicePoolName": "US_NYC_DP",
     }
-    axl.phone.add(**bot_device_attributes)
+    axl.phone.add(**ipphone_attributes)
 
     # api endpoints can be created prior to invoking axl method-calling for pre-processing
     new_bot_device = axl.phone.create()
