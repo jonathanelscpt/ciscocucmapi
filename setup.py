@@ -22,7 +22,7 @@ def read(*names, **kwargs):
 
 setup(
     name="ciscocucmapi",
-    version='0.0.1',
+    version='0.0.2',
     license="MIT",
     description="Python Wrappers for Cisco CUCM SOAP APIs",
     long_description='%s\n%s' % (
