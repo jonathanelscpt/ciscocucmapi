@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-from uctoolkit import UCMAXLConnector
+from ciscocucmapi import UCMAXLConnector
 
 # explicit auth credentials
 USERNAME = 'administrator'
