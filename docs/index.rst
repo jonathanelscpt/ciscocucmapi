@@ -8,7 +8,10 @@ Contents
    readme
    installation
    usage
+   env
+   axl
    reference/index
+   development
    contributing
    authors
    changelog
