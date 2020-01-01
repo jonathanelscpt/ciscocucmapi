@@ -41,6 +41,15 @@ script:
 after_failure:
   - more .tox/log/* | cat
   - more .tox/*/log/* | cat
+deploy:
+  provider: pypi
+  user: "__token__"
+  password:
+      secure: "twv2mfwd/SHXEfL5xNUvUDvg7WPKg6Uq2JLTSucq1XKvlolWP5vvZQYn1+dy5x7vFni4iX51sbObfjCUQokU+h6t6STInZ2kGYmnJLyiP7tQxowO+rbKmiFvkM5Qyof2dnd7cJ4U/Qgx9cPY5qBNHy7Ng5ixvHjrSiR08ugssPjiT30QUYxgx4jFEgPGMFe4PCvSY6AB/4q84EZTOBZRcgtJh8n2uzctqftqoWwh5vAhiKIhJUAsoOfrCeb27XbCfFfYQDBbpPCy6TLlCB/ORrISje/a6FpT6yHkN+AyppzWcD4O0gciREdF/KI3JgcodN5y2zUYK6wzbIMVgmta7T+/pCuZ7ojB3Nn08yP69e3MPvk79qTRDDoRE42Vkg1kT9bORks1BaxOzfCCSoB794gAvSKc5ae2YvMoXzKhWiDiY5VGG2MVmt8dnJlSeRlBltsUtxlq0DwMRaoNxGzFG61R/c512lYQxtczE18zcPvgfkrN2WTZTt4ZHa2DOPU04Y8CXROCNNa9cp0n0cAxx/x8+PuLwmEpSysnalxoj+CeN3LgoPy79Zh9nSEZOY0leE2f7vp7grYAD07aou2tYAvbh6s31aaWtm0dc+yjpBeiZEVGvo5jjm4vMMO5gtjm44M4DADZP0M8GcVeyfv/wxcKYPgWiZtFthWYygxo3Z8="
+  on:
+      tags: true
+  distributions: "sdist bdist_wheel"
+  skip_existing: true
 notifications:
   email:
     on_success: always
