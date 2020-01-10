@@ -2,7 +2,6 @@
 AXL Support
 ===========
 
-.. inclusion-marker-do-not-remove
 
 WSDL
 ========

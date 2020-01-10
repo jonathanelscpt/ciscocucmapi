@@ -2,7 +2,6 @@
 Environment Variables
 =====================
 
-.. inclusion-marker-do-not-remove
 
  The following env vars are supported for ease of use:
 
