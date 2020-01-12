@@ -75,8 +75,5 @@ setup(
         # ':python_version=="2.6"': ['argparse'],
     },
     entry_points={
-        'console_scripts': [
-            'ciscocucmapi = ciscocucmapi.cli:main',
-        ]
     },
 )
