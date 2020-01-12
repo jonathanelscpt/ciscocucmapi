@@ -6227,23 +6227,17 @@
 	<message name="restartEnterpriseParametersOut">
 		<part element="xsd1:restartEnterpriseParametersResponse" name="axlParams"/>
 	</message>
-	<message name="doSmartLicenseRegisterIn">
-		<part element="xsd1:doSmartLicenseRegister" name="axlParams"/>
+	<message name="listAuthzKeysIn">
+		<part element="xsd1:listAuthzKeys" name="axlParams"/>
 	</message>
-	<message name="doSmartLicenseRegisterOut">
-		<part element="xsd1:doSmartLicenseRegisterResponse" name="axlParams"/>
+	<message name="listAuthzKeysOut">
+		<part element="xsd1:listAuthzKeysResponse" name="axlParams"/>
 	</message>
-	<message name="doSmartLicenseReRegisterIn">
-		<part element="xsd1:doSmartLicenseReRegister" name="axlParams"/>
+	<message name="getAuthzKeyIn">
+		<part element="xsd1:getAuthzKey" name="axlParams"/>
 	</message>
-	<message name="doSmartLicenseReRegisterOut">
-		<part element="xsd1:doSmartLicenseReRegisterResponse" name="axlParams"/>
-	</message>
-	<message name="doSmartLicenseDeRegisterIn">
-		<part element="xsd1:doSmartLicenseDeRegister" name="axlParams"/>
-	</message>
-	<message name="doSmartLicenseDeRegisterOut">
-		<part element="xsd1:doSmartLicenseDeRegisterResponse" name="axlParams"/>
+	<message name="getAuthzKeyOut">
+		<part element="xsd1:getAuthzKeyResponse" name="axlParams"/>
 	</message>
 	
 	<portType name="AXLPort">
@@ -11422,19 +11416,14 @@
 			<output message="s0:restartEnterpriseParametersOut"/>
 			<fault name="fault" message="s0:AXLError"/>
 		</operation>
-		<operation name="doSmartLicenseRegister">
-			<input message="s0:doSmartLicenseRegisterIn"/>
-			<output message="s0:doSmartLicenseRegisterOut"/>
+		<operation name="listAuthzKeys">
+			<input message="s0:listAuthzKeysIn"/>
+			<output message="s0:listAuthzKeysOut"/>
 			<fault name="fault" message="s0:AXLError"/>
 		</operation>
-		<operation name="doSmartLicenseReRegister">
-			<input message="s0:doSmartLicenseReRegisterIn"/>
-			<output message="s0:doSmartLicenseReRegisterOut"/>
-			<fault name="fault" message="s0:AXLError"/>
-		</operation>
-		<operation name="doSmartLicenseDeRegister">
-			<input message="s0:doSmartLicenseDeRegisterIn"/>
-			<output message="s0:doSmartLicenseDeRegisterOut"/>
+		<operation name="getAuthzKey">
+			<input message="s0:getAuthzKeyIn"/>
+			<output message="s0:getAuthzKeyOut"/>
 			<fault name="fault" message="s0:AXLError"/>
 		</operation>
 	</portType>
@@ -23861,8 +23850,8 @@
 				<soap:fault name="fault" use="literal"/>
 			</fault>
 		</operation>
-		<operation name="doSmartLicenseRegister">
-			<soap:operation soapAction="CUCM:DB ver=12.0 doSmartLicenseRegister" style="document"/>
+		<operation name="listAuthzKeys">
+			<soap:operation soapAction="CUCM:DB ver=12.0 listAuthzKeys" style="document"/>
 			<input>
 				<soap:body use="literal"/>
 			</input>
@@ -23873,20 +23862,8 @@
 				<soap:fault name="fault" use="literal"/>
 			</fault>
 		</operation>
-		<operation name="doSmartLicenseReRegister">
-			<soap:operation soapAction="CUCM:DB ver=12.0 doSmartLicenseReRegister" style="document"/>
-			<input>
-				<soap:body use="literal"/>
-			</input>
-			<output>
-				<soap:body use="literal"/>
-			</output>
-			<fault name="fault">
-				<soap:fault name="fault" use="literal"/>
-			</fault>
-		</operation>
-		<operation name="doSmartLicenseDeRegister">
-			<soap:operation soapAction="CUCM:DB ver=12.0 doSmartLicenseDeRegister" style="document"/>
+		<operation name="getAuthzKey">
+			<soap:operation soapAction="CUCM:DB ver=12.0 getAuthzKey" style="document"/>
 			<input>
 				<soap:body use="literal"/>
 			</input>

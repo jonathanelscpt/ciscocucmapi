@@ -386,7 +386,6 @@
 			<xsd:enumeration value="Lithuania"/>
 			<xsd:enumeration value="Latvia"/>
 			<xsd:enumeration value="Estonia"/>
-			<xsd:enumeration value="Ukraine"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="XCredential">
@@ -1179,16 +1178,10 @@
 			<xsd:enumeration value="Cisco Spark Remote Device"/>
 			<xsd:enumeration value="Cisco TelePresence DX80"/>
 			<xsd:enumeration value="Cisco TelePresence DX70"/>
-			<xsd:enumeration value="Cisco 7832"/>
 			<xsd:enumeration value="Cisco 8865NR"/>
 			<xsd:enumeration value="Cisco Meeting Server"/>
 			<xsd:enumeration value="Cisco Spark Room Kit"/>
-			<xsd:enumeration value="Cisco Spark Room 55"/>
 			<xsd:enumeration value="Cisco Spark Room Kit Plus"/>
-			<xsd:enumeration value="CP-8800-Video 28-Button Key Expansion Module"/>
-			<xsd:enumeration value="CP-8800-Audio 28-Button Key Expansion Module"/>
-			<xsd:enumeration value="Cisco 8832"/>
-			<xsd:enumeration value="Cisco 8832NR"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="XMonthOfYear">
@@ -1732,16 +1725,10 @@
 			<xsd:enumeration value="Cisco Spark Remote Device"/>
 			<xsd:enumeration value="Cisco TelePresence DX80"/>
 			<xsd:enumeration value="Cisco TelePresence DX70"/>
-			<xsd:enumeration value="Cisco 7832"/>
 			<xsd:enumeration value="Cisco 8865NR"/>
 			<xsd:enumeration value="Cisco Meeting Server"/>
 			<xsd:enumeration value="Cisco Spark Room Kit"/>
-			<xsd:enumeration value="Cisco Spark Room 55"/>
 			<xsd:enumeration value="Cisco Spark Room Kit Plus"/>
-			<xsd:enumeration value="CP-8800-Audio 28-Button Key Expansion Module"/>
-			<xsd:enumeration value="CP-8800-Video 28-Button Key Expansion Module"/>
-			<xsd:enumeration value="Cisco 8832"/>
-			<xsd:enumeration value="Cisco 8832NR"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="XProtocolSide">
@@ -1989,8 +1976,6 @@
 			<xsd:enumeration value="Cisco Certificate Change Notification Service"/>
 			<xsd:enumeration value="Cisco Wireless Controller Synchronization Service"/>
 			<xsd:enumeration value="Cisco Smart License Manager"/>
-			<xsd:enumeration value="Cisco Upgrade Agent Service"/>
-			<xsd:enumeration value="Cisco Management Agent Service"/>
 			<xsd:enumeration value="Cisco Push Notification Service"/>
 		</xsd:restriction>
 	</xsd:simpleType>
@@ -2010,7 +1995,6 @@
 			<xsd:enumeration value="Platform Services"/>
 			<xsd:enumeration value="IM and Presence Services"/>
 			<xsd:enumeration value="Location based Tracking Services"/>
-			<xsd:enumeration value="Cloud based Management Services"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="XSilenceSuppressionThreshold">
